@@ -18,6 +18,7 @@ export const contenedoresEn: ContenedoresDict = {
       invite: 'Invite user',
       edit: 'Edit container',
       updateSubscription: 'Update subscription',
+      transfer: 'Transfer container',
       delete: 'Delete container',
       leave: 'Leave company',
       closeSupport: 'Close support',
@@ -62,7 +63,7 @@ export const contenedoresEn: ContenedoresDict = {
     expired: {
       badge: 'Expired',
       ownerCta: 'Renew subscription',
-      memberLocked: 'Only the owner can renew',
+      memberLocked: 'Only the owner or an admin can renew',
     },
     estado: {
       creando: 'Creating…',
@@ -79,6 +80,7 @@ export const contenedoresEn: ContenedoresDict = {
     lastConnection: 'Last connection',
     roles: {
       propietario: 'Owner',
+      administrador: 'Admin',
       miembro: 'Member',
       soporte: 'Support',
     },
@@ -186,6 +188,31 @@ export const contenedoresEn: ContenedoresDict = {
       },
     },
   },
+  transfer: {
+    title: 'Transfer container',
+    subtitle: 'Hand ownership over to another member.',
+    warning:
+      'You will no longer own {nombre} and will stay on as an admin. Only the new owner will be able to delete it or transfer it again. Invitations you sent that are still pending will be cancelled.',
+    memberLabel: 'New owner',
+    memberPlaceholder: 'Choose a member',
+    searchPlaceholder: 'Search by name or email',
+    empty: 'No one to transfer to: invite someone to the company first.',
+    passwordLabel: 'Your password',
+    passwordPlaceholder: 'Confirm with your password',
+    validation: {
+      memberRequired: 'Choose who to transfer the company to.',
+      passwordRequired: 'Enter your password to confirm.',
+    },
+    genericError: 'Could not transfer the container. Try again.',
+    loadError: 'Could not load the members. Try again.',
+    retry: 'Retry',
+    submit: 'Transfer',
+    cancel: 'Cancel',
+    success: {
+      title: 'Container transferred',
+      desc: '{nombre} is now the owner. You stayed on as an admin.',
+    },
+  },
   delete: {
     title: 'Delete container',
     subtitle: 'This action is permanent and cannot be undone.',
@@ -235,6 +262,8 @@ export const contenedoresEn: ContenedoresDict = {
       you: 'you',
       roles: {
         propietario: 'Owner',
+        administrador: 'Admin',
+        soporte: 'Support',
         miembro: 'Member',
       },
       removeAria: 'Remove member',

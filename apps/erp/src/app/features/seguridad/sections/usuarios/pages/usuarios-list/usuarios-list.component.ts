@@ -11,7 +11,6 @@ import {
   TenantService,
   ToastService,
   normalizeHttpError,
-  type ContenedorMember,
   type FilterCondition,
   extractErrorMessage,
 } from '@reddoc/core';
@@ -38,6 +37,7 @@ import {
   noEsPropietario,
 } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
+import type { UsuarioFila } from '../../usuarios.utils';
 
 /**
  * Usuarios con acceso al contenedor activo.
@@ -92,7 +92,7 @@ export class UsuariosListComponent {
   protected readonly primaryAction = SEGURIDAD_USUARIOS_PRIMARY_ACTION;
   protected readonly trailingActions = SEGURIDAD_USUARIOS_TRAILING_ACTIONS;
 
-  private readonly members = signal<readonly ContenedorMember[]>([]);
+  private readonly members = signal<readonly UsuarioFila[]>([]);
   /** Última petición disparada; las respuestas que no la traen se ignoran. */
   private lastRequestId = 0;
   /** Motivo del 403 del backend, o `null` si hay acceso. */
@@ -102,7 +102,7 @@ export class UsuariosListComponent {
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
   protected readonly searchValue = signal('');
-  protected readonly selectedRows = signal<readonly ContenedorMember[]>([]);
+  protected readonly selectedRows = signal<readonly UsuarioFila[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(SEGURIDAD_USUARIOS_FILTERS_STORAGE_KEY),
   );
@@ -128,7 +128,7 @@ export class UsuariosListComponent {
 
   protected readonly totalCount = computed(() => this.members().length);
 
-  protected readonly pageItems = computed<readonly ContenedorMember[]>(() => {
+  protected readonly pageItems = computed<readonly UsuarioFila[]>(() => {
     const start = this.currentPage() * this.pageSize();
     return this.members().slice(start, start + this.pageSize());
   });
@@ -197,11 +197,11 @@ export class UsuariosListComponent {
   }
 
   protected onSelectionChange(rows: unknown[]): void {
-    this.selectedRows.set(rows as ContenedorMember[]);
+    this.selectedRows.set(rows as UsuarioFila[]);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    const usuario = event.row as ContenedorMember;
+    const usuario = event.row as UsuarioFila;
     switch (event.actionId) {
       case 'view':
         this.verDetalle(usuario);
@@ -223,7 +223,7 @@ export class UsuariosListComponent {
 
   // ── Interno ───────────────────────────────────────────────────────────────
 
-  private verDetalle(usuario: ContenedorMember): void {
+  private verDetalle(usuario: UsuarioFila): void {
     // Respaldo del predicado de la tabla: el propietario no tiene detalle.
     if (usuario.propietario) return;
     const slug = this.tenant.currentSlug();
@@ -231,7 +231,7 @@ export class UsuariosListComponent {
     void this.router.navigate(['/t', slug, ...SEGURIDAD_USUARIOS_PATH, 'detalle', usuario.id]);
   }
 
-  private confirmRemove(usuarios: readonly ContenedorMember[]): void {
+  private confirmRemove(usuarios: readonly UsuarioFila[]): void {
     if (usuarios.length === 0) return;
     const dict = this.t().seguridad.usuarios;
     this.confirmation.confirm({

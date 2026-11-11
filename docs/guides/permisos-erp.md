@@ -14,7 +14,7 @@ no) la pantalla, y al final **la receta** para sumar un recurso.
 > **Los módulos ya no salen del plan (`acceso_*`) sino de los grupos de la membresía.**
 > `readModuleAccessFlags` traduce `grupos` con `GRUPO_ACCESO` (1 Venta, 2 Compra,
 > 3 Tesorería, 4 Cartera, 5 Inventario, 6 Humano, 7 Contabilidad, 8 Turno) a las mismas
-> flags que leen los descriptores y el guard del POS. Propietario, superusuario y soporte
+> flags que leen los descriptores y el guard del POS. Propietario, administrador y soporte
 > entran a todo. Donde abajo dice "plan del tenant", léase "grupos del usuario".
 
 ---

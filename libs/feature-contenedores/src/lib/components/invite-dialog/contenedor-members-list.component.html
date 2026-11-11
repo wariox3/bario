@@ -90,9 +90,12 @@
               </div>
             } @else {
               <span
-                class="shrink-0 rounded-full border px-2 py-[0.1rem] text-[0.65rem] font-semibold leading-none"
+                class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-[0.1rem] text-[0.65rem] font-semibold leading-none"
                 [ngClass]="pillClass(member)"
               >
+                @if (roleIcon(member); as icono) {
+                  <i [class]="icono + ' text-[0.6rem]'" aria-hidden="true"></i>
+                }
                 {{ roleLabel(member) }}
               </span>
 

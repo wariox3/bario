@@ -16,6 +16,7 @@ const TURNOS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   edit: true,
   invite: true,
   delete: true,
+  transfer: true,
   leave: true,
   subscription: true,
   viewToggle: true,

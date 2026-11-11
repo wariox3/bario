@@ -30,7 +30,7 @@ const MEMBRESIA = {
   cliente_id: 13,
   propietario: false,
   soporte: false,
-  is_superuser: false,
+  administrador: false,
   // Contabilidad (7), no Venta (1).
   grupos: [7],
 };

@@ -42,7 +42,20 @@ export const GRUPO_ACCESO: ReadonlyMap<number, ContenedorAccesoId> = new Map([
 
 /** El contenedor activo, o lo mínimo de él que decide los accesos. */
 type AccesoDeMembresia = Pick<ContenedorAccess, 'grupos' | 'propietario'> &
-  Partial<Pick<ContenedorAccess, 'soporte' | 'is_superuser'>>;
+  Partial<Pick<ContenedorAccess, 'soporte' | 'administrador'>>;
+
+/**
+ * ¿El usuario administra la empresa? Propietario o administrador: invitan,
+ * editan la empresa, gestionan la suscripción y entran a Seguridad y Mi
+ * empresa. Eliminar y transferir siguen siendo solo del propietario.
+ *
+ * Soporte no cuenta: entra a todos los módulos para ayudar, no a administrar.
+ */
+export function administraContenedor(
+  contenedor: Pick<ContenedorAccess, 'propietario' | 'administrador'> | null | undefined,
+): boolean {
+  return contenedor?.propietario === true || contenedor?.administrador === true;
+}
 
 /**
  * Accesos del usuario en el contenedor activo, como nombres de flag
@@ -57,14 +70,14 @@ type AccesoDeMembresia = Pick<ContenedorAccess, 'grupos' | 'propietario'> &
  * `null` significa **sin restricción**:
  *  - sin contenedor en memoria (todavía no se validó; los guards de acceso
  *    corren después de `tenantAccessGuard`);
- *  - propietario, superusuario o membresía de soporte: no se les cierra ningún
+ *  - propietario, administrador o membresía de soporte: no se les cierra ningún
  *    módulo de su propia empresa, ni al staff que entra a ayudar.
  */
 export function readModuleAccessFlags(
   contenedor: AccesoDeMembresia | null,
 ): ReadonlySet<AccesoFlagName> | null {
   if (contenedor === null) return null;
-  if (contenedor.propietario || contenedor.is_superuser || contenedor.soporte) return null;
+  if (administraContenedor(contenedor) || contenedor.soporte) return null;
 
   const flags = new Set<AccesoFlagName>();
   for (const grupo of contenedor.grupos) {

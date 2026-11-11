@@ -20,6 +20,7 @@ import { Menu, MenuModule } from 'primeng/menu';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {
+  administraContenedor,
   AUTH_SERVICE,
   Contenedor,
   ContenedorDetalle,
@@ -36,6 +37,7 @@ import { SaludoComponent } from '@reddoc/ui';
 import { isSuscripcionExpired } from '../../utils/contenedor-suscripcion.utils';
 import { ContenedoresCreateDialogComponent } from '../../components/create-dialog/contenedores-create-dialog.component';
 import { ContenedoresDeleteDialogComponent } from '../../components/delete-dialog/contenedores-delete-dialog.component';
+import { ContenedoresTransferDialogComponent } from '../../components/transfer-dialog/contenedores-transfer-dialog.component';
 import { ContenedoresInviteDialogComponent } from '../../components/invite-dialog/contenedores-invite-dialog.component';
 import { ContenedoresSupportDialogComponent } from '../../components/support-dialog/contenedores-support-dialog.component';
 import { ContenedorRowItemComponent } from '../../components/contenedor-row-item/contenedor-row-item.component';
@@ -62,6 +64,7 @@ interface EstadoConsultado {
   imports: [
     ContenedoresCreateDialogComponent,
     ContenedoresDeleteDialogComponent,
+    ContenedoresTransferDialogComponent,
     ContenedoresInviteDialogComponent,
     ContenedoresSupportDialogComponent,
     ContenedorRowItemComponent,
@@ -97,25 +100,33 @@ export class ContenedoresListComponent {
    */
   readonly capabilities = input<ContenedoresCapabilities>(CONTENEDORES_CAPABILITIES_FULL);
 
-  /** Lo que el propietario puede hacer desde el menú: administrar la empresa. */
-  private readonly hasOwnerActions = computed(() => {
+  /**
+   * Lo que propietario y administrador hacen desde el menú: administrar la
+   * empresa. Eliminar va aparte porque es solo del propietario.
+   */
+  private readonly hasAdminActions = computed(() => {
     const caps = this.capabilities();
-    return caps.invite || caps.edit || caps.subscription || caps.delete;
+    return caps.invite || caps.edit || caps.subscription;
   });
 
   /**
    * El menú de fila solo se dibuja si alguna empresa puede tener acciones.
    * Reserva la columna del engranaje en todas las filas aunque una no tenga nada.
    */
-  readonly hasRowActions = computed(() => this.hasOwnerActions() || this.capabilities().leave);
+  readonly hasRowActions = computed(() => {
+    const caps = this.capabilities();
+    return this.hasAdminActions() || caps.transfer || caps.delete || caps.leave;
+  });
 
   readonly showCreate = signal(false);
   readonly showEdit = signal(false);
   readonly showDelete = signal(false);
+  readonly showTransfer = signal(false);
   readonly showInvite = signal(false);
   readonly showSupport = signal(false);
   readonly contenedorToEdit = signal<ContenedorDetalle | null>(null);
   readonly contenedorToDelete = signal<Contenedor | null>(null);
+  readonly contenedorToTransfer = signal<Contenedor | null>(null);
   readonly contenedorToInvite = signal<Contenedor | null>(null);
 
   readonly viewMode = signal<'list' | 'grid'>('list');
@@ -307,7 +318,7 @@ export class ContenedoresListComponent {
     if (item.estado !== 'listo') return;
     // Soporte entra aunque la suscripción esté vencida: el backend se lo permite.
     if (isSuscripcionExpired(item.suscripcion_fecha_fin) && !item.soporte) {
-      if (item.propietario) this.renewContenedor(item.suscripcion_id);
+      if (administraContenedor(item)) this.renewContenedor(item.suscripcion_id);
       return;
     }
     // Registra la última conexión sin esperarla: entrar no depende de ese dato.
@@ -327,15 +338,22 @@ export class ContenedoresListComponent {
     window.open(`${base}${path}`, '_blank', 'noopener');
   }
 
-  /** Mismo menú para los dos roles; cambia el contenido: el propietario administra, el miembro sale. */
+  /**
+   * Mismo menú para todos los roles; cambia el contenido: propietario y
+   * administrador administran (solo el propietario elimina), el resto sale.
+   */
   hasActionsFor(item: Contenedor): boolean {
-    return item.propietario ? this.hasOwnerActions() : this.capabilities().leave;
+    return this.rowMenuItemsFor(item).length > 0;
   }
 
   openRowMenu(event: Event, item: Contenedor): void {
     event.stopPropagation();
-    this.rowMenuItems = item.propietario ? this.ownerMenuItems(item) : this.memberMenuItems(item);
+    this.rowMenuItems = this.rowMenuItemsFor(item);
     this.rowMenu.toggle(event);
+  }
+
+  private rowMenuItemsFor(item: Contenedor): MenuItem[] {
+    return administraContenedor(item) ? this.adminMenuItems(item) : this.memberMenuItems(item);
   }
 
   private memberMenuItems(item: Contenedor): MenuItem[] {
@@ -345,13 +363,13 @@ export class ContenedoresListComponent {
       {
         label: item.soporte ? labels.closeSupport : labels.leave,
         icon: 'pi pi-sign-out',
-        styleClass: 'cl-row-menu__danger',
+        styleClass: 'lib-data-table__menu-item--danger',
         command: () => this.confirmLeave(item),
       },
     ];
   }
 
-  private ownerMenuItems(item: Contenedor): MenuItem[] {
+  private adminMenuItems(item: Contenedor): MenuItem[] {
     const caps = this.capabilities();
     const labels = this.t().contenedores.list.actions;
     const items: MenuItem[] = [];
@@ -379,14 +397,12 @@ export class ContenedoresListComponent {
         command: () => this.renewContenedor(item.suscripcion_id),
       });
     }
-    if (caps.delete) {
+    // Transferir y eliminar son solo del propietario; el administrador, que no
+    // es dueño, puede salir.
+    const cierre = item.propietario ? this.ownerOnlyMenuItems(item) : this.memberMenuItems(item);
+    if (cierre.length) {
       if (items.length) items.push({ separator: true });
-      items.push({
-        label: labels.delete,
-        icon: 'pi pi-trash',
-        styleClass: 'cl-row-menu__danger',
-        command: () => this.deleteContenedor(item),
-      });
+      items.push(...cierre);
     }
     return items;
   }
@@ -467,6 +483,42 @@ export class ContenedoresListComponent {
   onContenedorUpdated(): void {
     this.showEdit.set(false);
     this.contenedorToEdit.set(null);
+    this.reload$.next();
+  }
+
+  /** Transferir (arriba) y eliminar: lo que el administrador no puede hacer. */
+  private ownerOnlyMenuItems(item: Contenedor): MenuItem[] {
+    const caps = this.capabilities();
+    const labels = this.t().contenedores.list.actions;
+    const items: MenuItem[] = [];
+    // Un contenedor que no se pudo crear no tiene a quién transferirse.
+    if (caps.transfer && item.estado !== 'error') {
+      items.push({
+        label: labels.transfer,
+        icon: 'pi pi-arrow-right-arrow-left',
+        command: () => this.transferContenedor(item),
+      });
+    }
+    if (caps.delete) {
+      items.push({
+        label: labels.delete,
+        icon: 'pi pi-trash',
+        styleClass: 'lib-data-table__menu-item--danger',
+        command: () => this.deleteContenedor(item),
+      });
+    }
+    return items;
+  }
+
+  transferContenedor(item: Contenedor): void {
+    this.contenedorToTransfer.set(item);
+    this.showTransfer.set(true);
+  }
+
+  /** Quien transfirió pasa a administrador: la lista se recarga con su nuevo rol. */
+  onContenedorTransferred(): void {
+    this.showTransfer.set(false);
+    this.contenedorToTransfer.set(null);
     this.reload$.next();
   }
 

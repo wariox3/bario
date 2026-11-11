@@ -1,19 +1,25 @@
 import type { PaginatedResponse } from '../../models/pagination.model';
 
 /**
- * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`).
+ * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`,
+ * serializer `SegUsuarioCliente`).
  *
- * El miembro **no tiene rol**: desde 2026-08-07 el backend cambió `rol_id`/
- * `rol_nombre` por la bandera `propietario` y sumó las flags `acceso_*` de esa
- * persona, que son las mismas que se otorgan al invitar (`SendInviteRequest`).
+ * La relación con la empresa sale de tres banderas: `propietario`,
+ * `administrador` (todo lo del propietario salvo eliminar y transferir) y
+ * `soporte` (staff que entró a ayudar). Ninguna = miembro. Los módulos salen de
+ * `grupos`.
  */
-export interface ContenedorMember extends ContenedorAccesoFlags {
-  id: number;
-  usuario_id: number;
-  usuario_nombre_corto: string | null;
-  usuario_email: string;
-  cliente_id: number;
-  propietario: boolean;
+export interface ContenedorMember {
+  readonly id: number;
+  readonly usuario_id: number;
+  readonly usuario_nombre_corto: string | null;
+  readonly usuario_email: string;
+  readonly cliente_id: number;
+  readonly propietario: boolean;
+  readonly administrador: boolean;
+  readonly soporte: boolean;
+  /** Ids de los grupos de la membresía (ver `GRUPO_ACCESO`). */
+  readonly grupos: readonly number[];
 }
 
 export type ContenedorMembersResponse = PaginatedResponse<ContenedorMember>;
@@ -232,15 +238,16 @@ export interface Contenedor extends ContenedorAccesoFlags {
   suscripcion_frecuencia?: 'P' | 'M' | 'A';
   suscripcion_suscripcion_tipo_nombre?: string;
   /**
-   * ¿El usuario es el propietario de esta empresa?
-   *
-   * Reemplaza al par `rol_id`/`rol_nombre` que mandaba antes
-   * `/contenedor/cliente/lista-usuario/`: a nivel contenedor la única distinción
-   * que hace el backend es propietario o no. Los tres roles (propietario /
-   * administrador / usuario) siguen existiendo pero **por membresía**, en
-   * `ContenedorMember.rol_id`, que es otro endpoint.
+   * ¿El usuario es el propietario de esta empresa? Es el único que puede
+   * eliminarla o transferirla.
    */
   propietario: boolean;
+  /**
+   * ¿El usuario administra esta empresa? Puede todo lo del propietario salvo
+   * eliminarla o transferirla (ver `administraContenedor`). Opcional: un
+   * despliegue que no lo mande se lee como `false`.
+   */
+  readonly administrador?: boolean;
   /**
    * ¿La membresía es de soporte? La abre el staff con
    * `POST /contenedor/cliente/{id}/soporte/`, sin invitación: entra con todos
@@ -248,8 +255,6 @@ export interface Contenedor extends ContenedorAccesoFlags {
    * de la empresa. Opcional: un despliegue que no lo mande se lee como `false`.
    */
   soporte?: boolean;
-  /** Superusuario de la plataforma: entra a todos los módulos. */
-  readonly is_superuser?: boolean;
   /** Grupos de la membresía: deciden a qué módulos entra (ver `GRUPO_ACCESO`). */
   readonly grupos: readonly number[];
 }
@@ -276,12 +281,24 @@ export interface MembresiaContenedor {
   readonly cliente_id: number;
   /** El schema no lo marca requerido: ausente se lee como `false`. */
   readonly propietario?: boolean;
+  /** Ausente se lee como `false`. */
+  readonly administrador?: boolean;
   readonly soporte: boolean;
-  readonly is_superuser: boolean;
   /** Ids de los grupos de la membresía. */
   readonly grupos: readonly number[];
   readonly cliente_nombre?: string | null;
   readonly cliente_imagen_thumbnail?: string | null;
+}
+
+/**
+ * Cuerpo de `POST /contenedor/cliente/{id}/transferir/` (sin `X-Tenant`).
+ *
+ * `usuario_cliente` es el id de la **membresía** del destino (una fila de
+ * `transferible/`), no el del usuario. La clave es la del propietario actual.
+ */
+export interface TransferirContenedorRequest {
+  readonly usuario_cliente: number;
+  readonly password: string;
 }
 
 /**

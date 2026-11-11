@@ -19,6 +19,7 @@ const POS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   edit: false,
   invite: false,
   delete: false,
+  transfer: false,
   leave: true,
   subscription: false,
   viewToggle: true,

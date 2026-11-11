@@ -19,6 +19,8 @@
 export type {
   BooleanTone,
   CellTone,
+  EnumBadge,
+  EnumBadgeTone,
   ColumnDef,
   ColumnValueType,
   ColumnAlignment,

@@ -22,6 +22,7 @@ import {
   toFiniteNumber,
   type ColumnDef,
   type ColumnPart,
+  type EnumBadge,
   type SortSpec,
 } from '@reddoc/core';
 import type { PageChangeEvent, RowAction, RowActionInvokedEvent } from './data-table.types';
@@ -160,6 +161,12 @@ export class DataTableComponent {
   protected readValue(row: unknown, field: string): unknown {
     if (row === null || typeof row !== 'object') return null;
     return (row as Record<string, unknown>)[field];
+  }
+
+  /** Badge que `enumBadges` le da al valor de la celda, o `null` si va como texto. */
+  protected enumBadge(row: unknown, col: ColumnDef): EnumBadge | null {
+    if (!col.enumBadges) return null;
+    return col.enumBadges[String(this.readValue(row, col.field))] ?? null;
   }
 
   /**

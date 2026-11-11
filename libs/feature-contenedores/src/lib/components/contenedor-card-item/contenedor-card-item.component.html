@@ -86,6 +86,13 @@
           <i class="pi pi-crown text-[0.6rem]" aria-hidden="true"></i>
           {{ ownerLabel() }}
         </span>
+      } @else if (isAdmin()) {
+        <span
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border bg-sky-50 text-sky-700 border-sky-200"
+        >
+          <i class="pi pi-shield text-[0.6rem]" aria-hidden="true"></i>
+          {{ adminLabel() }}
+        </span>
       } @else if (isSoporte()) {
         <span
           class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border border-dashed border-slate-400 text-slate-600"
@@ -149,7 +156,7 @@
         {{ errorLabel() }}
       </span>
     } @else if (isExpired() && !isSoporte()) {
-      @if (isOwner() && canRenew()) {
+      @if (administra() && canRenew()) {
         <span class="cl-card__cta cl-card__cta--renew">
           {{ renewLabel() }}
           <i class="pi pi-external-link" aria-hidden="true"></i>

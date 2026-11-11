@@ -1,4 +1,5 @@
 import type {
+  ContenedorMember,
   FilterCondition,
   ParamValue,
   PermisoCatalogoFiltros,
@@ -128,3 +129,28 @@ export function agruparPermisos(permisos: readonly PermisoSeguridad[]): readonly
     modelos: [...modelos].map(([modelo, fila]) => ({ modelo, ...fila })),
   }));
 }
+
+/** Relación de la persona con la empresa; una sola por fila. */
+export type RolMiembro = 'propietario' | 'administrador' | 'soporte' | 'miembro';
+
+/** Fila del listado: el miembro más su rol, que la columna «Rol» pinta. */
+export interface UsuarioFila extends ContenedorMember {
+  readonly rol: RolMiembro;
+}
+
+/**
+ * Rol que se muestra, de las tres banderas del backend. Propietario gana a todo
+ * (una transferencia a un administrador puede dejar ambas en `true`); soporte va
+ * antes que miembro porque no lo invitaron: entró a ayudar.
+ */
+export function rolDeMiembro(miembro: ContenedorMember): RolMiembro {
+  if (miembro.propietario) return 'propietario';
+  if (miembro.administrador) return 'administrador';
+  if (miembro.soporte) return 'soporte';
+  return 'miembro';
+}
+
+export const conRol = (miembro: ContenedorMember): UsuarioFila => ({
+  ...miembro,
+  rol: rolDeMiembro(miembro),
+});

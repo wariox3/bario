@@ -22,6 +22,7 @@ export interface ContenedoresDict {
       invite: string;
       edit: string;
       updateSubscription: string;
+      transfer: string;
       delete: string;
       leave: string;
       /** «Salir» de una membresía de soporte. */
@@ -74,11 +75,12 @@ export interface ContenedoresDict {
       ready: { title: string; desc: string };
       failed: { title: string; desc: string };
     };
-    /** Pill de la tarjeta/fila: el backend solo distingue propietario o no. */
     /** Antecede a la recencia: «Última conexión hace 3 horas». */
     lastConnection: string;
+    /** Pill de la tarjeta/fila: una sola relación por empresa. */
     roles: {
       propietario: string;
+      administrador: string;
       miembro: string;
       soporte: string;
     };
@@ -178,6 +180,28 @@ export interface ContenedoresDict {
       };
     };
   };
+  transfer: {
+    title: string;
+    subtitle: string;
+    /** Lo que pasa al transferir; `{nombre}` es la empresa. */
+    warning: string;
+    memberLabel: string;
+    memberPlaceholder: string;
+    searchPlaceholder: string;
+    /** Bajo el selector, cuando nadie puede recibir la propiedad. */
+    empty: string;
+    passwordLabel: string;
+    passwordPlaceholder: string;
+    validation: { memberRequired: string; passwordRequired: string };
+    /** Cuando el backend no manda `detail`. */
+    genericError: string;
+    loadError: string;
+    retry: string;
+    submit: string;
+    cancel: string;
+    /** `{nombre}` es el nuevo propietario. */
+    success: { title: string; desc: string };
+  };
   delete: {
     title: string;
     subtitle: string;
@@ -216,6 +240,8 @@ export interface ContenedoresDict {
       you: string;
       roles: {
         propietario: string;
+        administrador: string;
+        soporte: string;
         miembro: string;
       };
       removeAria: string;

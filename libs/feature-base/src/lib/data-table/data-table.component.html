@@ -177,11 +177,20 @@
     @case ('enum') {
       <!-- Sin valor no hay clave que traducir: la celda queda vacía, no `prefijo.null` -->
       @if (hasValue(row, col.field)) {
-        {{
+        @let enumLabel =
           col.enumKeyPrefix
             ? translate(col.enumKeyPrefix + '.' + readValue(row, col.field))
-            : readValue(row, col.field)
-        }}
+            : readValue(row, col.field);
+        @if (enumBadge(row, col); as badge) {
+          <span class="lib-data-table__enum-badge lib-data-table__enum-badge--{{ badge.tone }}">
+            @if (badge.icon) {
+              <i [class]="badge.icon" aria-hidden="true"></i>
+            }
+            {{ enumLabel }}
+          </span>
+        } @else {
+          {{ enumLabel }}
+        }
       }
     }
     @case ('currency') {

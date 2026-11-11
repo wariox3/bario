@@ -22,6 +22,7 @@ import {
   PermisoCatalogoFiltros,
   PermisoSeguridad,
   SendInviteRequest,
+  TransferirContenedorRequest,
   UserSearchResult,
   UsuarioClienteGrupo,
   UsuarioClientePermiso,
@@ -126,7 +127,7 @@ export class ContenedorService extends BaseHttpService {
   }
 
   /**
-   * Hace al staff miembro del contenedor como soporte (`is_superuser` y todos los
+   * Hace al staff miembro del contenedor como soporte (con todos los
    * accesos), sin invitación. Solo staff con MFA activo (403 si no); 409 si el
    * contenedor no está `listo` o ya es miembro. Responde la membresía con la
    * forma de `lista-usuario`. No vence: se cierra saliendo de la empresa.
@@ -294,6 +295,61 @@ export class ContenedorService extends BaseHttpService {
    */
   removeMember(membershipId: number, opts?: RequestOptions): Observable<unknown> {
     return this.delete(`/seguridad/usuario-cliente/${membershipId}/`, opts);
+  }
+
+  /**
+   * Marca o desmarca administrador a una membresía. Lo puede el propietario o un
+   * administrador; nunca sobre el propietario ni sobre una membresía de soporte
+   * (400 con `detail`). Responde la membresía actualizada.
+   */
+  setAdministrador(
+    membershipId: number,
+    administrador: boolean,
+    opts?: RequestOptions,
+  ): Observable<MembresiaContenedor> {
+    return this.post<MembresiaContenedor>(
+      `/seguridad/usuario-cliente/${membershipId}/administrador/`,
+      { administrador },
+      undefined,
+      opts,
+    );
+  }
+
+  /**
+   * Membresías que pueden recibir la propiedad del contenedor: todas menos la del
+   * propietario y las de soporte (los administradores sí salen). Solo responde al
+   * propietario; a cualquier otro, 404.
+   *
+   * El endpoint no declara búsqueda: se trae todo y el modal filtra en memoria.
+   */
+  getTransferibles(clienteId: number): Observable<readonly MembresiaContenedor[]> {
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<MembresiaContenedor>>('/seguridad/usuario-cliente/transferible/', {
+        cliente_id: clienteId,
+        page,
+      }),
+    );
+  }
+
+  /**
+   * Pasa la propiedad a otro miembro. El destino queda `propietario` y quien
+   * transfiere, como `administrador`; se borran las invitaciones pendientes que
+   * había enviado. No pide aceptación del destino.
+   *
+   * 400 con `detail` si la clave es incorrecta o la membresía no sirve; `opts`
+   * deja que el modal apague el toast del interceptor y lo avise en línea.
+   */
+  transferir(
+    clienteId: number,
+    payload: TransferirContenedorRequest,
+    opts?: RequestOptions,
+  ): Observable<ContenedorDetalle> {
+    return this.post<ContenedorDetalle>(
+      `/contenedor/cliente/${clienteId}/transferir/`,
+      payload,
+      undefined,
+      opts,
+    );
   }
 
   /**

@@ -69,7 +69,7 @@ describe('tenantAccessGuard', () => {
       cliente_id: 8,
       propietario: true,
       soporte: false,
-      is_superuser: false,
+      administrador: false,
       grupos: [1, 7],
       cliente_nombre: 'Acme',
     });
