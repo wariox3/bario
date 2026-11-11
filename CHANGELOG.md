@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.26](https://github.com/wariox3/bario/compare/v0.1.25...v0.1.26) (2026-11-11)
+
+### Features
+
+- **contenedores:** rol administrador y transferir la propiedad ([71d13f7](https://github.com/wariox3/bario/commit/71d13f7fc946b4a8e3857a3e98dc9875a2c4bc40))
+- **contenedores:** rol de cada miembro en el diálogo de invitar ([87deb55](https://github.com/wariox3/bario/commit/87deb55f40a5d6a4ebd08aa527f688f8d86be592))
+- **seguridad:** rol y administrador en los usuarios del contenedor ([efcb298](https://github.com/wariox3/bario/commit/efcb298813e198ae87d35a9a13b663a7e59516b3))
+
 ## [0.1.25](https://github.com/wariox3/bario/compare/v0.1.24...v0.1.25) (2026-11-10)
 
 ### Features
