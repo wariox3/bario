@@ -262,6 +262,8 @@ export const contenedoresEn: ContenedoresDict = {
       you: 'you',
       roles: {
         propietario: 'Owner',
+        administrador: 'Admin',
+        soporte: 'Support',
         miembro: 'Member',
       },
       removeAria: 'Remove member',

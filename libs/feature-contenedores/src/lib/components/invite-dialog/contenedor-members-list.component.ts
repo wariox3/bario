@@ -22,6 +22,30 @@ import {
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
+type RolMiembro = 'propietario' | 'administrador' | 'soporte' | 'miembro';
+
+/** Una sola relación por persona; propietario gana a todo, soporte a miembro. */
+const rolDe = (member: ContenedorMember): RolMiembro => {
+  if (member.propietario) return 'propietario';
+  if (member.administrador) return 'administrador';
+  if (member.soporte) return 'soporte';
+  return 'miembro';
+};
+
+const ORDEN_ROL: readonly RolMiembro[] = ['propietario', 'administrador', 'miembro', 'soporte'];
+const rangoDeRol = (rol: RolMiembro): number => ORDEN_ROL.indexOf(rol);
+
+/**
+ * Pill de la relación con la empresa: los mismos tonos e íconos que la de la
+ * lista de contenedores y la columna «Rol» de Seguridad (ver system.md).
+ */
+const PILL_DE_ROL: Readonly<Record<RolMiembro, { clase: string; icono: string | null }>> = {
+  propietario: { clase: 'border-indigo-200 bg-indigo-50 text-indigo-700', icono: 'pi pi-crown' },
+  administrador: { clase: 'border-sky-200 bg-sky-50 text-sky-700', icono: 'pi pi-shield' },
+  soporte: { clase: 'border-dashed border-slate-400 text-slate-600', icono: 'pi pi-headphones' },
+  miembro: { clase: 'border-slate-200 bg-slate-50 text-slate-700', icono: null },
+};
+
 @Component({
   selector: 'lib-contenedor-members-list',
   standalone: true,
@@ -48,10 +72,10 @@ export class ContenedorMembersListComponent {
 
   readonly currentUserId = computed(() => this.authService.currentUser()?.id ?? null);
 
-  /** Propietario primero, después el resto por nombre. */
+  /** Propietario primero, luego administradores, después el resto por nombre. */
   readonly sortedMembers = computed(() =>
     [...this.members()].sort((a, b) => {
-      const r = Number(b.propietario) - Number(a.propietario);
+      const r = rangoDeRol(rolDe(a)) - rangoDeRol(rolDe(b));
       if (r !== 0) return r;
       return (a.usuario_nombre_corto ?? a.usuario_email).localeCompare(
         b.usuario_nombre_corto ?? b.usuario_email,
@@ -81,29 +105,32 @@ export class ContenedorMembersListComponent {
     return !member.propietario && !this.isYou(member);
   }
 
-  /**
-   * Etiqueta de la pill. El backend ya no manda nombre de rol: a nivel
-   * contenedor solo dice si la persona es la propietaria.
-   */
+  /** Etiqueta de la pill, de las banderas propietario / administrador / soporte. */
   roleLabel(member: ContenedorMember): string {
-    const roles = this.t().contenedores.invite.members.roles;
-    return member.propietario ? roles.propietario : roles.miembro;
+    return this.t().contenedores.invite.members.roles[rolDe(member)];
+  }
+
+  roleIcon(member: ContenedorMember): string | null {
+    return PILL_DE_ROL[rolDe(member)].icono;
   }
 
   monogramClass(member: ContenedorMember): string {
-    return member.propietario
-      ? 'bg-amber-100 text-amber-800'
-      : 'bg-[rgba(20,48,73,0.06)] text-brand-navy';
+    switch (rolDe(member)) {
+      case 'propietario':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'administrador':
+        return 'bg-sky-100 text-sky-800';
+      default:
+        return 'bg-[rgba(20,48,73,0.06)] text-brand-navy';
+    }
   }
 
   rowClass(member: ContenedorMember): string {
-    return member.propietario ? 'bg-amber-50/40' : '';
+    return member.propietario ? 'bg-indigo-50/40' : '';
   }
 
   pillClass(member: ContenedorMember): string {
-    return member.propietario
-      ? 'bg-amber-50 text-amber-700 border-amber-200'
-      : 'bg-slate-50 text-slate-700 border-slate-200';
+    return PILL_DE_ROL[rolDe(member)].clase;
   }
 
   requestRemove(member: ContenedorMember): void {

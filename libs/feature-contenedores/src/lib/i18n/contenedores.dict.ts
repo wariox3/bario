@@ -240,6 +240,8 @@ export interface ContenedoresDict {
       you: string;
       roles: {
         propietario: string;
+        administrador: string;
+        soporte: string;
         miembro: string;
       };
       removeAria: string;

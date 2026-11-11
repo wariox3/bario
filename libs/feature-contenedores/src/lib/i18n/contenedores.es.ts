@@ -277,6 +277,8 @@ export const contenedoresEs: ContenedoresDict = {
       you: 'tú',
       roles: {
         propietario: 'Propietario',
+        administrador: 'Administrador',
+        soporte: 'Soporte',
         miembro: 'Miembro',
       },
       removeAria: 'Quitar miembro',
