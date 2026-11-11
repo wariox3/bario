@@ -13,8 +13,10 @@ export interface ContenedoresCapabilities {
   readonly edit: boolean;
   /** Invitar miembros y gestionar los existentes. */
   readonly invite: boolean;
-  /** Eliminar la empresa. */
+  /** Eliminar la empresa. Solo el propietario. */
   readonly delete: boolean;
+  /** Transferir la propiedad a otro miembro. Solo el propietario. */
+  readonly transfer: boolean;
   /** Salir de una empresa de la que se es miembro (no propietario). */
   readonly leave: boolean;
   /** Saltar a la app de cuenta para renovar o cambiar el plan. */
@@ -38,6 +40,7 @@ export const CONTENEDORES_CAPABILITIES_FULL: ContenedoresCapabilities = {
   edit: true,
   invite: true,
   delete: true,
+  transfer: true,
   leave: true,
   subscription: true,
   viewToggle: true,

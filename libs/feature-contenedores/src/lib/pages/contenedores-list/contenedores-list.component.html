@@ -144,6 +144,7 @@
                     [memberLockedLabel]="t().contenedores.list.expired.memberLocked"
                     [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                     [ownerLabel]="t().contenedores.list.roles.propietario"
+                    [adminLabel]="t().contenedores.list.roles.administrador"
                     [memberLabel]="t().contenedores.list.roles.miembro"
                     [supportLabel]="t().contenedores.list.roles.soporte"
                     [creatingLabel]="
@@ -174,6 +175,7 @@
                   [memberLockedLabel]="t().contenedores.list.expired.memberLocked"
                   [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                   [ownerLabel]="t().contenedores.list.roles.propietario"
+                  [adminLabel]="t().contenedores.list.roles.administrador"
                   [memberLabel]="t().contenedores.list.roles.miembro"
                   [supportLabel]="t().contenedores.list.roles.soporte"
                   [creatingLabel]="
@@ -238,6 +240,17 @@
       (visibleChange)="showEdit.set($event)"
       (updated)="onContenedorUpdated()"
       (imagenChanged)="onContenedorImagenChanged()"
+    />
+  }
+}
+
+@defer (when showTransfer()) {
+  @if (showTransfer()) {
+    <lib-contenedores-transfer-dialog
+      [visible]="showTransfer()"
+      (visibleChange)="showTransfer.set($event)"
+      [contenedor]="contenedorToTransfer()"
+      (transferred)="onContenedorTransferred()"
     />
   }
 }

@@ -44,7 +44,7 @@ function nombrePorId(catalogo: readonly ErpSelectOption[], id: number | null | u
  *
  * Es lo que sale impreso en cada documento, por eso vive aparte de Configuración,
  * que guarda parámetros de operación (UVT, nómina, tipos de documento). Solo
- * entra el propietario del contenedor; el guard de la ruta lo sostiene y el
+ * entran el propietario y el administrador; el guard de la ruta lo sostiene y el
  * user-menu esconde la entrada al resto.
  */
 @Component({

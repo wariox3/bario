@@ -13,6 +13,7 @@ export {
   MODULE_ACCESS_PREFIX,
   GRUPO_ACCESO,
   readModuleAccessFlags,
+  administraContenedor,
   accesoFlag,
 } from './acceso/contenedor-acceso';
 export type { AccesoFlagName, ContenedorAccesoId } from './acceso/contenedor-acceso';
@@ -24,6 +25,7 @@ export type {
 export type {
   Contenedor,
   MembresiaContenedor,
+  TransferirContenedorRequest,
   ContenedorDetalle,
   ContenedorEstado,
   ContenedorEstadoResponse,

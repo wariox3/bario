@@ -3,6 +3,7 @@ import { Observable, map, of } from 'rxjs';
 import {
   TenantService,
   readModuleAccessFlags,
+  administraContenedor,
   type ModeloId,
   ModelPermissionsService,
   type PermissionAction,
@@ -26,9 +27,9 @@ const GRANTS_COMPLETOS = false;
  *     Sale de los grupos de la membresía (ver `GRUPO_ACCESO` en `@reddoc/core`).
  *  2. **¿Qué puede hacer este usuario?** — `can` / `canResolve`, sobre los
  *     modelos del backend (`ModelPermissionsService`).
- *  3. **¿Administra el contenedor?** — `isContenedorPropietario`, de la bandera
- *     `propietario` del contenedor activo.
- *     Gobierna la pantalla de Seguridad, no el trabajo operativo.
+ *  3. **¿Administra el contenedor?** — `isContenedorAdministrador`, de las
+ *     banderas `propietario` y `administrador` del contenedor activo.
+ *     Gobierna Seguridad y Mi empresa, no el trabajo operativo.
  *
  * Nada de esto es seguridad: es UX. El backend sigue siendo el que responde
  * 403. Acá solo evitamos ofrecer puertas que van a rebotar.
@@ -45,7 +46,7 @@ export class PermissionsService {
    * y cada descriptor declara cuál le corresponde. Un módulo sin `accessFlag`
    * (General) está siempre disponible: es la base, no se contrata aparte.
    *
-   * Propietario, superusuario y soporte no se restringen — ver
+   * Propietario, administrador y soporte no se restringen — ver
    * `readModuleAccessFlags`.
    */
   readonly enabledModuleIds = computed<ReadonlySet<string>>(() => {
@@ -122,22 +123,18 @@ export class PermissionsService {
   }
 
   /**
-   * ¿El usuario es el propietario del contenedor activo?
+   * ¿El usuario administra el contenedor activo? Propietario o administrador
+   * (ver `administraContenedor`).
    *
-   * Gobierna todo lo que sea administrar el contenedor en sí —hoy la pantalla de
-   * Seguridad— y no depende del backend: la bandera ya viaja en el contenedor
+   * Gobierna todo lo que sea administrar el contenedor en sí —Seguridad y Mi
+   * empresa— y no depende del backend: las banderas ya viajan en el contenedor
    * activo, que `tenantAccessGuard` repuebla antes de pintar (sobrevive reload
-   * duro).
-   *
-   * A nivel contenedor **solo hay propietario o no**: `/contenedor/cliente/lista-usuario/`
-   * dejó de mandar `rol_id`/`rol_nombre` y manda `propietario`. Antes también
-   * calificaba el rol "administrador"; ese rol sigue existiendo por membresía
-   * (`ContenedorMember.rol_id`) pero ya no dice quién administra la empresa.
+   * duro). Eliminar y transferir la empresa siguen siendo solo del propietario.
    *
    * Sin contenedor en memoria responde `false`: mejor esconder de más que
    * mostrar una pantalla de administración a quien no le toca.
    */
-  readonly isContenedorPropietario = computed<boolean>(
-    () => this.tenant.currentContenedor()?.propietario === true,
+  readonly isContenedorAdministrador = computed<boolean>(() =>
+    administraContenedor(this.tenant.currentContenedor()),
   );
 }

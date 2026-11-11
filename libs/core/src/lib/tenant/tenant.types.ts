@@ -24,8 +24,9 @@ export interface ContenedorAccess {
   readonly propietario: boolean;
   /** Grupos de la membresía; deciden los módulos (ver `GRUPO_ACCESO`). */
   readonly grupos: readonly number[];
+  /** Administra la empresa como el propietario, salvo eliminarla o transferirla. */
+  readonly administrador?: boolean;
   readonly soporte?: boolean;
-  readonly is_superuser?: boolean;
   /** Sin él, el header pinta el slug. */
   readonly cliente_nombre?: string | null;
   readonly activo?: boolean;

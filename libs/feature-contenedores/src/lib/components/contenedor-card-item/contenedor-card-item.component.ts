@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { Contenedor, getInitials } from '@reddoc/core';
+import { administraContenedor, Contenedor, getInitials } from '@reddoc/core';
 import {
   getSuscripcionExpiryLabel,
   getUltimaConexion,
@@ -20,9 +20,12 @@ export class ContenedorCardItemComponent {
   readonly menuLabel = input<string>('Opciones');
   readonly enterLabel = input<string>('Ingresar');
   readonly renewLabel = input<string>('Renovar suscripción');
-  readonly memberLockedLabel = input<string>('Pide al propietario que renueve la suscripción');
+  readonly memberLockedLabel = input<string>(
+    'Solo el propietario o un administrador pueden renovar',
+  );
   readonly expiredBadgeLabel = input<string>('Vencida');
   readonly ownerLabel = input<string>('Propietario');
+  readonly adminLabel = input<string>('Administrador');
   readonly memberLabel = input<string>('Miembro');
   readonly supportLabel = input<string>('Soporte');
   readonly creatingLabel = input<string>('Creando…');
@@ -36,7 +39,7 @@ export class ContenedorCardItemComponent {
    * capabilities de la app. Sin acciones, el engranaje guarda su ranura invisible.
    */
   readonly hasActions = input<boolean>(true);
-  /** Muestra el CTA de renovación al propietario con la suscripción vencida. */
+  /** Muestra el CTA de renovación a quien administra, con la suscripción vencida. */
   readonly canRenew = input<boolean>(true);
 
   readonly enter = output<void>();
@@ -60,6 +63,12 @@ export class ContenedorCardItemComponent {
 
   readonly isOwner = computed(() => this.contenedor().propietario);
 
+  /** Administrador sin ser dueño: lleva su propia pill. */
+  readonly isAdmin = computed(() => !this.isOwner() && this.contenedor().administrador === true);
+
+  /** Propietario o administrador: renueva la suscripción vencida. */
+  readonly administra = computed(() => administraContenedor(this.contenedor()));
+
   /** Membresía de soporte: entra aunque la suscripción esté vencida. */
   readonly isSoporte = computed(() => this.contenedor().soporte === true);
 
@@ -71,8 +80,8 @@ export class ContenedorCardItemComponent {
 
   readonly isError = computed(() => this.contenedor().estado === 'error');
 
-  /** Vencida y sin cómo entrar: ni la renueva (propietario) ni la salta (soporte). */
-  readonly isLocked = computed(() => this.isExpired() && !this.isOwner() && !this.isSoporte());
+  /** Vencida y sin cómo entrar: ni la renueva (quien administra) ni la salta (soporte). */
+  readonly isLocked = computed(() => this.isExpired() && !this.administra() && !this.isSoporte());
 
   /** Mientras se crea no hay acciones: el menú vuelve cuando termina (o falla). */
   readonly menuDisabled = computed(() => !this.hasActions() || this.isCreando());
@@ -81,7 +90,7 @@ export class ContenedorCardItemComponent {
     // Hasta estar `listo`, el backend responde 409 a cualquier petición del tenant.
     if (this.contenedor().estado !== 'listo') return;
     if (this.isExpired() && !this.isSoporte()) {
-      if (this.isOwner() && this.canRenew()) this.renew.emit();
+      if (this.administra() && this.canRenew()) this.renew.emit();
       return;
     }
     this.enter.emit();

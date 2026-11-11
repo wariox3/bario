@@ -1,0 +1,22 @@
+// El host solo envuelve al diálogo, que se pinta `fixed`: fuera del flujo no
+// pierde nada y deja de cobrar el `gap` del contenedor que lo declara.
+:host {
+  display: contents;
+}
+
+:host ::ng-deep .cp-transfer-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(19 38 60 / 0.04),
+    0 20px 60px rgba(19 38 60 / 0.14) !important;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+}

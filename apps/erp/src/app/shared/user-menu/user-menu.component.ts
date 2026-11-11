@@ -52,7 +52,7 @@ export class UserMenuComponent {
    * aplican los guards de esas rutas: el menú y la puerta tienen que decidir con
    * el mismo criterio.
    */
-  readonly canManageSecurity = this.permissions.isContenedorPropietario;
+  readonly canManageSecurity = this.permissions.isContenedorAdministrador;
 
   items: MenuItem[] = [];
 

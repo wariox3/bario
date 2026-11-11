@@ -18,6 +18,7 @@ export const contenedoresEs: ContenedoresDict = {
       invite: 'Invitar usuario',
       edit: 'Editar contenedor',
       updateSubscription: 'Actualizar suscripción',
+      transfer: 'Transferir contenedor',
       delete: 'Eliminar contenedor',
       leave: 'Salir de la empresa',
       closeSupport: 'Cerrar soporte',
@@ -62,7 +63,7 @@ export const contenedoresEs: ContenedoresDict = {
     expired: {
       badge: 'Vencida',
       ownerCta: 'Renovar suscripción',
-      memberLocked: 'Solo el propietario puede renovar',
+      memberLocked: 'Solo el propietario o un administrador pueden renovar',
     },
     estado: {
       creando: 'Creando…',
@@ -79,6 +80,7 @@ export const contenedoresEs: ContenedoresDict = {
     lastConnection: 'Última conexión',
     roles: {
       propietario: 'Propietario',
+      administrador: 'Administrador',
       miembro: 'Miembro',
       soporte: 'Soporte',
     },
@@ -193,6 +195,31 @@ export const contenedoresEs: ContenedoresDict = {
         upload: 'No se pudo subir la imagen. Intenta de nuevo.',
         remove: 'No se pudo quitar la imagen. Intenta de nuevo.',
       },
+    },
+  },
+  transfer: {
+    title: 'Transferir contenedor',
+    subtitle: 'Pasa la propiedad a otro miembro.',
+    warning:
+      'Dejarás de ser el propietario de {nombre} y quedarás como administrador. Solo el nuevo propietario podrá eliminarla o volver a transferirla. Las invitaciones que enviaste y siguen pendientes se cancelan.',
+    memberLabel: 'Nuevo propietario',
+    memberPlaceholder: 'Elige un miembro',
+    searchPlaceholder: 'Buscar por nombre o correo',
+    empty: 'No hay a quién transferir: invita a alguien a la empresa primero.',
+    passwordLabel: 'Tu contraseña',
+    passwordPlaceholder: 'Confirma con tu contraseña',
+    validation: {
+      memberRequired: 'Elige a quién transferir la empresa.',
+      passwordRequired: 'Escribe tu contraseña para confirmar.',
+    },
+    genericError: 'No se pudo transferir el contenedor. Intenta de nuevo.',
+    loadError: 'No se pudieron cargar los miembros. Intenta de nuevo.',
+    retry: 'Reintentar',
+    submit: 'Transferir',
+    cancel: 'Cancelar',
+    success: {
+      title: 'Contenedor transferido',
+      desc: '{nombre} es ahora el propietario. Tú quedaste como administrador.',
     },
   },
   delete: {

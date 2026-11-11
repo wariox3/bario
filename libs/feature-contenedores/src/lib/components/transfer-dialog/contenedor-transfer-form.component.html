@@ -1,0 +1,105 @@
+@let tr = t().contenedores.transfer;
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  class="flex flex-col gap-[1.1rem]"
+  novalidate
+>
+  <!-- Qué pasa al transferir -->
+  <div class="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-3">
+    <i
+      class="pi pi-exclamation-triangle mt-[1px] shrink-0 text-[0.95rem] text-amber-600"
+      aria-hidden="true"
+    ></i>
+    <p class="m-0 text-[0.78rem] leading-relaxed text-amber-800">{{ warning() }}</p>
+  </div>
+
+  <!-- Nuevo propietario -->
+  <div class="flex flex-col gap-1.5">
+    <label
+      for="transfer-miembro"
+      class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
+    >
+      {{ tr.memberLabel }}
+    </label>
+    <lib-api-select
+      inputId="transfer-miembro"
+      formControlName="usuario_cliente"
+      [catalogo]="candidatos()"
+      [displayWith]="etiqueta"
+      filterBy="nombre,usuario_email"
+      [filterThreshold]="1"
+      [filterPlaceholder]="tr.searchPlaceholder"
+      [placeholder]="tr.memberPlaceholder"
+      [invalid]="form.controls.usuario_cliente.invalid && form.controls.usuario_cliente.touched"
+    />
+    <lib-field-error
+      [control]="form.controls.usuario_cliente"
+      [messages]="{ required: tr.validation.memberRequired }"
+    />
+    @if (loadError()) {
+      <span class="flex items-center gap-2 text-[0.72rem] text-red-700">
+        {{ tr.loadError }}
+        <button
+          type="button"
+          class="font-semibold text-brand-navy underline underline-offset-2"
+          (click)="cargarCandidatos()"
+        >
+          {{ tr.retry }}
+        </button>
+      </span>
+    } @else if (sinCandidatos()) {
+      <span class="text-[0.72rem] text-brand-muted">{{ tr.empty }}</span>
+    }
+  </div>
+
+  <!-- Clave del propietario -->
+  <div class="flex flex-col gap-1.5">
+    <label
+      for="transfer-password"
+      class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
+    >
+      {{ tr.passwordLabel }}
+    </label>
+    <p-password
+      inputId="transfer-password"
+      formControlName="password"
+      fluid
+      [feedback]="false"
+      [toggleMask]="true"
+      [placeholder]="tr.passwordPlaceholder"
+      [invalid]="form.controls.password.invalid && form.controls.password.touched"
+      autocomplete="current-password"
+    />
+    <lib-field-error
+      [control]="form.controls.password"
+      [messages]="{ required: tr.validation.passwordRequired }"
+    />
+  </div>
+
+  @if (submitError(); as error) {
+    <div
+      class="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-3"
+      role="alert"
+    >
+      <i
+        class="pi pi-times-circle mt-[1px] shrink-0 text-[0.9rem] text-red-600"
+        aria-hidden="true"
+      ></i>
+      <p class="m-0 text-[0.78rem] leading-relaxed text-red-800">{{ error }}</p>
+    </div>
+  }
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="tr.cancel"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onCancel()"
+    />
+    <p-button type="submit" [label]="tr.submit" [loading]="isSaving()" [disabled]="isSaving()" />
+  </div>
+</form>
