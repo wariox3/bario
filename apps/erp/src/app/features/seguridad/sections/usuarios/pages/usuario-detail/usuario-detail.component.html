@@ -85,7 +85,41 @@
         </dt>
         <dd class="m-0 text-[0.88rem] text-brand-text">{{ u.usuario_id }}</dd>
       </div>
+      <div class="flex flex-col gap-1">
+        <dt class="text-[0.72rem] font-medium tracking-[0.06em] text-brand-muted uppercase">
+          {{ det.fields.rol }}
+        </dt>
+        <dd class="m-0 text-[0.88rem] text-brand-text">{{ dict.roles[u.rol] }}</dd>
+      </div>
     </dl>
+
+    <!-- Rol de administrador: soporte no se marca (el backend lo rechaza). -->
+    @if (!u.soporte) {
+      <div
+        class="flex flex-col gap-3 rounded-lg border border-[rgba(19,38,60,0.08)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex min-w-0 flex-col gap-0.5">
+          <span class="flex items-center gap-1.5 text-[0.85rem] font-semibold text-brand-navy">
+            <i class="pi pi-shield text-[0.8rem] text-sky-700" aria-hidden="true"></i>
+            {{ det.administrador.title }}
+          </span>
+          <span class="text-[0.75rem] leading-relaxed text-brand-muted">
+            {{ esYo() ? det.administrador.propio : det.administrador.desc }}
+          </span>
+        </div>
+        <p-button
+          type="button"
+          class="shrink-0"
+          [label]="u.administrador ? det.administrador.quitar : det.administrador.hacer"
+          [icon]="u.administrador ? 'pi pi-times' : 'pi pi-shield'"
+          [severity]="u.administrador ? 'danger' : undefined"
+          [outlined]="u.administrador"
+          [loading]="cambiandoAdmin()"
+          [disabled]="cambiandoAdmin() || esYo()"
+          (onClick)="onCambiarAdmin()"
+        />
+      </div>
+    }
 
     <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ det.accesoHint }}</p>
   </section>
@@ -138,3 +172,5 @@
     </div>
   </section>
 }
+
+<p-confirmDialog />

@@ -5582,9 +5582,15 @@ export interface AppDict
     menu: { usuarios: string };
     usuarios: {
       searchPlaceholder: string;
-      columns: { nombre: string; correo: string; propietario: string };
-      /** Labels de la columna booleana `propietario` (`booleanKeyPrefix`). */
-      propietarioBadge: { true: string; false: string };
+      columns: {
+        nombre: string;
+        correo: string;
+        rol: string;
+        propietario: string;
+        administrador: string;
+      };
+      /** Valores de la columna `rol` (`enumKeyPrefix`), derivada de las banderas. */
+      roles: { propietario: string; administrador: string; soporte: string; miembro: string };
       actions: { invitar: string };
       empty: { title: string; sub: string };
       invitar: {
@@ -5602,10 +5608,31 @@ export interface AppDict
       detalle: {
         eyebrow: string;
         tabs: { grupos: string; permisos: string };
-        fields: { usuarioId: string };
+        fields: { usuarioId: string; rol: string };
         accesoHint: string;
         notFound: { title: string; desc: string };
         propietario: { title: string; desc: string };
+        /** Marcar o desmarcar administrador desde la ficha. */
+        administrador: {
+          title: string;
+          desc: string;
+          hacer: string;
+          quitar: string;
+          /** Por qué no puede cambiarse a sí mismo. */
+          propio: string;
+          confirmar: {
+            hacerHeader: string;
+            hacerMessage: string;
+            quitarHeader: string;
+            quitarMessage: string;
+            cancel: string;
+          };
+          toasts: {
+            hecho: { title: string; desc: string };
+            quitado: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
         grupos: {
           count: { zero: string; one: string; other: string };
           completos: string;

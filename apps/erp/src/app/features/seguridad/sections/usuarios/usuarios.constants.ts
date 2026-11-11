@@ -36,10 +36,18 @@ export const SEGURIDAD_USUARIOS_COLUMNS: readonly ColumnDef[] = [
   },
   { field: 'usuario_email', headerKey: 'seguridad.usuarios.columns.correo', type: 'text' },
   {
-    field: 'propietario',
-    headerKey: 'seguridad.usuarios.columns.propietario',
-    type: 'boolean',
-    booleanKeyPrefix: 'seguridad.usuarios.propietarioBadge',
+    // Derivada en el front de propietario / administrador / soporte (ver `rolDeMiembro`).
+    field: 'rol',
+    headerKey: 'seguridad.usuarios.columns.rol',
+    type: 'enum',
+    enumKeyPrefix: 'seguridad.usuarios.roles',
+    // Los mismos colores e íconos que la pill de la lista de contenedores.
+    enumBadges: {
+      propietario: { tone: 'indigo', icon: 'pi pi-crown' },
+      administrador: { tone: 'sky', icon: 'pi pi-shield' },
+      soporte: { tone: 'outline', icon: 'pi pi-headphones' },
+      miembro: { tone: 'neutral' },
+    },
     width: '160px',
   },
 ];
@@ -59,6 +67,12 @@ export const SEGURIDAD_USUARIOS_FILTER_FIELDS: readonly FilterField[] = [
   {
     name: 'propietario',
     displayNameKey: 'seguridad.usuarios.columns.propietario',
+    type: 'boolean',
+  },
+  // SUPUESTO, como `propietario`: el backend filtra por el nombre de la respuesta.
+  {
+    name: 'administrador',
+    displayNameKey: 'seguridad.usuarios.columns.administrador',
     type: 'boolean',
   },
 ];

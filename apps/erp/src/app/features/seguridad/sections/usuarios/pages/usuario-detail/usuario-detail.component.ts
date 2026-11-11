@@ -10,15 +10,18 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from 'primeng/tabs';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import {
+  AUTH_SERVICE,
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   getInitials,
-  type ContenedorMember,
   type UsuarioClienteGrupo,
   type UsuarioClientePermiso,
 } from '@reddoc/core';
@@ -28,6 +31,7 @@ import { UsuarioGruposPanelComponent } from '../../components/usuario-grupos-pan
 import { UsuarioPermisosPanelComponent } from '../../components/usuario-permisos-panel/usuario-permisos-panel.component';
 import { SEGURIDAD_USUARIOS_PATH } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
+import { rolDeMiembro, type UsuarioFila } from '../../usuarios.utils';
 
 /**
  * Detalle de un usuario del contenedor.
@@ -47,6 +51,7 @@ import { SeguridadUsuariosService } from '../../usuarios.service';
   standalone: true,
   imports: [
     ButtonModule,
+    ConfirmDialogModule,
     TabsModule,
     BreadcrumbComponent,
     UsuarioGruposPanelComponent,
@@ -55,6 +60,7 @@ import { SeguridadUsuariosService } from '../../usuarios.service';
   templateUrl: './usuario-detail.component.html',
   styleUrl: './usuario-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService],
 })
 export class UsuarioDetailComponent {
   private readonly service = inject(SeguridadUsuariosService);
@@ -62,6 +68,8 @@ export class UsuarioDetailComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
+  private readonly auth = inject(AUTH_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -74,7 +82,9 @@ export class UsuarioDetailComponent {
   readonly tab = input<string>();
   protected readonly activeTab = computed(() => this.tab() || 'grupos');
 
-  protected readonly usuario = signal<ContenedorMember | null>(null);
+  protected readonly usuario = signal<UsuarioFila | null>(null);
+  /** Mientras viaja el cambio de administrador. */
+  protected readonly cambiandoAdmin = signal(false);
   protected readonly isLoading = signal(false);
   protected readonly notFound = signal(false);
 
@@ -90,6 +100,15 @@ export class UsuarioDetailComponent {
    * del detalle.
    */
   protected readonly esPropietario = computed(() => this.usuario()?.propietario === true);
+
+  /**
+   * ¿La ficha es la de quien la mira? Un administrador no se quita el rol a sí
+   * mismo desde acá: perdería en el acto la pantalla en la que está.
+   */
+  protected readonly esYo = computed(() => {
+    const me = this.auth.currentUser()?.id;
+    return me != null && this.usuario()?.usuario_id === me;
+  });
 
   /** Seguridad → Usuarios → <persona>. La hoja no lleva link (es esta página). */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -132,6 +151,49 @@ export class UsuarioDetailComponent {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...SEGURIDAD_USUARIOS_PATH]);
+  }
+
+  /** Confirma y marca o desmarca administrador según lo que la persona es hoy. */
+  protected onCambiarAdmin(): void {
+    const usuario = this.usuario();
+    if (!usuario || usuario.propietario || usuario.soporte || this.esYo()) return;
+
+    const textos = this.t().seguridad.usuarios.detalle.administrador;
+    const hacer = !usuario.administrador;
+    const nombre = usuario.usuario_nombre_corto || usuario.usuario_email;
+    const conNombre = (texto: string) => texto.replace('{nombre}', nombre);
+    this.confirmation.confirm({
+      header: conNombre(hacer ? textos.confirmar.hacerHeader : textos.confirmar.quitarHeader),
+      message: hacer ? textos.confirmar.hacerMessage : textos.confirmar.quitarMessage,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: hacer ? textos.hacer : textos.quitar,
+      rejectLabel: textos.confirmar.cancel,
+      // Dar el rol construye (navy); quitarlo retira acceso (rojo).
+      acceptButtonStyleClass: hacer ? undefined : 'p-button-danger',
+      accept: () => this.cambiarAdmin(usuario, hacer, nombre),
+    });
+  }
+
+  private cambiarAdmin(usuario: UsuarioFila, administrador: boolean, nombre: string): void {
+    const toasts = this.t().seguridad.usuarios.detalle.administrador.toasts;
+    this.cambiandoAdmin.set(true);
+    this.service
+      .setAdministrador(usuario.id, administrador)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cambiandoAdmin.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          const actualizado = { ...usuario, administrador };
+          this.usuario.set({ ...actualizado, rol: rolDeMiembro(actualizado) });
+          const aviso = administrador ? toasts.hecho : toasts.quitado;
+          this.toast.success(aviso.title, aviso.desc.replace('{nombre}', nombre));
+        },
+        error: (err: unknown) => {
+          this.toast.error(toasts.error.title, extractErrorMessage(err, toasts.error.desc));
+        },
+      });
   }
 
   private load(membershipId: number): void {

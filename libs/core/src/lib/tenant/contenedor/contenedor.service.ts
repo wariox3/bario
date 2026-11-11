@@ -298,6 +298,24 @@ export class ContenedorService extends BaseHttpService {
   }
 
   /**
+   * Marca o desmarca administrador a una membresía. Lo puede el propietario o un
+   * administrador; nunca sobre el propietario ni sobre una membresía de soporte
+   * (400 con `detail`). Responde la membresía actualizada.
+   */
+  setAdministrador(
+    membershipId: number,
+    administrador: boolean,
+    opts?: RequestOptions,
+  ): Observable<MembresiaContenedor> {
+    return this.post<MembresiaContenedor>(
+      `/seguridad/usuario-cliente/${membershipId}/administrador/`,
+      { administrador },
+      undefined,
+      opts,
+    );
+  }
+
+  /**
    * Membresías que pueden recibir la propiedad del contenedor: todas menos la del
    * propietario y las de soporte (los administradores sí salen). Solo responde al
    * propietario; a cualquier otro, 404.

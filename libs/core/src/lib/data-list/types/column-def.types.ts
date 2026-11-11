@@ -53,6 +53,20 @@ export type BooleanTone = 'positive' | 'negative';
  */
 export type CellTone = 'positive' | 'critical' | 'pending';
 
+/**
+ * Color del badge de un valor `enum` (`ColumnDef.enumBadges`). `positive` y
+ * `adverse` son los del badge booleano; `indigo`, `sky` y `neutral` sirven para
+ * categorías sin juicio de valor; `outline` (punteado, sin fondo) para lo que
+ * está pero no es «de la casa», como una membresía de soporte.
+ */
+export type EnumBadgeTone = 'positive' | 'adverse' | 'neutral' | 'indigo' | 'sky' | 'outline';
+
+/** Badge de un valor `enum`: su tono y, si suma, un ícono (`'pi pi-crown'`). */
+export interface EnumBadge {
+  readonly tone: EnumBadgeTone;
+  readonly icon?: string;
+}
+
 export interface ColumnDef {
   /** Nombre del campo en el row (acceso por `row[field]`). */
   readonly field: string;
@@ -71,6 +85,12 @@ export interface ColumnDef {
    * El valor final se busca como `${enumKeyPrefix}.${row[field]}`.
    */
   readonly enumKeyPrefix?: string;
+  /**
+   * Para `type === 'enum'`: pinta el valor como badge, con el tono que el mapa
+   * le da a cada valor crudo (`row[field]`). Un valor que no esté en el mapa
+   * queda como texto, igual que sin `enumBadges`.
+   */
+  readonly enumBadges?: Readonly<Record<string, EnumBadge>>;
   /**
    * Para `type === 'boolean'`: prefijo i18n para resolver los labels de
    * verdadero y falso. Default: `'common.boolean'`.

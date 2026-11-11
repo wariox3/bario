@@ -1,19 +1,25 @@
 import type { PaginatedResponse } from '../../models/pagination.model';
 
 /**
- * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`).
+ * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`,
+ * serializer `SegUsuarioCliente`).
  *
- * El miembro **no tiene rol**: desde 2026-08-07 el backend cambió `rol_id`/
- * `rol_nombre` por la bandera `propietario` y sumó las flags `acceso_*` de esa
- * persona, que son las mismas que se otorgan al invitar (`SendInviteRequest`).
+ * La relación con la empresa sale de tres banderas: `propietario`,
+ * `administrador` (todo lo del propietario salvo eliminar y transferir) y
+ * `soporte` (staff que entró a ayudar). Ninguna = miembro. Los módulos salen de
+ * `grupos`.
  */
-export interface ContenedorMember extends ContenedorAccesoFlags {
-  id: number;
-  usuario_id: number;
-  usuario_nombre_corto: string | null;
-  usuario_email: string;
-  cliente_id: number;
-  propietario: boolean;
+export interface ContenedorMember {
+  readonly id: number;
+  readonly usuario_id: number;
+  readonly usuario_nombre_corto: string | null;
+  readonly usuario_email: string;
+  readonly cliente_id: number;
+  readonly propietario: boolean;
+  readonly administrador: boolean;
+  readonly soporte: boolean;
+  /** Ids de los grupos de la membresía (ver `GRUPO_ACCESO`). */
+  readonly grupos: readonly number[];
 }
 
 export type ContenedorMembersResponse = PaginatedResponse<ContenedorMember>;

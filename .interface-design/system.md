@@ -683,6 +683,9 @@ miente: a soporte no lo invitaron).
 - **Comportamiento:** soporte entra aunque la suscripción esté vencida (`isLocked` excluye
   soporte), y en el menú «Salir de la empresa» pasa a «Cerrar soporte», con una confirmación que
   no promete «el propietario tendrá que invitarte»: el staff puede volver a abrirlo solo.
+- **Administrador** va en sky + `pi-shield`, entre propietario y miembro. La columna «Rol» de
+  Seguridad › Usuarios (ERP) repite los mismos tonos e íconos con `ColumnDef.enumBadges` de
+  `<lib-data-table>`: la relación con la empresa se lee igual en las dos pantallas.
 
 ## Regla: confirmación con una sola acción con color
 

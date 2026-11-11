@@ -5,7 +5,6 @@ import {
   FileDownloadService,
   TenantService,
   buildFiltros,
-  type ContenedorMember,
   type FilterCondition,
   type GrupoSeguridad,
   type PaginatedResponse,
@@ -17,7 +16,12 @@ import {
 } from '@reddoc/core';
 import { ContenedorNoResueltoError } from '../../seguridad.errors';
 import { SEGURIDAD_USUARIOS_EXPORT_URL } from './usuarios.constants';
-import { permisoCatalogoKey, usuariosQueryParams } from './usuarios.utils';
+import {
+  conRol,
+  permisoCatalogoKey,
+  usuariosQueryParams,
+  type UsuarioFila,
+} from './usuarios.utils';
 
 /**
  * Operaciones sobre los usuarios del contenedor activo.
@@ -50,10 +54,7 @@ export class SeguridadUsuariosService {
    * en el backend** (viajan como query params). Sin contenedor todavía, lista
    * vacía.
    */
-  list(
-    search = '',
-    filtros: readonly FilterCondition[] = [],
-  ): Observable<readonly ContenedorMember[]> {
+  list(search = '', filtros: readonly FilterCondition[] = []): Observable<readonly UsuarioFila[]> {
     const clienteId = this.clienteId();
     if (clienteId == null) return of([]);
     return this.contenedor
@@ -62,7 +63,15 @@ export class SeguridadUsuariosService {
         // de "no tienes acceso", no como un aviso que se va solo).
         errorToast: false,
       })
-      .pipe(map((response) => response.results ?? []));
+      .pipe(map((response) => (response.results ?? []).map(conRol)));
+  }
+
+  /**
+   * Marca o desmarca administrador. Sin toast del interceptor: la ficha avisa
+   * el resultado con su propio texto.
+   */
+  setAdministrador(membershipId: number, administrador: boolean): Observable<unknown> {
+    return this.contenedor.setAdministrador(membershipId, administrador, { errorToast: false });
   }
 
   /** Busca usuarios de la plataforma para invitar (mínimo 3 caracteres). */

@@ -7456,8 +7456,19 @@ export const es: AppDict = {
     menu: { usuarios: 'Usuarios' },
     usuarios: {
       searchPlaceholder: 'Buscar por nombre o correo...',
-      columns: { nombre: 'Nombre', correo: 'Correo', propietario: 'Propietario' },
-      propietarioBadge: { true: 'Propietario', false: 'Miembro' },
+      columns: {
+        nombre: 'Nombre',
+        correo: 'Correo',
+        rol: 'Rol',
+        propietario: 'Propietario',
+        administrador: 'Administrador',
+      },
+      roles: {
+        propietario: 'Propietario',
+        administrador: 'Administrador',
+        soporte: 'Soporte',
+        miembro: 'Miembro',
+      },
       actions: {
         invitar: 'Invitar usuario',
       },
@@ -7480,12 +7491,39 @@ export const es: AppDict = {
       detalle: {
         eyebrow: 'Usuario del contenedor',
         tabs: { grupos: 'Grupos', permisos: 'Permisos' },
-        fields: { usuarioId: 'ID de usuario' },
+        fields: { usuarioId: 'ID de usuario', rol: 'Rol' },
         accesoHint:
-          'El propietario administra la empresa; el resto solo la opera. Los módulos a los que entra esta persona se definen al invitarla.',
+          'El propietario y los administradores administran la empresa; el resto solo la opera. Los módulos a los que entra esta persona salen de sus grupos.',
         notFound: {
           title: 'Usuario no encontrado',
           desc: 'Puede que le hayan quitado el acceso a esta empresa.',
+        },
+        administrador: {
+          title: 'Administrador',
+          desc: 'Administra la empresa como el propietario: entra a todos los módulos, invita y gestiona usuarios. No puede eliminarla ni transferirla.',
+          hacer: 'Hacer administrador',
+          quitar: 'Quitar administrador',
+          propio: 'No puedes cambiar tu propio rol.',
+          confirmar: {
+            hacerHeader: '¿Hacer administrador a {nombre}?',
+            hacerMessage:
+              'Podrá entrar a todos los módulos, invitar y gestionar usuarios y editar la empresa.',
+            quitarHeader: '¿Quitar el rol de administrador a {nombre}?',
+            quitarMessage:
+              'Seguirá en la empresa, pero solo entrará a los módulos de sus grupos y ya no podrá administrarla.',
+            cancel: 'Cancelar',
+          },
+          toasts: {
+            hecho: { title: 'Administrador asignado', desc: '{nombre} ahora es administrador.' },
+            quitado: {
+              title: 'Administrador quitado',
+              desc: '{nombre} ya no es administrador.',
+            },
+            error: {
+              title: 'No se pudo cambiar el rol',
+              desc: 'Intenta de nuevo en unos segundos.',
+            },
+          },
         },
         propietario: {
           title: 'El propietario no se gestiona desde aquí',

@@ -7349,8 +7349,19 @@ export const en: AppDict = {
     menu: { usuarios: 'Users' },
     usuarios: {
       searchPlaceholder: 'Search by name or email...',
-      columns: { nombre: 'Name', correo: 'Email', propietario: 'Owner' },
-      propietarioBadge: { true: 'Owner', false: 'Member' },
+      columns: {
+        nombre: 'Name',
+        correo: 'Email',
+        rol: 'Role',
+        propietario: 'Owner',
+        administrador: 'Admin',
+      },
+      roles: {
+        propietario: 'Owner',
+        administrador: 'Admin',
+        soporte: 'Support',
+        miembro: 'Member',
+      },
       actions: {
         invitar: 'Invite user',
       },
@@ -7373,6 +7384,27 @@ export const en: AppDict = {
       detalle: {
         eyebrow: 'Container user',
         tabs: { grupos: 'Groups', permisos: 'Permissions' },
+        administrador: {
+          title: 'Admin',
+          desc: 'Manages the company like the owner: opens every module, invites and manages users. Cannot delete or transfer it.',
+          hacer: 'Make admin',
+          quitar: 'Remove admin',
+          propio: 'You cannot change your own role.',
+          confirmar: {
+            hacerHeader: 'Make {nombre} an admin?',
+            hacerMessage:
+              'They will open every module, invite and manage users and edit the company.',
+            quitarHeader: 'Remove the admin role from {nombre}?',
+            quitarMessage:
+              'They stay in the company, but will only open the modules of their groups and can no longer manage it.',
+            cancel: 'Cancel',
+          },
+          toasts: {
+            hecho: { title: 'Admin assigned', desc: '{nombre} is now an admin.' },
+            quitado: { title: 'Admin removed', desc: '{nombre} is no longer an admin.' },
+            error: { title: 'Could not change the role', desc: 'Try again in a few seconds.' },
+          },
+        },
         propietario: {
           title: 'The owner is not managed from here',
           desc: 'The owner account has full control of the company; their groups and permissions are not administered.',
@@ -7436,9 +7468,9 @@ export const en: AppDict = {
             },
           },
         },
-        fields: { usuarioId: 'User ID' },
+        fields: { usuarioId: 'User ID', rol: 'Role' },
         accesoHint:
-          'The owner manages the company; everyone else only operates it. The modules this person can open are set when inviting them.',
+          'The owner and admins manage the company; everyone else only operates it. The modules this person can open come from their groups.',
         notFound: {
           title: 'User not found',
           desc: 'Their access to this company may have been removed.',

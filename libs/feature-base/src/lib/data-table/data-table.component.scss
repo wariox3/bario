@@ -148,6 +148,59 @@
     }
   }
 
+  // `ColumnDef.enumBadges`: misma geometría que el badge booleano para que
+  // las dos columnas se lean igual; el tono lo elige la columna por valor.
+  &__enum-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+
+    i {
+      font-size: 0.6rem;
+    }
+
+    &--positive {
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+
+    &--adverse {
+      background: #fffbeb;
+      color: #b45309;
+    }
+
+    &--neutral {
+      background: rgba(20 48 73 / 0.06);
+      color: var(--brand-muted);
+    }
+
+    &--indigo {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+      color: #4338ca;
+    }
+
+    &--sky {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      color: #0369a1;
+    }
+
+    // Punteado y sin fondo: presencia de visitante (soporte), no un rol propio.
+    &--outline {
+      border: 1px dashed #94a3b8;
+      color: #475569;
+    }
+  }
+
   // `ColumnDef.toneFor`: la celda entera se tiñe con los mismos pares que los
   // badges, así una fecha marcada se lee de un vistazo sin cambiar su formato.
   &__cell--positive {
