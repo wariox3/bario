@@ -1,10 +1,12 @@
 import { Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ListShellComponent } from '@reddoc/feature-base';
 import { MovimientoInformePageBase } from '../../../../shared/movimiento-informe-page.base';
 import type { InformeAuxiliarCuentaRow } from '../../../../shared/movimiento-informe.types';
 import { MovimientoInformeActionsComponent } from '../../../../shared/components/movimiento-informe-actions/movimiento-informe-actions.component';
 import { MovimientoInformeParamsComponent } from '../../../../shared/components/movimiento-informe-params/movimiento-informe-params.component';
 import { MovimientoInformeTableComponent } from '../../../../shared/components/movimiento-informe-table/movimiento-informe-table.component';
+import { consultaDesdeUrl } from '../../../../shared/movimiento-informe.utils';
 import { AuxiliarCuentaService } from '../../auxiliar-cuenta.service';
 
 /**
@@ -26,6 +28,10 @@ import { AuxiliarCuentaService } from '../../auxiliar-cuenta.service';
  * la tabla enciende la columna del id, que al menos permite buscar el asiento en
  * la consulta de movimientos, que lista por `id`. Si backend puede sumar
  * comprobante y número acá, esa columna técnica sobra — ver `PENDIENTES.md` §0.
+ *
+ * Se puede abrir **ya consultado** desde otro informe: «Ver auxiliar» del
+ * estado de situación financiera manda la cuenta y el rango por la URL (ver
+ * `consultaDesdeUrl`) y la pantalla genera sola.
  */
 @Component({
   selector: 'app-auxiliar-cuenta',
@@ -42,6 +48,15 @@ import { AuxiliarCuentaService } from '../../auxiliar-cuenta.service';
 export class AuxiliarCuentaComponent extends MovimientoInformePageBase<InformeAuxiliarCuentaRow> {
   protected readonly service = inject(AuxiliarCuentaService);
   protected readonly archivo = 'auxiliar-cuenta';
+
+  constructor() {
+    super();
+    const consulta = consultaDesdeUrl(inject(ActivatedRoute).snapshot.queryParams);
+    if (consulta) {
+      this.form.patchValue(consulta);
+      this.generar();
+    }
+  }
 
   protected get nombre(): string {
     return this.t().entities.auxiliarCuenta.name;

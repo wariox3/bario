@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -21,6 +22,7 @@ import type { MovimientoInformeForm } from '../../movimiento-informe.types';
   selector: 'app-movimiento-informe-params',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     ReactiveFormsModule,
     CheckboxModule,
     DatePickerModule,
@@ -62,4 +64,27 @@ export class MovimientoInformeParamsComponent {
    * igual ocupa su ranura.
    */
   readonly showDetalle = input<boolean>(false);
+
+  /**
+   * Pinta la fecha desde. Se apaga en los informes que son un **corte** a una
+   * fecha (la situación financiera formal), donde solo cuenta la fecha hasta.
+   * Con ella apagada tampoco se avisan los errores del rango, que no se ve.
+   */
+  readonly showFechaDesde = input<boolean>(true);
+
+  /** Encabezado de la banda de fechas. Vacío = «Periodo». */
+  readonly periodoLabel = input<string>('');
+
+  /** Etiqueta de la fecha hasta. Vacía = «Fecha hasta» (p. ej. «Fecha de corte»). */
+  readonly fechaHastaLabel = input<string>('');
+
+  /** Encabezado de la banda de parámetros propios. Vacío = «Documento». */
+  readonly detalleLabel = input<string>('');
+
+  /**
+   * Sube la banda de parámetros propios a la fila de la banda de fechas. Tiene
+   * sentido sin plan de cuentas (`showCuentas` apagado), cuando esa fila queda
+   * con una sola banda.
+   */
+  readonly detalleEnFila = input<boolean>(false);
 }

@@ -4574,6 +4574,42 @@ export interface AppDict
     };
     estadoSituacionFinanciera: {
       name: string;
+      presentacion: { label: string; base: string; formal: string };
+      groups: { corte: string; periodo: string; presentacion: string };
+      params: { fechaCorte: string; comparar: string; nivel: string };
+      comparar: { cierre_anterior: string; anio_anterior: string; ninguno: string };
+      nivel: { cuenta: string; grupo: string };
+      /** Interruptor de las columnas de variación (solo pantalla). */
+      variacion: string;
+      formal: {
+        columns: {
+          codigo: string;
+          concepto: string;
+          saldo: string;
+          variacion: string;
+          porcentaje: string;
+        };
+        resumen: {
+          activo: string;
+          pasivo: string;
+          patrimonio: string;
+          razonCorriente: string;
+          endeudamiento: string;
+          /** `{valor}`: la cifra del corte anterior. */
+          antes: string;
+          cuadrado: string;
+          /** `{valor}`: la diferencia en pesos. */
+          descuadrado: string;
+          /** `{valor}`: la diferencia del corte anterior. */
+          descuadradoAnterior: string;
+          descuadreAyuda: string;
+        };
+        resultadoTag: string;
+        resultadoAyuda: string;
+        verAuxiliar: string;
+        plegar: string;
+        desplegar: string;
+      };
       empty: {
         notGenerated: { title: string; sub: string };
         noData: { title: string; sub: string };

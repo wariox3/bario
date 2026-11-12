@@ -5941,14 +5941,52 @@ export const en: AppDict = {
     },
     estadoSituacionFinanciera: {
       name: 'Statement of financial position',
+      presentacion: { label: 'Presentation', base: 'Base', formal: 'Formal' },
+      groups: { corte: 'Cut-off', periodo: 'Period', presentacion: 'Presentation' },
+      params: { fechaCorte: 'Cut-off date', comparar: 'Compare with', nivel: 'Detail' },
+      comparar: {
+        cierre_anterior: 'Dec 31 of the previous year',
+        anio_anterior: 'Same date, previous year',
+        ninguno: 'No comparison',
+      },
+      nivel: { cuenta: 'Account', grupo: 'Group' },
+      variacion: 'Change',
+      formal: {
+        columns: {
+          codigo: 'Code',
+          concepto: 'Item',
+          saldo: 'Balance',
+          variacion: 'Change',
+          porcentaje: '%',
+        },
+        resumen: {
+          activo: 'Assets',
+          pasivo: 'Liabilities',
+          patrimonio: 'Equity',
+          razonCorriente: 'Current ratio',
+          endeudamiento: 'Debt ratio',
+          antes: 'was {valor}',
+          cuadrado: 'Balanced',
+          descuadrado: 'Off by {valor}',
+          descuadradoAnterior: 'Previous cut-off off by {valor}',
+          descuadreAyuda:
+            'Assets do not equal liabilities plus equity. A document with unequal debits and credits, or a filter, throws it off.',
+        },
+        resultadoTag: 'Classes 4 to 7',
+        resultadoAyuda:
+          'Classes 4 to 7 and group 36 accumulated at the cut-off: the result not yet closed.',
+        verAuxiliar: 'View ledger',
+        plegar: 'Collapse',
+        desplegar: 'Expand',
+      },
       empty: {
         notGenerated: {
           title: 'Report not generated yet',
-          sub: 'Pick the period and generate to see the financial position.',
+          sub: 'Pick the cut-off date and generate to see the financial position.',
         },
         noData: {
-          title: 'No activity in the period',
-          sub: 'No account moved between those dates. Try widening the period.',
+          title: 'No balances at the cut-off',
+          sub: 'No account has a balance at that date. Try another date or clear the cost center.',
         },
       },
     },

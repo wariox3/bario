@@ -1,5 +1,12 @@
 import { Validators, type FormBuilder, type ValidatorFn } from '@angular/forms';
-import { buildFiltros, toIsoDate, type ErpSelectOption, type FilterCondition } from '@reddoc/core';
+import {
+  buildFiltros,
+  fromIsoDate,
+  toIsoDate,
+  type ErpSelectOption,
+  type FilterCondition,
+} from '@reddoc/core';
+import type { Params } from '@angular/router';
 import { rangoFechasMismoAnio } from './rango-fechas.validators';
 import type { MovimientoInformeForm, MovimientoInformeParams } from './movimiento-informe.types';
 
@@ -203,4 +210,46 @@ export function buildFiltrosDetalle(input: FiltrosDetalleInput): readonly Filter
   }
 
   return conditions;
+}
+
+/**
+ * Lo que otro informe manda por la URL para abrir este ya consultado: una
+ * cuenta (con todas las que cuelgan de ella) y un rango de fechas. Lo usa «Ver
+ * auxiliar» del estado de situación financiera.
+ *
+ * `?cuenta=1105&nombre=Caja&desde=2026-01-01&hasta=2026-10-31`
+ */
+export interface ConsultaDesdeUrl {
+  readonly fecha_desde: Date;
+  readonly fecha_hasta: Date;
+  readonly cuenta_desde: ErpSelectOption;
+  readonly cuenta_hasta: ErpSelectOption;
+}
+
+/**
+ * Tope del rango que cubre una cuenta **y sus hijas**. El filtro compara
+ * `cuenta__codigo` como texto, así que `1105` ≤ `110505` ≤ `1105999…`: con el
+ * código relleno de nueves entran todas las subcuentas y ninguna vecina.
+ */
+const RELLENO_HIJAS = '9'.repeat(12);
+
+/**
+ * Lee la consulta que viene por la URL; `null` si falta algo o no se entiende,
+ * y la pantalla abre como siempre. La cuenta llega como opción armada a mano
+ * (sin id: el filtro viaja por código) para que el selector la muestre.
+ */
+export function consultaDesdeUrl(params: Params): ConsultaDesdeUrl | null {
+  const cuenta = typeof params['cuenta'] === 'string' ? params['cuenta'] : '';
+  const nombre = typeof params['nombre'] === 'string' ? params['nombre'] : '';
+  const desde = fromIsoDate(typeof params['desde'] === 'string' ? params['desde'] : null);
+  const hasta = fromIsoDate(typeof params['hasta'] === 'string' ? params['hasta'] : null);
+  if (!/^\d+$/.test(cuenta) || !desde || !hasta) return null;
+
+  const etiqueta = nombre ? `${cuenta} - ${nombre}` : cuenta;
+  return {
+    fecha_desde: desde,
+    fecha_hasta: hasta,
+    cuenta_desde: { id: 0, nombre: etiqueta, codigo: cuenta },
+    cuenta_hasta: { id: 0, nombre: etiqueta, codigo: `${cuenta}${RELLENO_HIJAS}` },
+  };
 }

@@ -44,7 +44,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
    * 400 a los otros ocho informes. Por eso el botón se enciende informe por
    * informe con `soportaPdf` y no de una vez en la botonera.
    */
-  readonly pdfUrl = `${MOVIMIENTO_INFORME_BASE_ENDPOINT}pdf/`;
+  readonly pdfUrl: string = `${MOVIMIENTO_INFORME_BASE_ENDPOINT}pdf/`;
 
   /**
    * Body común a las tres acciones. Público porque la descarga la dispara la

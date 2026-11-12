@@ -1,0 +1,167 @@
+@let d = t().entities.estadoSituacionFinanciera.formal;
+
+@if (informe().filas.length) {
+  <!--
+    Franja de resumen: cuánto y si cuadra, antes de leer el estado. Sin empresa
+    ni NIT: dentro del ERP ya se sabe en qué empresa se está. Vive
+    dentro del recuadro, entre el panel y la tabla, con el mismo filete que
+    separa las bandas del panel.
+  -->
+  <div
+    class="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-[0.9rem] py-[0.6rem]"
+    [class.opacity-55]="loading()"
+  >
+    @for (cifra of totales(); track cifra.etiqueta) {
+      <div class="flex flex-col gap-px">
+        <span class="text-[0.66rem] font-semibold uppercase tracking-[0.04em] text-brand-muted">
+          {{ cifra.etiqueta }}
+        </span>
+        <span class="whitespace-nowrap text-[0.9rem] font-bold tabular-nums text-brand-navy">
+          {{ cifra.valor }}
+          @if (cifra.nota) {
+            <small [class]="'ml-1 text-[0.72rem] font-medium ' + cifra.notaClase">
+              {{ cifra.nota }}
+            </small>
+          }
+        </span>
+      </div>
+    }
+
+    <span
+      class="hidden w-px self-stretch bg-[rgba(20,48,73,0.08)] md:block"
+      aria-hidden="true"
+    ></span>
+
+    @for (cifra of razones(); track cifra.etiqueta) {
+      <div class="flex flex-col gap-px">
+        <span class="text-[0.66rem] font-semibold uppercase tracking-[0.04em] text-brand-muted">
+          {{ cifra.etiqueta }}
+        </span>
+        <span class="whitespace-nowrap text-[0.9rem] font-bold tabular-nums text-brand-navy">
+          {{ cifra.valor }}
+          @if (cifra.nota) {
+            <small [class]="'ml-1 text-[0.72rem] font-medium ' + cifra.notaClase">
+              {{ cifra.nota }}
+            </small>
+          }
+        </span>
+      </div>
+    }
+
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      @if (cuadre().length) {
+        @for (aviso of cuadre(); track aviso) {
+          <span
+            class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-[0.74rem] font-semibold text-amber-700"
+            [title]="d.resumen.descuadreAyuda"
+          >
+            <i class="pi pi-exclamation-circle text-[0.72rem]"></i>{{ aviso }}
+          </span>
+        }
+      } @else {
+        <span
+          class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-[0.74rem] font-semibold text-green-700"
+        >
+          <i class="pi pi-check text-[0.66rem]"></i>{{ d.resumen.cuadrado }}
+        </span>
+      }
+    </div>
+  </div>
+}
+
+<div class="min-h-0 flex-1 overflow-auto" [class.opacity-55]="loading()">
+  <table class="w-full border-collapse text-[0.82rem]" [class.h-full]="!informe().filas.length">
+    <thead>
+      <tr>
+        <th [class]="th + ' h-px w-24 text-left'" scope="col">{{ d.columns.codigo }}</th>
+        <th [class]="th + ' min-w-[16rem] text-left'" scope="col">{{ d.columns.concepto }}</th>
+        <th [class]="th + ' w-44 text-right'" scope="col">
+          {{ d.columns.saldo }}
+          <span class="block font-normal normal-case tracking-normal">{{ fechaCorte() }}</span>
+        </th>
+        @if (hayAnterior()) {
+          <th [class]="th + ' w-44 text-right'" scope="col">
+            {{ d.columns.saldo }}
+            <span class="block font-normal normal-case tracking-normal">{{ fechaAnterior() }}</span>
+          </th>
+        }
+        @if (verVariacion()) {
+          <th [class]="th + ' w-40 text-right'" scope="col">{{ d.columns.variacion }}</th>
+          <th [class]="th + ' w-20 text-right'" scope="col">{{ d.columns.porcentaje }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (vm of filas(); track vm.indice) {
+        <tr [class]="vm.estilo">
+          @if (vm.plegable) {
+            <!--
+              Sección y subsección: título a lo ancho de código y concepto, con
+              el botón de plegar. La subsección entra un paso; las líneas van en
+              su columna, así los nombres se leen anidados sin perder la columna
+              de códigos.
+            -->
+            <td colspan="2" [class]="td + (vm.fila.tipo === 'SUBSECCION' ? ' pl-7' : '')">
+              <button
+                type="button"
+                class="-mx-1 inline-flex cursor-pointer items-center gap-1.5 rounded border-0 bg-transparent px-1 py-0 text-left font-[inherit] text-[inherit] hover:bg-[rgba(19,38,60,0.04)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue"
+                [attr.aria-expanded]="!vm.plegada"
+                [attr.aria-label]="(vm.plegada ? d.desplegar : d.plegar) + ' ' + vm.fila.nombre"
+                (click)="alternar(vm.indice)"
+              >
+                <i
+                  class="pi pi-chevron-down text-[0.62rem] text-brand-muted transition-transform duration-150 motion-reduce:transition-none"
+                  [class.-rotate-90]="vm.plegada"
+                ></i>
+                {{ vm.fila.nombre }}
+              </button>
+            </td>
+          } @else {
+            <td [class]="td + ' whitespace-nowrap tabular-nums text-brand-muted'">
+              {{ vm.fila.tipo === 'LINEA' ? vm.fila.codigo : '' }}
+            </td>
+            <td
+              [class]="
+                td + (vm.fila.tipo === 'LINEA' || vm.fila.tipo === 'RESULTADO' ? ' pl-6' : '')
+              "
+            >
+              {{ vm.fila.nombre }}
+              @if (vm.fila.tipo === 'RESULTADO') {
+                <span
+                  class="ml-2 cursor-help rounded bg-[rgba(20,48,73,0.08)] px-1.5 py-px text-[0.66rem] font-semibold text-brand-navy"
+                  [title]="d.resultadoAyuda"
+                  >{{ d.resultadoTag }}</span
+                >
+              }
+              @if (vm.auxiliar; as aux) {
+                <a
+                  class="ml-2 inline-flex items-center gap-1 whitespace-nowrap text-[0.74rem] font-medium text-brand-blue no-underline opacity-0 transition-opacity duration-150 hover:underline focus:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
+                  [routerLink]="auxiliarRuta()"
+                  [queryParams]="aux"
+                  >{{ d.verAuxiliar }}<i class="pi pi-arrow-right text-[0.6rem]"></i
+                ></a>
+              }
+            </td>
+          }
+          @for (celda of vm.celdas; track $index) {
+            <td [class]="td + ' whitespace-nowrap text-right tabular-nums ' + celda.clase">
+              {{ celda.texto }}
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columnas()" class="px-4 py-16 text-center">
+            <i class="pi pi-inbox text-[1.4rem] text-brand-muted opacity-50"></i>
+            <p class="mb-1 mt-3 text-[0.95rem] font-bold text-brand-navy">
+              {{ empty().noData.title }}
+            </p>
+            <p class="m-0 mx-auto max-w-[280px] text-[0.8rem] text-brand-muted">
+              {{ empty().noData.sub }}
+            </p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

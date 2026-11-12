@@ -6029,14 +6029,52 @@ export const es: AppDict = {
     },
     estadoSituacionFinanciera: {
       name: 'Estado de situación financiera',
+      presentacion: { label: 'Presentación', base: 'Base', formal: 'Formal' },
+      groups: { corte: 'Corte', periodo: 'Periodo', presentacion: 'Presentación' },
+      params: { fechaCorte: 'Fecha de corte', comparar: 'Comparar con', nivel: 'Detalle' },
+      comparar: {
+        cierre_anterior: '31 dic del año anterior',
+        anio_anterior: 'Misma fecha, año anterior',
+        ninguno: 'Sin comparativo',
+      },
+      nivel: { cuenta: 'Cuenta', grupo: 'Grupo' },
+      variacion: 'Variación',
+      formal: {
+        columns: {
+          codigo: 'Código',
+          concepto: 'Concepto',
+          saldo: 'Saldo',
+          variacion: 'Variación',
+          porcentaje: '%',
+        },
+        resumen: {
+          activo: 'Activo',
+          pasivo: 'Pasivo',
+          patrimonio: 'Patrimonio',
+          razonCorriente: 'Razón corriente',
+          endeudamiento: 'Endeudamiento',
+          antes: 'antes {valor}',
+          cuadrado: 'Cuadrado',
+          descuadrado: 'Descuadrado por {valor}',
+          descuadradoAnterior: 'Corte anterior descuadrado por {valor}',
+          descuadreAyuda:
+            'El activo no es igual al pasivo más el patrimonio. Lo descuadra un documento con débitos y créditos distintos o un filtro.',
+        },
+        resultadoTag: 'Clases 4 a 7',
+        resultadoAyuda:
+          'Clases 4 a 7 y grupo 36 acumulados al corte: el resultado que aún no se ha cerrado.',
+        verAuxiliar: 'Ver auxiliar',
+        plegar: 'Plegar',
+        desplegar: 'Desplegar',
+      },
       empty: {
         notGenerated: {
           title: 'Todavía no generaste el informe',
-          sub: 'Elige el periodo y genera para ver la situación financiera.',
+          sub: 'Elige la fecha de corte y genera para ver la situación financiera.',
         },
         noData: {
-          title: 'Sin movimientos en el periodo',
-          sub: 'Ninguna cuenta movió entre esas fechas. Intenta ampliar el periodo.',
+          title: 'Sin saldos al corte',
+          sub: 'Ninguna cuenta tiene saldo a esa fecha. Intenta con otra fecha o quita el centro de costo.',
         },
       },
     },

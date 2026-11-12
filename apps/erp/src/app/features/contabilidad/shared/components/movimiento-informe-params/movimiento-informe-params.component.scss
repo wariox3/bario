@@ -38,6 +38,12 @@
       min-width: 0;
     }
 
+    // La banda propia subida a la fila (`detalleEnFila`) trae más controles que
+    // la de fechas: toma una parte mayor, pero fija, para no comérsela.
+    > .mi-params__band--wide {
+      flex: 1.6 1 0;
+    }
+
     > .mi-params__band + .mi-params__band {
       border-top: 0;
       border-left: 1px solid rgba(20 48 73 / 0.08);
