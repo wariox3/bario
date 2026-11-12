@@ -72,7 +72,6 @@ interface CabeceraView {
   readonly fecha: Date | null;
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
-  readonly sede: string | null;
   readonly almacen: string | null;
   readonly centroCosto: string | null;
   readonly formaPago: string | null;
@@ -319,7 +318,7 @@ export class FacturaCompraDetailComponent implements OnInit {
 
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
-    // Los nombres de los FK (plazo de pago, forma de pago, sede) llegan en los
+    // Los nombres de los FK (plazo de pago, forma de pago) llegan en los
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
@@ -340,7 +339,6 @@ export class FacturaCompraDetailComponent implements OnInit {
             fecha: fc.fecha ?? null,
             fechaVence: fc.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
-            sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,

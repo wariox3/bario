@@ -116,6 +116,10 @@
           {{ c.salario !== null ? formatMoney(c.salario) : '—' }}
         </dd>
       </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="servicio-documento-detail__label">{{ det.labels.sede }}</dt>
+        <dd class="servicio-documento-detail__value">{{ c.sede }}</dd>
+      </div>
     </dl>
   </section>
 

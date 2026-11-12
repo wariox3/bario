@@ -20,6 +20,7 @@ import {
   startOfToday,
   TenantService,
   toFiniteNumber,
+  SELECT_ENDPOINTS,
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -105,6 +106,7 @@ export class ServicioDocumentoFormComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
   protected readonly sectorEndpoint = SECTOR_ENDPOINT;
+  protected readonly sedeEndpoint = SELECT_ENDPOINTS.sede;
   /** Copia mutable de las opciones de estrato (PrimeNG `p-select` exige `any[]`). */
   protected readonly estratoOptions = [...ESTRATO_OPTIONS];
 
@@ -122,6 +124,9 @@ export class ServicioDocumentoFormComponent implements OnInit {
   readonly documentoEdit = input<unknown>();
 
   protected readonly isEditMode = computed(() => !!this.id());
+
+  /** En alta la sede arranca en la primera opción; en edición manda la del documento. */
+  protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -155,6 +160,7 @@ export class ServicioDocumentoFormComponent implements OnInit {
     sector: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     estrato: this.fb.control<number | null>(null, Validators.required),
     salario: this.fb.control<number | null>(null, Validators.required),
+    sede: this.fb.control<ErpSelectOption | null>(null),
     detalles: new FormArray<DetalleGroup>([]),
   });
 

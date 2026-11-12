@@ -50,7 +50,6 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly formaPago: string | null;
   readonly centroCosto: string | null;
-  readonly sede: string | null;
   readonly almacen: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
@@ -225,7 +224,6 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
-            sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,

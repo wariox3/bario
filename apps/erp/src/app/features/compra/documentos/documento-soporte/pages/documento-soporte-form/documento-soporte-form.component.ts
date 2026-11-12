@@ -64,7 +64,6 @@ import {
   METODO_PAGO_ENDPOINT,
   METODO_PAGO_NO_DEFINIDO,
   RESOLUCION_ENDPOINT,
-  SEDE_ENDPOINT,
 } from '../../documento-soporte.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
@@ -148,7 +147,6 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
   protected readonly tablasOcupadas = computed(() => this.detallesTable()?.ocupado() ?? false);
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
-  protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
@@ -215,6 +213,8 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     fecha_vence: this.fb.control<Date | null>(null, Validators.required),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Oculta en el form (compra solo muestra centro de costo), pero el control
+    // se queda: en edición conserva la sede que ya traía el documento.
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),

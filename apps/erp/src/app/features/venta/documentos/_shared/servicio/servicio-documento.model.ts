@@ -30,6 +30,9 @@ export interface ServicioDocumentoRead extends DocumentoReadBase {
   readonly estrato: number | null;
   /** El backend lo devuelve como string con cola de ceros (`"1423500.000000"`). */
   readonly salario: string | number | null;
+  readonly sede: number | null;
+  /** Nombre de la sede para etiquetar el selector al cargar en edición. */
+  readonly sede_nombre?: string | null;
 }
 
 /**
@@ -197,6 +200,7 @@ export interface ServicioDocumentoPayload extends DocumentoPayloadBase {
   readonly sector: number | null;
   readonly estrato: number | null;
   readonly salario: number | null;
+  readonly sede: number | null;
   /** Opcional: en edición se omite (los detalles transaccionan contra documento-detalle). */
   readonly detalles?: readonly ServicioDocumentoDetallePayload[];
 }

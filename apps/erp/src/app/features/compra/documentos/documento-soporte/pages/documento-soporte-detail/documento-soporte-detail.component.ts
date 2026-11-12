@@ -50,7 +50,6 @@ interface CabeceraView {
   readonly fecha: Date | null;
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
-  readonly sede: string | null;
   readonly almacen: string | null;
   readonly centroCosto: string | null;
   readonly metodoPago: string | null;
@@ -240,7 +239,6 @@ export class DocumentoSoporteDetailComponent implements OnInit {
             fecha: ds.fecha ?? null,
             fechaVence: ds.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
-            sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,

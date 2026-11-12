@@ -181,20 +181,6 @@
           />
         </div>
 
-        <!-- Sede -->
-        <div class="flex flex-col gap-1.5">
-          <label for="sede" class="documento-soporte-form__label">
-            {{ t().entities.documentoSoporte.form.fields.sede }}
-          </label>
-          <lib-api-select
-            inputId="sede"
-            formControlName="sede"
-            [endpoint]="sedeEndpoint"
-            [suggestedIndex]="primeraOpcionSugerida()"
-            [placeholder]="t().entities.documentoSoporte.form.fields.sedePlaceholder"
-          />
-        </div>
-
         <!-- Almacén general: lo heredan las líneas nuevas; cada una lo puede cambiar. -->
         <div class="flex flex-col gap-1.5">
           <label for="almacen" class="documento-soporte-form__label">
@@ -218,6 +204,7 @@
             inputId="centro_costo"
             formControlName="centro_costo"
             [endpoint]="centroCostoEndpoint"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="t().entities.documentoSoporte.form.fields.centroCostoPlaceholder"
           />
         </div>

@@ -18,27 +18,34 @@
     a horizontal al apilarse.
   -->
   <div class="mi-params__row">
-    <!-- Periodo. Obligatorio para el backend: acota el informe entero. -->
+    <!--
+      Periodo. Obligatorio para el backend: acota el informe entero. Un informe
+      que es un **corte** (situación financiera formal) apaga la fecha desde y
+      renombra la banda; lo que el corte suma (contra qué comparar) entra por el
+      slot [periodo].
+    -->
     <div class="mi-params__band">
-      <span class="mi-params__group">{{ d.groups.periodo }}</span>
+      <span class="mi-params__group">{{ periodoLabel() || d.groups.periodo }}</span>
       <div class="mi-params__fields">
-        <div class="mi-params__field">
-          <label [for]="p + '-fecha-desde'" class="mi-params__label">{{
-            d.params.fechaDesde
-          }}</label>
-          <p-datepicker
-            [inputId]="p + '-fecha-desde'"
-            formControlName="fecha_desde"
-            [showIcon]="true"
-            appendTo="body"
-            [fluid]="true"
-          />
-          <lib-field-error [control]="form().controls.fecha_desde" />
-        </div>
+        @if (showFechaDesde()) {
+          <div class="mi-params__field">
+            <label [for]="p + '-fecha-desde'" class="mi-params__label">{{
+              d.params.fechaDesde
+            }}</label>
+            <p-datepicker
+              [inputId]="p + '-fecha-desde'"
+              formControlName="fecha_desde"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+            />
+            <lib-field-error [control]="form().controls.fecha_desde" />
+          </div>
+        }
 
         <div class="mi-params__field">
           <label [for]="p + '-fecha-hasta'" class="mi-params__label">{{
-            d.params.fechaHasta
+            fechaHastaLabel() || d.params.fechaHasta
           }}</label>
           <p-datepicker
             [inputId]="p + '-fecha-hasta'"
@@ -49,6 +56,8 @@
           />
           <lib-field-error [control]="form().controls.fecha_hasta" />
         </div>
+
+        <ng-content select="[periodo]" />
       </div>
     </div>
 
@@ -98,23 +107,39 @@
         </div>
       </div>
     }
+
+    <!--
+      Sin plan de cuentas la fila queda con una sola banda: el informe puede
+      subir la suya a ese lugar (`detalleEnFila`) en vez de apilarla debajo.
+    -->
+    @if (showDetalle() && detalleEnFila()) {
+      <ng-container [ngTemplateOutlet]="detalle" />
+    }
   </div>
 
   <!-- Parámetros propios del informe (tercero, número, comprobante). -->
-  @if (showDetalle()) {
-    <div class="mi-params__band">
-      <span class="mi-params__group">{{ d.groups.documento }}</span>
+  @if (showDetalle() && !detalleEnFila()) {
+    <ng-container [ngTemplateOutlet]="detalle" />
+  }
+
+  <!--
+    Un ng-content solo se proyecta una vez: va en un template para que la banda
+    pueda caer en la fila o debajo sin duplicar el slot.
+  -->
+  <ng-template #detalle>
+    <div class="mi-params__band" [class.mi-params__band--wide]="detalleEnFila()">
+      <span class="mi-params__group">{{ detalleLabel() || d.groups.documento }}</span>
       <div class="mi-params__fields">
         <ng-content />
       </div>
     </div>
-  }
+  </ng-template>
 
   <!--
     Errores del rango (validador a nivel de formulario). Banda propia para que
     el mensaje no empuje los campos ni quede colgando fuera del recuadro.
   -->
-  @if (form().touched || form().dirty) {
+  @if (showFechaDesde() && (form().touched || form().dirty)) {
     @if (form().hasError('rangoInvertido')) {
       <p class="mi-params__error">{{ d.validation.rangoInvertido }}</p>
     } @else if (form().hasError('anioDistinto')) {

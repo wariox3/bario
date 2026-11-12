@@ -70,7 +70,6 @@ import {
 import {
   FORMA_PAGO_ENDPOINT,
   PLAZO_PAGO_ENDPOINT,
-  SEDE_ENDPOINT,
 } from '../../factura-compra-recurrente.constants';
 import {
   facturaCompraRecurrenteToFormValue,
@@ -208,7 +207,6 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
-  protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
 
   /** Filtra el autocomplete de contacto a proveedores. */
@@ -258,6 +256,8 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     forma_pago: this.fb.control<ErpSelectOption | null>(null),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
+    // Oculta en el form (compra solo muestra centro de costo), pero el control
+    // se queda: en edición conserva la sede que ya traía el documento.
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),

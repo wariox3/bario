@@ -94,6 +94,20 @@
             [messages]="{ required: t().entities.pedidoCliente.form.validation.required }"
           />
         </div>
+
+        <!-- Sede -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sede" class="pedido-cliente-form__label">
+            {{ t().entities.pedidoCliente.form.fields.sede }}
+          </label>
+          <lib-api-select
+            inputId="sede"
+            formControlName="sede"
+            [endpoint]="sedeEndpoint"
+            [suggestedIndex]="primeraSugerida()"
+            [placeholder]="t().entities.pedidoCliente.form.fields.sedePlaceholder"
+          />
+        </div>
       </div>
     </div>
   </section>
