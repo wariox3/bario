@@ -2614,6 +2614,8 @@ export const en: AppDict = {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
           fecha: 'Date',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
         },
         validation: { required: 'This field is required' },
         toasts: {
@@ -2649,6 +2651,7 @@ export const en: AppDict = {
           cliente: 'Customer',
           identificacion: 'ID number',
           fecha: 'Date',
+          sede: 'Branch',
         },
         notFound: {
           title: 'Order not found',
@@ -6800,6 +6803,8 @@ export const en: AppDict = {
           estrato: 'Stratum',
           estratoPlaceholder: 'Select…',
           salario: 'Salary',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
         },
         validation: { required: 'This field is required' },
         submitCreate: 'Create document',
@@ -6931,6 +6936,7 @@ export const en: AppDict = {
           sector: 'Sector',
           estrato: 'Stratum',
           salario: 'Salary',
+          sede: 'Branch',
         },
         notFound: {
           title: 'Document not found',

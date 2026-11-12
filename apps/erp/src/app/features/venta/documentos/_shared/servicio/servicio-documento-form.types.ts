@@ -15,5 +15,6 @@ export interface ServicioDocumentoFormRawValue {
   readonly sector: ErpSelectOption | null;
   readonly estrato: number | null;
   readonly salario: number | null;
+  readonly sede: ErpSelectOption | null;
   readonly detalles: readonly DetalleFormRawValue[];
 }

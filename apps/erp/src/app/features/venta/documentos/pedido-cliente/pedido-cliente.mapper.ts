@@ -17,6 +17,7 @@ export function pedidoClienteToFormValue(
   return {
     contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
+    sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
   };
 }
 
@@ -36,6 +37,7 @@ export function formValueToPayload(
     documento_tipo: documentTypeId,
     contacto: raw.contacto?.id ?? null,
     fecha: toIsoDate(raw.fecha),
+    sede: raw.sede?.id ?? null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

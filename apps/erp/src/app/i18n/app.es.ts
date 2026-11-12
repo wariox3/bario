@@ -2679,6 +2679,8 @@ export const es: AppDict = {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
           fecha: 'Fecha',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
         },
         validation: { required: 'Este campo es requerido' },
         toasts: {
@@ -2714,6 +2716,7 @@ export const es: AppDict = {
           cliente: 'Cliente',
           identificacion: 'Identificación',
           fecha: 'Fecha',
+          sede: 'Sede',
         },
         notFound: {
           title: 'Pedido no encontrado',
@@ -6890,6 +6893,8 @@ export const es: AppDict = {
           estrato: 'Estrato',
           estratoPlaceholder: 'Selecciona…',
           salario: 'Salario',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
         },
         validation: { required: 'Este campo es requerido' },
         submitCreate: 'Crear documento',
@@ -7021,6 +7026,7 @@ export const es: AppDict = {
           sector: 'Sector',
           estrato: 'Estrato',
           salario: 'Salario',
+          sede: 'Sede',
         },
         notFound: {
           title: 'Documento no encontrado',

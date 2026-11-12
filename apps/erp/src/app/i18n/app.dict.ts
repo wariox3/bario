@@ -1956,6 +1956,8 @@ export interface AppDict
           cliente: string;
           clientePlaceholder: string;
           fecha: string;
+          sede: string;
+          sedePlaceholder: string;
         };
         validation: { required: string };
         toasts: {
@@ -1973,6 +1975,7 @@ export interface AppDict
           cliente: string;
           identificacion: string;
           fecha: string;
+          sede: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -5218,6 +5221,8 @@ export interface AppDict
           estrato: string;
           estratoPlaceholder: string;
           salario: string;
+          sede: string;
+          sedePlaceholder: string;
         };
         validation: { required: string };
         submitCreate: string;
@@ -5325,6 +5330,7 @@ export interface AppDict
           sector: string;
           estrato: string;
           salario: string;
+          sede: string;
         };
         notFound: { title: string; desc: string };
       };
