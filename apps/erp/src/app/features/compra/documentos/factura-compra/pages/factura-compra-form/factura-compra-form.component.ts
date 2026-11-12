@@ -56,7 +56,7 @@ import {
 } from '@erp/features/documentos/tablas-en-vivo';
 import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
-import { FORMA_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
+import { FORMA_PAGO_ENDPOINT } from '../../factura-compra.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
   setupVencimientoAutocompute,
@@ -213,7 +213,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   };
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
-  protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
@@ -266,6 +265,8 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     fecha_vence: this.fb.control<Date | null>(null, Validators.required),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Oculta en el form (compra solo muestra centro de costo), pero el control
+    // se queda: en edición conserva la sede que ya traía el documento.
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),

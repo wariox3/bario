@@ -168,6 +168,12 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
 
   protected readonly isEditMode = computed(() => !!this.id());
 
+  /**
+   * En alta el centro de costo arranca en la primera opción; la persona lo
+   * puede cambiar. En edición no se sugiere: se respeta lo guardado.
+   */
+  protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
