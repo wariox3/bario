@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.27](https://github.com/wariox3/bario/compare/v0.1.26...v0.1.27) (2026-11-13)
+
+### Features
+
+- **compra:** el id de factura de compra y documento soporte abre su afectación ([519ca3e](https://github.com/wariox3/bario/commit/519ca3e71302986d42c02609f3589b592bed3625))
+- **compra:** solo centro de costo en la cabecera, sugerido al crear ([7bc08a6](https://github.com/wariox3/bario/commit/7bc08a654b337555a03cb6c48be0b50cf6ea36b0))
+- **contabilidad:** estado de situación financiera formal ([5a48ff9](https://github.com/wariox3/bario/commit/5a48ff9b77a323e634944c0d76b387ce3f00088e))
+- **venta:** sede sugerida al crear en todos los documentos ([bbc58bf](https://github.com/wariox3/bario/commit/bbc58bf3bd1a579c3aea94b25b6824bb9b1391c3))
+
 ## [0.1.26](https://github.com/wariox3/bario/compare/v0.1.25...v0.1.26) (2026-11-11)
 
 ### Features
