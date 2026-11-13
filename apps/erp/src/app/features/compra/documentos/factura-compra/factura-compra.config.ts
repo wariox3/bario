@@ -51,6 +51,7 @@ export const FACTURA_COMPRA_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canViewAfectacion: true,
     canCorregir: true,
     canAnular: true,
   },

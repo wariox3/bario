@@ -851,6 +851,59 @@ pointer-events:none`), no se parpadea la tabla entera. **No se atenúa el empty 
 - **Sass:** las declaraciones sueltas van **antes** de cualquier regla anidada (`&--x`,
   `&::-webkit-scrollbar`) o el build tira `mixed-decls`.
 
+## Patrón: estado financiero formal (secciones plegables + franja de resumen)
+
+`features/contabilidad/informes/estado-situacion-financiera/components/situacion-formal-table/` —
+un estado **presentado** (no una lista de cuentas): secciones, subtotales y totales que el backend
+manda ya armados y tipados (`SECCION`, `SUBSECCION`, `LINEA`, `RESULTADO`, `SUBTOTAL`, `TOTAL`,
+`TOTAL_FINAL`). Vive en el mismo recuadro de `<lib-list-shell>` que el panel de parámetros; no es
+una "hoja impresa" con sombra: el sistema es borders-only.
+
+- **Franja de resumen entre el panel y la tabla**, con el filete de las bandas: **sin empresa ni
+  NIT** (dentro del ERP ya se sabe en qué empresa se está; eso es del PDF), arranca con las cifras grandes en millones (`$ 830,4 M`) con su cambio ▲/▼
+  verde/rojo, un separador vertical, las razones con «antes …» en muted, y al final, empujado a la
+  derecha (`ml-auto`), el **cuadre** como píldora: verde «Cuadrado» o **ámbar** «Descuadrado por $X» (es un estado de la
+  contabilidad con explicación en `title`, no un error de pantalla). Etiqueta de cifra = el mismo
+  micro-encabezado uppercase `0.66rem/600` muted.
+- **El tipo de fila decide tinte y peso, no color de texto:** sección `0.035` + `600`; subsección
+  `600`; total `0.035` + `700`; total final `0.055` + `700`.
+- **Doble subrayado en los totales** (`border-b-[3px] border-double`) y raya simple arriba del
+  subtotal y del total. La raya de arriba va como `shadow-[inset_0_1px_0_…]`, no como borde: con
+  `border-collapse` competiría con el borde inferior de la fila anterior.
+- **Sangría: excepción a la regla de la jerarquía aplanada.** Aquí el código va en su columna y
+  solo trae código la `LINEA`, así que sangrar no rompe el escaneo de códigos: sección a ras,
+  subsección `pl-7` (ambas ocupando código + concepto con `colspan=2`), líneas `pl-6` en la columna
+  de concepto, subtotales y totales a ras de esa columna (se leen "fuera" de las líneas, como en un
+  estado impreso).
+- **Plegar es solo de pantalla.** Botón con chevron y `aria-expanded` dentro de la celda (no la
+  fila con `tabindex`). Subsección plegada: oculta líneas y subtotal y la cabecera pinta los
+  importes del subtotal. Sección plegada: oculta todo menos su `TOTAL`, y la cabecera no pinta
+  importes (el total ya está debajo). Se reinicia con cada informe (`linkedSignal`).
+- **Negativos entre paréntesis y sin rojo** (convención contable; la depreciación es negativa por
+  naturaleza). Rojo solo en el resultado del ejercicio negativo (pérdida). La variación y el % van
+  verde/rojo por dirección; sin cambio, la celda queda vacía.
+- **Acción por fila al hover** («Ver auxiliar →», `text-brand-blue`, `opacity-0
+group-hover:opacity-100 focus:opacity-100`): un enlace real (`routerLink` + `queryParams`), así
+  se abre en otra pestaña. Solo donde la fila es una cuenta (nivel cuenta), no en grupos.
+- **Controles de vista en la botonera, no en el panel:** el interruptor «Variación» no cambia la
+  consulta (el Excel y el PDF la traen siempre), así que va con los botones y no deja viejo el
+  informe. Va proyectado en `<app-movimiento-informe-actions>`.
+- **Exportar va en un desplegable**, no en botones sueltos: `p-button` secundario outlined `small`
+  «Exportar» con `pi-chevron-down` a la derecha + `<p-menu [popup]>` (Excel y, si el informe lo
+  sirve, PDF). Mismo idioma que «Acciones» de los listados y «Utilidades» de las fichas; deja a
+  Generar como la única acción con color. Los ítems salen de un `computed` (array estable: con uno
+  nuevo por detección de cambios el menú pierde el primer clic). Vive en
+  `<app-movimiento-informe-actions>`, así que aplica a los nueve informes.
+- **Un corte no es un periodo:** el panel apaga la fecha desde (`showFechaDesde`), la banda pasa a
+  «Corte» y lo que completa la pregunta («Comparar con») entra por el slot `[periodo]`. Sin plan de
+  cuentas, la banda propia sube a la fila (`detalleEnFila`, `flex 1.6`). El nivel cuenta/grupo va
+  como selector segmentado (`radiogroup`), no como desplegable:
+  son dos opciones que se ven a la vez. Dentro de un panel de parámetros, la opción activa usa el
+  **color primario del tema** (`var(--p-primary-color)` / `--p-primary-contrast-color`, el mismo de
+  los botones primarios) y el marco usa las variables de los inputs (`--p-form-field-border-color`,
+  `--p-form-field-border-radius`), para leerse como un control más de la fila y no como una pieza
+  aparte.
+
 ## Patrón: aviso de resultado desactualizado (informe ya generado)
 
 Para una pantalla de **consultar → resultado** donde los parámetros pueden cambiar después de

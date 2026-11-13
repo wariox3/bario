@@ -28,6 +28,7 @@ export function servicioDocumentoToFormValue(
     sector: read.sector != null ? { id: read.sector, nombre: read.sector_nombre ?? '' } : null,
     estrato: read.estrato,
     salario: toFiniteNumber(read.salario),
+    sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
   };
 }
 
@@ -106,6 +107,7 @@ export function formValueToPayload(
     sector: raw.sector?.id ?? null,
     estrato: raw.estrato ?? null,
     salario: raw.salario ?? null,
+    sede: raw.sede?.id ?? null,
     fecha: toIsoDate(raw.fecha),
     // En edición se omiten: los detalles transaccionan contra documento-detalle.
     ...(includeDetalles ? { detalles: raw.detalles.map(detalleToPayload) } : {}),

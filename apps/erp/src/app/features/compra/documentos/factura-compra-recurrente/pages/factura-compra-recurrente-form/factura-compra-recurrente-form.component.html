@@ -109,36 +109,18 @@
           />
         </div>
 
-        <!-- Centro de costo + Sede (par compacto en la mitad izquierda) -->
-        <div class="grid grid-cols-2 gap-x-3">
-          <!-- Centro de costo -->
-          <div class="flex flex-col gap-1.5">
-            <label for="centro_costo" class="factura-compra-recurrente-form__label">
-              {{ t().entities.facturaCompraRecurrente.form.fields.centroCosto }}
-            </label>
-            <lib-api-select
-              inputId="centro_costo"
-              formControlName="centro_costo"
-              [endpoint]="centroCostoEndpoint"
-              [suggestedIndex]="0"
-              [placeholder]="
-                t().entities.facturaCompraRecurrente.form.fields.centroCostoPlaceholder
-              "
-            />
-          </div>
-
-          <!-- Sede -->
-          <div class="flex flex-col gap-1.5">
-            <label for="sede" class="factura-compra-recurrente-form__label">
-              {{ t().entities.facturaCompraRecurrente.form.fields.sede }}
-            </label>
-            <lib-api-select
-              inputId="sede"
-              formControlName="sede"
-              [endpoint]="sedeEndpoint"
-              [placeholder]="t().entities.facturaCompraRecurrente.form.fields.sedePlaceholder"
-            />
-          </div>
+        <!-- Centro de costo: lo heredan las líneas nuevas; cada una lo puede cambiar. -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="factura-compra-recurrente-form__label">
+            {{ t().entities.facturaCompraRecurrente.form.fields.centroCosto }}
+          </label>
+          <lib-api-select
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [suggestedIndex]="0"
+            [placeholder]="t().entities.facturaCompraRecurrente.form.fields.centroCostoPlaceholder"
+          />
         </div>
 
         <!-- Almacén general: lo heredan las líneas nuevas; cada una lo puede cambiar. -->

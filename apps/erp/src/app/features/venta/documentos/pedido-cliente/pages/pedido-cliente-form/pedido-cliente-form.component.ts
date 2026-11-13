@@ -28,6 +28,7 @@ import {
   I18nService,
   startOfToday,
   TenantService,
+  SELECT_ENDPOINTS,
   ToastService,
   precioListaDeContacto,
   resumenDesdeCabecera,
@@ -35,7 +36,7 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
-import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ENTITY_DATA_GATEWAY, extractDocumentoId } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
@@ -92,6 +93,7 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    ErpApiSelectComponent,
     CrearTerceroDirective,
     ComercialDocumentoDetallesComponent,
   ],
@@ -140,6 +142,10 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
 
   protected readonly isEditMode = computed(() => !!this.id());
 
+  protected readonly sedeEndpoint = SELECT_ENDPOINTS.sede;
+  /** En alta la sede arranca en la primera opción; en edición manda la del documento. */
+  protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
@@ -161,6 +167,7 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
   protected readonly form = this.fb.group({
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
+    sede: this.fb.control<ErpSelectOption | null>(null),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 

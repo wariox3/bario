@@ -48,6 +48,7 @@ interface CabeceraView {
   readonly sector: string | null;
   readonly estrato: number | null;
   readonly salario: number | null;
+  readonly sede: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
    * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
@@ -210,6 +211,7 @@ export class ServicioDocumentoDetailComponent implements OnInit {
             sector: fv.sector?.nombre ?? read.sector_nombre ?? null,
             estrato: fv.estrato ?? null,
             salario: fv.salario ?? null,
+            sede: fv.sede?.nombre ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,
               estado_anulado: read.estado_anulado,

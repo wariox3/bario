@@ -4,6 +4,7 @@ import {
   buildFiltrosDetalle,
   buildMovimientoInformeForm,
   buildMovimientoInformeParams,
+  consultaDesdeUrl,
 } from './movimiento-informe.utils';
 
 /**
@@ -103,5 +104,30 @@ describe('movimiento-informe · filtros', () => {
 
   it('sin parámetros de detalle no agrega filtros', () => {
     expect(buildFiltrosDetalle({})).toEqual([]);
+  });
+});
+
+describe('consultaDesdeUrl', () => {
+  const params = { cuenta: '1105', nombre: 'Caja', desde: '2026-01-01', hasta: '2026-10-31' };
+
+  it('arma el rango de la cuenta con sus hijas y las dos fechas', () => {
+    const consulta = consultaDesdeUrl(params);
+    expect(consulta?.cuenta_desde).toMatchObject({ nombre: '1105 - Caja', codigo: '1105' });
+    expect(consulta?.cuenta_hasta['codigo']).toBe('1105999999999999');
+    expect(consulta?.fecha_desde).toEqual(new Date(2026, 0, 1));
+    expect(consulta?.fecha_hasta).toEqual(new Date(2026, 9, 31));
+  });
+
+  it('deja afuera a la cuenta vecina y adentro a las hijas', () => {
+    const consulta = consultaDesdeUrl(params);
+    const hasta = consulta?.cuenta_hasta['codigo'] as string;
+    expect('110505' <= hasta).toBe(true);
+    expect('1110' <= hasta).toBe(false);
+  });
+
+  it('sin cuenta o con fechas inválidas no hay consulta', () => {
+    expect(consultaDesdeUrl({})).toBeNull();
+    expect(consultaDesdeUrl({ ...params, cuenta: 'abc' })).toBeNull();
+    expect(consultaDesdeUrl({ ...params, hasta: 'ayer' })).toBeNull();
   });
 });

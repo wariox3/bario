@@ -166,6 +166,20 @@
             [messages]="{ required: t().entities.servicioDocumento.form.validation.required }"
           />
         </div>
+
+        <!-- Sede -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sede" class="servicio-documento-form__label">
+            {{ t().entities.servicioDocumento.form.fields.sede }}
+          </label>
+          <lib-api-select
+            inputId="sede"
+            formControlName="sede"
+            [endpoint]="sedeEndpoint"
+            [suggestedIndex]="primeraSugerida()"
+            [placeholder]="t().entities.servicioDocumento.form.fields.sedePlaceholder"
+          />
+        </div>
       </div>
     </div>
   </section>

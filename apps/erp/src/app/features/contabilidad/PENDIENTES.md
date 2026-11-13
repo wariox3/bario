@@ -55,6 +55,10 @@ La ruta vieja quedó para el listado plano de movimientos (§9).
 Luego el backend la renombró a `/contabilidad/movimiento-informe-base/`, y el front ya apunta ahí.
 El estado de resultados salió de esa familia: va por `/contabilidad/movimiento-informe-resultado/`
 (`lista/` y `excel/`, sin paginar ni `totales/`), con la presentación `base` o `formal` en `informe`.
+El estado de situación financiera hizo lo mismo: va por `/contabilidad/movimiento-informe-situacion/`
+(`lista/`, `excel/` y `pdf/`, este solo del formal). El formal es un **corte** (`fecha_hasta`, sin
+`fecha_desde`) con `comparar` y `nivel`, y responde `encabezado` (totales, cuadre y razones de los
+dos cortes) más `filas` tipadas (`SECCION` … `TOTAL_FINAL`).
 
 Confirmado contra el **schema del contenedor**: `GET https://reddocapi.uk/api/contenedor/schema/`
 sirve el OpenAPI con todas las rutas del tenant. Ahí está declarado todo lo de abajo.
@@ -337,8 +341,8 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 | Auxiliar general               | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
 | Base                           | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | no  |
 | Certificado de retención       | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | sí  |
-| Estado de resultados           | `movimiento-informe-personalizado/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
-| Estado de situación financiera | `movimiento-informe-personalizado/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
+| Estado de resultados           | `movimiento-informe-resultado/`          | periodo + centro de costo | formal propia · base plana    | no  |
+| Estado de situación financiera | `movimiento-informe-situacion/`          | corte + comparar + nivel  | formal propia · base plana    | sí  |
 
 > "Completos" = periodo + rango de cuentas + las dos banderas.
 

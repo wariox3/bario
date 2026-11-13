@@ -1,19 +1,26 @@
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import type { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { MenuModule } from 'primeng/menu';
 import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 
 /**
- * Botonera de los informes contables: **PDF**, **Excel** y **Generar**.
+ * Botonera de los informes contables: **Exportar** (Excel y, si el informe lo
+ * sirve, PDF) y **Generar**.
  *
- * Componente tonto: recibe los estados y emite. Las tres acciones pegan al
- * mismo endpoint con los mismos parámetros —solo cambia una bandera del body—,
- * pero las descargas se habilitan únicamente sobre un informe ya generado.
+ * Componente tonto: recibe los estados y emite. Las acciones pegan al mismo
+ * endpoint con los mismos parámetros, pero las descargas se habilitan
+ * únicamente sobre un informe ya generado.
+ *
+ * Las descargas van en un **desplegable** y no como botones sueltos: es el
+ * estándar del ERP (el «Acciones» de los listados, «Utilidades» en las fichas)
+ * y deja a Generar como la única acción con color de la botonera.
  */
 @Component({
   selector: 'app-movimiento-informe-actions',
   standalone: true,
-  imports: [ButtonModule],
+  imports: [ButtonModule, MenuModule],
   template: `
     @let d = t();
     <div class="flex items-center justify-end gap-2">
@@ -28,28 +35,23 @@ import type { AppDict } from '@erp/i18n';
           <i class="pi pi-exclamation-circle text-[0.8rem]"></i>{{ hint() }}
         </span>
       }
-      @if (showPdf()) {
-        <p-button
-          icon="pi pi-file-pdf"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          [label]="d.common.actions.exportPdf"
-          [loading]="exportingPdf()"
-          [disabled]="!canExport()"
-          (onClick)="pdf.emit()"
-        />
-      }
+      <!--
+        Controles de vista del informe (p. ej. mostrar la variación): no cambian
+        la consulta, así que van con la botonera y no en el panel de parámetros.
+      -->
+      <ng-content />
       <p-button
-        icon="pi pi-file-excel"
+        [label]="d.common.actions.export"
+        icon="pi pi-chevron-down"
+        iconPos="right"
         severity="secondary"
         [outlined]="true"
         size="small"
-        [label]="d.common.actions.exportExcel"
-        [loading]="exportingExcel()"
+        [loading]="exportingExcel() || exportingPdf()"
         [disabled]="!canExport()"
-        (onClick)="excel.emit()"
+        (onClick)="exportMenu.toggle($event)"
       />
+      <p-menu #exportMenu [popup]="true" [model]="exportItems()" appendTo="body" />
       <p-button
         icon="pi pi-bolt"
         size="small"
@@ -91,6 +93,29 @@ export class MovimientoInformeActionsComponent {
    * después de generar, así lo que se ve en la tabla no se lee como vigente.
    */
   readonly hint = input<string>('');
+
+  /**
+   * Ítems del desplegable. `computed` y no un getter: `<p-menu [model]>` pierde
+   * el primer clic si recibe un array nuevo en cada detección de cambios.
+   */
+  protected readonly exportItems = computed<MenuItem[]>(() => {
+    const actions = this.t().common.actions;
+    const items: MenuItem[] = [
+      {
+        label: actions.exportExcel,
+        icon: 'pi pi-file-excel',
+        command: () => this.excel.emit(),
+      },
+    ];
+    if (this.showPdf()) {
+      items.push({
+        label: actions.exportPdf,
+        icon: 'pi pi-file-pdf',
+        command: () => this.pdf.emit(),
+      });
+    }
+    return items;
+  });
 
   readonly generar = output<void>();
   readonly excel = output<void>();

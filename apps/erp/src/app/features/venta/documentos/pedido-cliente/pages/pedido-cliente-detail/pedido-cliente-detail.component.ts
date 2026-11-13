@@ -45,6 +45,7 @@ interface CabeceraView {
   /** Identificación del contacto (`contacto_numero_identificacion` del read). */
   readonly identificacion: string | null;
   readonly fecha: Date | null;
+  readonly sede: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
    * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
@@ -225,6 +226,7 @@ export class PedidoClienteDetailComponent implements OnInit {
             cliente: read.contacto_nombre_corto ?? null,
             identificacion: read.contacto_numero_identificacion ?? null,
             fecha: fromIsoDate(read.fecha),
+            sede: read.sede_nombre ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,
               estado_anulado: read.estado_anulado,

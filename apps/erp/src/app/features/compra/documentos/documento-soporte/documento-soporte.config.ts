@@ -49,6 +49,7 @@ export const DOCUMENTO_SOPORTE_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canViewAfectacion: true,
     canCorregir: true,
     canAnular: true,
   },

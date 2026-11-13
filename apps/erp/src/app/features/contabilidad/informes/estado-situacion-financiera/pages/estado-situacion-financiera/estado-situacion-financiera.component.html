@@ -1,8 +1,11 @@
 <!--
   Informe "Estado de situación financiera".
-  Gemelo del estado de resultados: el panel solo muestra el periodo y la tabla va
-  plana, con clase y grupo al frente. Sin PDF.
+  Gemelo del estado de resultados: formal o base, sin paginar. El formal es un
+  corte (sin fecha desde) con comparativo, nivel de detalle y PDF.
 -->
+@let d = t().entities.estadoSituacionFinanciera;
+@let dc = t().entities.informeCuentas;
+
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
   <app-movimiento-informe-params
     toolbar
@@ -10,35 +13,133 @@
     idPrefix="esf"
     [showCuentas]="false"
     [showSoloConSaldo]="false"
+    [showFechaDesde]="!esFormal()"
+    [periodoLabel]="esFormal() ? d.groups.corte : d.groups.periodo"
+    [fechaHastaLabel]="esFormal() ? d.params.fechaCorte : ''"
+    [showDetalle]="true"
+    [detalleEnFila]="true"
+    [detalleLabel]="d.groups.presentacion"
   >
+    <!-- Contra qué corte se compara: va con la fecha de corte, es la otra mitad de la pregunta. -->
+    @if (esFormal()) {
+      <div periodo class="mi-params__field">
+        <label for="esf-comparar" class="mi-params__label">{{ d.params.comparar }}</label>
+        <p-select
+          inputId="esf-comparar"
+          [formControl]="comparar"
+          [options]="opcionesComparar()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [fluid]="true"
+        />
+      </div>
+    }
+
+    <div class="mi-params__field">
+      <label for="esf-presentacion" class="mi-params__label">{{ d.presentacion.label }}</label>
+      <p-select
+        inputId="esf-presentacion"
+        [formControl]="presentacion"
+        [options]="presentaciones()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+
+    <!--
+      Nivel de detalle: dos opciones que se ven a la vez, así que va segmentado
+      y no en un desplegable. Solo lo lee el formal. La opción activa toma el
+      color primario del tema (el de Generar) y el marco es el de los inputs
+      vecinos, por variables de PrimeNG y no por colores sueltos.
+    -->
+    @if (esFormal()) {
+      <div class="mi-params__field !flex-none">
+        <span id="esf-nivel-label" class="mi-params__label">{{ d.params.nivel }}</span>
+        <div
+          role="radiogroup"
+          aria-labelledby="esf-nivel-label"
+          class="inline-flex h-[2.35rem] gap-0.5 rounded-[var(--p-form-field-border-radius)] border border-[var(--p-form-field-border-color)] bg-[var(--p-form-field-background)] p-0.5"
+        >
+          @for (opcion of niveles(); track opcion.value) {
+            <button
+              type="button"
+              role="radio"
+              [attr.aria-checked]="nivelActual() === opcion.value"
+              class="cursor-pointer rounded border-0 px-3 text-[0.8rem] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue motion-reduce:transition-none"
+              [class]="
+                nivelActual() === opcion.value
+                  ? 'bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)]'
+                  : 'bg-transparent text-brand-muted hover:bg-[rgba(19,38,60,0.04)] hover:text-brand-navy'
+              "
+              (click)="elegirNivel(opcion.value)"
+            >
+              {{ opcion.label }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="mi-params__field">
+      <label for="esf-centro-costo" class="mi-params__label">{{ dc.params.centroCosto }}</label>
+      <lib-api-autocomplete
+        inputId="esf-centro-costo"
+        [formControl]="centroCosto"
+        [endpoint]="centroCostoEndpoint"
+        [placeholder]="dc.params.centroCostoPlaceholder"
+      />
+    </div>
+
     <app-movimiento-informe-actions
       acciones
       [loading]="isLoading()"
       [exportingExcel]="isExportingExcel()"
       [busy]="isBusy()"
       [canExport]="canExport()"
-      [showPdf]="soportaPdf"
+      [showPdf]="esFormal()"
       [exportingPdf]="isExportingPdf()"
       [hint]="hint()"
       (generar)="generar()"
       (excel)="exportExcel()"
       (pdf)="exportPdf()"
-    />
+    >
+      @if (ofreceVariacion()) {
+        <label
+          for="esf-variacion"
+          class="mr-1 inline-flex cursor-pointer items-center gap-2 text-[0.82rem] text-brand-navy"
+        >
+          <p-checkbox inputId="esf-variacion" [formControl]="verVariacion" [binary]="true" />
+          {{ d.variacion }}
+        </label>
+      }
+    </app-movimiento-informe-actions>
   </app-movimiento-informe-params>
 
-  <app-movimiento-informe-table
-    table
-    [rows]="rows()"
-    [amounts]="montos()"
-    [empty]="empty"
-    [totales]="totales()"
-    [loading]="isLoading()"
-    [generated]="generated()"
-    [showUbicacion]="true"
-    [jerarquia]="false"
-    [descuadre]="false"
-    [totalCount]="totalCount()"
-    [page]="page()"
-    (pageChange)="onPageChange($event)"
-  />
+  <ng-container ngProjectAs="[table]">
+    @if (formal(); as informeFormal) {
+      <app-situacion-formal-table
+        [informe]="informeFormal"
+        [empty]="empty"
+        [loading]="isLoading()"
+        [mostrarVariacion]="variacionVisible()"
+        [auxiliarRuta]="auxiliarRuta()"
+      />
+    } @else {
+      <!-- Sin `totalCount`: la presentación base no pagina y el pie queda oculto. -->
+      <app-movimiento-informe-table
+        [rows]="rows()"
+        [amounts]="montos()"
+        [empty]="empty"
+        [totales]="totales()"
+        [loading]="isLoading()"
+        [generated]="generated()"
+        [showUbicacion]="true"
+        [jerarquia]="false"
+        [descuadre]="false"
+      />
+    }
+  </ng-container>
 </lib-list-shell>

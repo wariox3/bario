@@ -156,6 +156,12 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
 
   protected readonly isEditMode = computed(() => !!this.id());
 
+  /**
+   * En alta la sede auto-selecciona su primera opción (como la factura de
+   * venta). En edición manda la del documento.
+   */
+  protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
