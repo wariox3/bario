@@ -375,6 +375,28 @@ export interface AppDict
       vacio: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    anularLista: {
+      label: string;
+      /** `message` lleva `{n}`, la cantidad de documentos; `messageUno`, para uno solo. */
+      confirmar: {
+        header: string;
+        headerUno: string;
+        message: string;
+        messageUno: string;
+        accept: string;
+        reject: string;
+      };
+      sinSeleccion: { title: string; desc: string };
+      /** `desc` lleva `{n}`; `descUno`, para uno solo. */
+      exito: { title: string; desc: string; descUno: string };
+      /** `title` lleva `{n}` (anulados) y `{total}`. */
+      parcial: { title: string };
+      error: { title: string; desc: string };
+      /** Prefijo del id de cada rechazo en el aviso. */
+      idLabel: string;
+      /** Lleva `{n}`: los rechazos que no se detallan. */
+      yMas: string;
+    };
     generarRecurrente: {
       seleccionadosLabel: string;
       modalHeader: string;

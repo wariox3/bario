@@ -403,6 +403,34 @@ export const es: AppDict = {
         desc: 'Ocurrió un error al generar la impresión. Intenta de nuevo.',
       },
     },
+    anularLista: {
+      label: 'Anular',
+      confirmar: {
+        header: 'Anular documentos',
+        headerUno: 'Anular documento',
+        message:
+          'Se anularán {n} documentos. Anular es irreversible: cada documento queda congelado.',
+        messageUno: 'Se anulará 1 documento. Anular es irreversible: el documento queda congelado.',
+        accept: 'Anular',
+        reject: 'Cancelar',
+      },
+      sinSeleccion: {
+        title: 'Sin selección',
+        desc: 'Selecciona al menos un documento para anular.',
+      },
+      exito: {
+        title: 'Documentos anulados',
+        desc: 'Se anularon {n} documentos.',
+        descUno: 'Se anuló 1 documento.',
+      },
+      parcial: { title: 'Se anularon {n} de {total}' },
+      error: {
+        title: 'No se pudo anular',
+        desc: 'Ocurrió un error al anular el documento.',
+      },
+      idLabel: 'ID',
+      yMas: 'y {n} más',
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',

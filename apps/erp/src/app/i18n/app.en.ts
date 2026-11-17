@@ -392,6 +392,33 @@ export const en: AppDict = {
         desc: 'Something went wrong while generating the print. Try again.',
       },
     },
+    anularLista: {
+      label: 'Void',
+      confirmar: {
+        header: 'Void documents',
+        headerUno: 'Void document',
+        message: '{n} documents will be voided. Voiding cannot be undone: each document is frozen.',
+        messageUno: '1 document will be voided. Voiding cannot be undone: the document is frozen.',
+        accept: 'Void',
+        reject: 'Cancel',
+      },
+      sinSeleccion: {
+        title: 'No selection',
+        desc: 'Select at least one document to void.',
+      },
+      exito: {
+        title: 'Documents voided',
+        desc: '{n} documents were voided.',
+        descUno: '1 document was voided.',
+      },
+      parcial: { title: '{n} of {total} voided' },
+      error: {
+        title: 'Could not void',
+        desc: 'Something went wrong while voiding the document.',
+      },
+      idLabel: 'ID',
+      yMas: 'and {n} more',
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',

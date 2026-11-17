@@ -14,7 +14,8 @@ import {
  *
  * **Documento de solo lectura, pero no inerte**: no se captura a mano (lo
  * fabrica la acción "Generar" del toolbar, que consolida las nóminas de un
- * periodo), y desde la ficha se aprueba, anula y emite a la DIAN.
+ * periodo), y desde la ficha se aprueba, anula y emite a la DIAN. Desde el
+ * listado también se anula: al marcar filas aparece "Anular" junto a eliminar.
  *
  * `new` y `edit` se declaran porque el tipo los exige, pero ninguna capa los
  * usa con `canCreate`/`canEdit` en false.
@@ -46,5 +47,11 @@ export const NOMINA_ELECTRONICA_CONFIG: DocumentEntityConfig = {
     canGenerate: false,
     canAnular: true,
   },
-  extraActionIds: ['generar-nomina-electronica', 'imprimir', 'imprimir-zip', 'export-excel'],
+  extraActionIds: [
+    'generar-nomina-electronica',
+    'imprimir',
+    'imprimir-zip',
+    'export-excel',
+    'anular',
+  ],
 };

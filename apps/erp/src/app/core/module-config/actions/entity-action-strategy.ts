@@ -31,6 +31,11 @@ export interface EntityActionContext {
   readonly totalCount: number;
   /** Recarga la lista. El strategy lo llama tras una operación exitosa. */
   readonly reload: () => void;
+  /**
+   * Desmarca las filas. Lo llama la acción que deja la selección sin sentido,
+   * como anular: las filas anuladas no se vuelven a anular.
+   */
+  readonly clearSelection: () => void;
 }
 
 /**
@@ -64,8 +69,11 @@ export interface EntityActionStrategy {
    *    acción **de rutina** del documento, la que se usa cada vez que se entra
    *    al listado y no merece un click de más (ej. "Generar todos" en una
    *    plantilla recurrente).
+   *  - `'selection'`: botón rojo que aparece junto a "Eliminar" solo cuando hay
+   *    filas marcadas, con el conteo. Para las acciones que solo existen sobre
+   *    una selección y no se deshacen (ej. anular).
    */
-  readonly placement?: 'menu' | 'button';
+  readonly placement?: 'menu' | 'button' | 'selection';
 
   /**
    * Filtro fino opcional, además de `extraActionIds`. Default: disponible.

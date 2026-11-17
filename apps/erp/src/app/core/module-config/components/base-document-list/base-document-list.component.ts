@@ -240,6 +240,16 @@ export class BaseDocumentListComponent {
   });
 
   /**
+   * Acciones de `placement: 'selection'`: el toolbar las pinta en rojo junto a
+   * "Eliminar" y solo mientras haya filas marcadas.
+   */
+  protected readonly selectionActions = computed<readonly ToolbarAction[]>(() =>
+    this.availableStrategies()
+      .filter((s) => s.placement === 'selection')
+      .map((s) => s.toolbarAction),
+  );
+
+  /**
    * El toolbar solo se monta si aporta algo: crear, filtrar, eliminar o alguna
    * acción extra. Un documento solo-lista (todas las capabilities en `false`, sin
    * filtros ni acciones) no lo muestra — queda card + tabla, sin barra vacía.
@@ -249,7 +259,8 @@ export class BaseDocumentListComponent {
       this.capabilities().canCreate ||
       this.filtersEnabled() ||
       this.capabilities().canDelete ||
-      this.trailingActions().length > 0,
+      this.trailingActions().length > 0 ||
+      this.selectionActions().length > 0,
   );
 
   /** Clave de persistencia de filtros, versionada por `schemaVersion` del documento. */
@@ -400,6 +411,7 @@ export class BaseDocumentListComponent {
         selectedIds: this.currentSelectedIds(),
         totalCount: this.totalCount(),
         reload: () => this.loadList(),
+        clearSelection: () => this.selectedRows.set([]),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
