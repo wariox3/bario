@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, EMPTY, Observable, switchMap, throwError } from 'rxjs';
+import { EMPTY, Observable, switchMap, throwError } from 'rxjs';
 import { AuthServiceContract, RoutePaths } from '../tokens';
 import { ToastService } from '../services/toast.service';
 import { TokenRefreshService } from '../services/token-refresh.service';
@@ -21,11 +21,24 @@ export function handleConnectionError(
   return throwError(() => error);
 }
 
+/**
+ * 401: renueva la sesión y reintenta la petición.
+ *
+ * - Todas las peticiones que caen en 401 a la vez comparten **un** refresh
+ *   (`TokenRefreshService.renovar`), que sigue aunque la que lo disparó se cancele.
+ * - Solo un refresh fallido cierra la sesión. Si falla el reintento (un 4xx de
+ *   negocio, un 500), la sesión ya se renovó y el error llega al componente.
+ * - Refresh fallido: un solo aviso de sesión vencida y al login. Las peticiones
+ *   se cortan con `EMPTY` en vez de propagar el error: la pantalla se va de todos
+ *   modos, y propagarlo sumaría el "no se pudo cargar" de cada una encima del
+ *   aviso. Como completan, los `finalize` (spinners) corren igual.
+ */
 export function handleUnauthorized(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
   authService: AuthServiceContract,
   tokenRefresh: TokenRefreshService,
+  toast: ToastService,
   error: HttpErrorResponse,
   skipUrls: string[],
 ): Observable<HttpEvent<unknown>> {
@@ -33,33 +46,18 @@ export function handleUnauthorized(
     return throwError(() => error);
   }
 
-  if (!tokenRefresh.refreshing) {
-    tokenRefresh.startRefresh();
+  const sesionVencida = () => {
+    // Sin sesión previa (p. ej. el `me()` del arranque sin cookies) no hay nada
+    // que avisar: `clearSession` tampoco navega en ese caso y el guard decide.
+    if (authService.isAuthenticated()) {
+      toast.warn('Sesión expirada', 'Inicia sesión de nuevo para continuar.');
+    }
+    authService.clearSession();
+  };
 
-    // El `catchError` va antes del reintento: solo un refresh fallido cierra la
-    // sesión. Si el reintento falla (un 4xx de negocio, un 500), la sesión ya se
-    // renovó y el error es de la petición, no de la autenticación.
-    return authService.refresh().pipe(
-      catchError((refreshError) => {
-        tokenRefresh.failRefresh();
-        authService.clearSession();
-        return throwError(() => refreshError);
-      }),
-      switchMap(() => {
-        tokenRefresh.completeRefresh();
-        return next(req);
-      }),
-    );
-  }
-
-  return tokenRefresh.waitForRefresh().pipe(
-    switchMap((success) => {
-      if (success) {
-        return next(req);
-      }
-      return throwError(() => error);
-    }),
-  );
+  return tokenRefresh
+    .renovar(() => authService.refresh(), sesionVencida)
+    .pipe(switchMap((renovada) => (renovada ? next(req) : EMPTY)));
 }
 
 /**
