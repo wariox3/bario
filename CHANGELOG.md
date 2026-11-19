@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.28](https://github.com/wariox3/bario/compare/v0.1.27...v0.1.28) (2026-11-19)
+
+### Features
+
+- **configuracion:** pestaña usuario con sede, almacén y caja por defecto ([47b419a](https://github.com/wariox3/bario/commit/47b419a4fad5b9d6a76a43ff75b095c686efb2db))
+- **documentos:** corregir contacto y base en las líneas de nómina ([ec57df6](https://github.com/wariox3/bario/commit/ec57df6023ba5922e7e0c64524240424867850a0))
+- **documentos:** sugerir sede y almacén por defecto del usuario ([1d06a80](https://github.com/wariox3/bario/commit/1d06a802681719b86b892408e4028f39994d9ff6))
+- **humano:** anular nóminas electrónicas desde el listado ([7e3d452](https://github.com/wariox3/bario/commit/7e3d45213e3519ca2255a67da44aea48e3f05c40))
+- **nomina:** corregir la contabilidad desde la ficha ([ac06102](https://github.com/wariox3/bario/commit/ac0610271a5eb00e883fc36cf75e56ad703e68b6))
+- **pos:** almacén, sede y caja desde la configuración del usuario ([067a051](https://github.com/wariox3/bario/commit/067a05139f75cb79f7f820a58eb6b4903a797cfd))
+- **programacion:** filtrar empleados por nombre e identificación ([3b860d9](https://github.com/wariox3/bario/commit/3b860d9a18141ff40383a5e6e7c2c8c4458580eb))
+- **venta:** sugerir el asesor del cliente al elegirlo ([565dfd1](https://github.com/wariox3/bario/commit/565dfd1561f8b2eea9135444acb30a8106df2867))
+
+### Bug Fixes
+
+- **core:** avisar y redirigir al login cuando vence la sesión ([be782a5](https://github.com/wariox3/bario/commit/be782a5aa87837b423c027886bdef0aacbda9e7d))
+- **documentos:** corregir trata las líneas de nómina sin cuenta ([f6b4fd1](https://github.com/wariox3/bario/commit/f6b4fd1eba69a2ca26d356d4817d495b290c8ba4))
+- **humano:** filtrar adicionales, créditos y novedades con campos permitidos ([9635b5e](https://github.com/wariox3/bario/commit/9635b5e1479a9d472e4ddceb024102a556c7e7b2))
+- **landing:** actualizar el teléfono de contacto y centralizarlo ([9f6e019](https://github.com/wariox3/bario/commit/9f6e019f0756863517b704005ccc7a7e6e9c2fa6))
+- **pos:** aclarar que almacén, sede y caja son de cada usuario ([af5c9d1](https://github.com/wariox3/bario/commit/af5c9d15d6ec52df8f4a8000244d5fb0106193a9))
+- **seguridad-social:** mostrar el precio de la línea en la columna pago ([4dcd93c](https://github.com/wariox3/bario/commit/4dcd93cdbdb0fb4e4a0850e3e70837b7cf7a5e1d))
+- **seguridad-social:** rotular entidad y quitar devengado y deducción del listado ([b5f91cc](https://github.com/wariox3/bario/commit/b5f91cc235365a4b03060515c6634136363f2780))
+
+### Refactoring
+
+- **erp:** una sola card para las tabs con tablas ([6bef1f2](https://github.com/wariox3/bario/commit/6bef1f25d89c5ea84bcde40f85bd7bc91d9172c9))
+- **humano:** tabla como cuerpo de la card en nómina y seguridad social ([aac915e](https://github.com/wariox3/bario/commit/aac915e92d678b39425673ba325ea564261f3032))
+
 ## [0.1.27](https://github.com/wariox3/bario/compare/v0.1.26...v0.1.27) (2026-11-13)
 
 ### Features
