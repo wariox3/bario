@@ -102,7 +102,7 @@
               inputId="almacen"
               formControlName="almacen"
               [endpoint]="almacenEndpoint"
-              [suggestedIndex]="almacenSugerido"
+              [suggestedIndex]="almacenSugerido()"
               [invalid]="form.controls.almacen.invalid && form.controls.almacen.touched"
             />
             <lib-field-error [control]="form.controls.almacen" />
@@ -125,13 +125,48 @@
 
           <div class="flex flex-col gap-1.5">
             <label
+              for="caja"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ c.campos.caja }}
+            </label>
+            <lib-api-select
+              inputId="caja"
+              formControlName="caja"
+              [endpoint]="cajaEndpoint"
+              [params]="cajaParams()"
+              [showClear]="true"
+              [invalid]="form.controls.caja.invalid"
+            />
+            <lib-field-error [control]="form.controls.caja" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
               for="asesor"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
               {{ c.campos.asesor }}
             </label>
             <lib-asesor-select inputId="asesor" formControlName="asesor" />
+            <p class="m-0 text-[0.72rem] text-brand-muted">{{ c.campos.asesorHint }}</p>
           </div>
+
+          @if (estadoUsuario() === 'error') {
+            <p
+              class="m-0 flex flex-wrap items-center gap-2 text-[0.78rem] text-red-700 md:col-span-2"
+              role="alert"
+            >
+              {{ c.operacion.error }}
+              <button
+                type="button"
+                class="font-semibold underline underline-offset-2"
+                (click)="recargarUsuario()"
+              >
+                {{ c.documento.reintentar }}
+              </button>
+            </p>
+          }
         </div>
       </section>
     </div>

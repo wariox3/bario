@@ -5,7 +5,13 @@ import { AUTH_SERVICE } from '../tokens';
 import { TenantService } from '../tenant/tenant.service';
 import type { ErpSelectOption } from '../data/erp-select-data.service';
 import { ConfiguracionUsuarioService } from './configuracion-usuario.service';
-import type { ConfiguracionUsuarioRead } from './configuracion-usuario.model';
+import type {
+  ConfiguracionUsuarioPayload,
+  ConfiguracionUsuarioRead,
+} from './configuracion-usuario.model';
+
+/** Lectura de la configuración del contenedor y usuario activos. */
+export type EstadoConfiguracionUsuario = 'cargando' | 'listo' | 'error';
 
 interface Entrada {
   /** Contenedor y usuario a los que pertenece: `slug|usuarioId`. */
@@ -37,6 +43,8 @@ export class ConfiguracionUsuarioStore {
   private readonly auth = inject(AUTH_SERVICE);
 
   private readonly entrada = signal<Entrada | null>(null);
+  /** Clave cuya última lectura falló; deja de valer sola al cambiar de contenedor o sesión. */
+  private readonly falloEn = signal<string | null>(null);
   /** Petición en vuelo y su clave: dos `cargar()` simultáneos comparten una sola. */
   private enVuelo: {
     readonly clave: string;
@@ -54,6 +62,17 @@ export class ConfiguracionUsuarioStore {
     const entrada = this.entrada();
     const clave = this.claveActual();
     return entrada && clave && entrada.clave === clave ? entrada.config : null;
+  });
+
+  /**
+   * `cargando` hasta que llega la primera lectura; `error` si falló (el próximo
+   * `cargar()` reintenta). Sirve a quien no puede operar sin ella, como el POS,
+   * para no confundir "todavía no llegó" con "no hay nada configurado".
+   */
+  readonly estado = computed((): EstadoConfiguracionUsuario => {
+    if (this.config()) return 'listo';
+    const clave = this.claveActual();
+    return clave && this.falloEn() === clave ? 'error' : 'cargando';
   });
 
   /** Sede por defecto como opción de select (`null` si no hay o aún no llegó). */
@@ -86,10 +105,14 @@ export class ConfiguracionUsuarioStore {
     if (vigente) return of(vigente);
     if (this.enVuelo?.clave === clave) return this.enVuelo.config$;
 
+    this.falloEn.set(null);
     const config$ = this.service.obtener({ errorToast: false }).pipe(
       tap((config) => this.entrada.set({ clave, config })),
       map((config): ConfiguracionUsuarioRead | null => config),
-      catchError(() => of(null)),
+      catchError(() => {
+        this.falloEn.set(clave);
+        return of(null);
+      }),
       tap(() => {
         if (this.enVuelo?.config$ === config$) this.enVuelo = null;
       }),
@@ -97,6 +120,14 @@ export class ConfiguracionUsuarioStore {
     );
     this.enVuelo = { clave, config$ };
     return config$;
+  }
+
+  /**
+   * Guarda en el backend (PATCH parcial: `null` quita el valor) y deja la copia
+   * en memoria con lo que devolvió. Los errores llegan a quien llama.
+   */
+  guardar(payload: ConfiguracionUsuarioPayload): Observable<ConfiguracionUsuarioRead> {
+    return this.service.actualizar(payload).pipe(tap((config) => this.establecer(config)));
   }
 
   /** Reemplaza la copia en memoria con lo que devolvió el backend (p. ej. tras el PATCH). */

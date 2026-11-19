@@ -40,7 +40,12 @@
         {{ a.fields.caja }}
         <span class="ml-px text-red-500">*</span>
       </label>
-      <lib-api-select inputId="turno-caja" formControlName="caja" [endpoint]="cajaEndpoint" />
+      <lib-api-select
+        inputId="turno-caja"
+        formControlName="caja"
+        [endpoint]="cajaEndpoint"
+        [suggestedMatch]="cajaSugerida()"
+      />
       <lib-field-error [control]="f.caja" [messages]="{ required: a.validation.required }" />
     </div>
 

@@ -102,14 +102,14 @@ export class UsuarioConfigComponent {
     const toasts = this.t().configuracion.toasts;
     const payload = usuarioConfigFormToPayload(this.form.getRawValue());
 
-    this.configuracionUsuarioService
-      .actualizar(payload)
+    // `guardar` deja la copia del store al día: los formularios de alta toman el
+    // cambio sin otra petición.
+    this.configuracionUsuarioStore
+      .guardar(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (config) => {
           this.isSaving.set(false);
-          // Los formularios de alta leen del store: así toman el cambio sin otra petición.
-          this.configuracionUsuarioStore.establecer(config);
           this.aplicar(usuarioConfiguracionToForm(config));
           this.toast.success(toasts.saveSuccess.title, toasts.saveSuccess.desc);
         },

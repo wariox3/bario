@@ -327,6 +327,7 @@ export {
   coincideConOpcion,
   configuracionUsuarioResolver,
 } from './lib/configuracion-usuario/configuracion-usuario.store';
+export type { EstadoConfiguracionUsuario } from './lib/configuracion-usuario/configuracion-usuario.store';
 export type {
   ConfiguracionUsuarioPayload,
   ConfiguracionUsuarioRead,

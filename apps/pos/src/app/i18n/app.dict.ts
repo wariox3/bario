@@ -613,11 +613,15 @@ export interface AppDict
       deLaVenta: string;
       error: string;
     };
-    operacion: { title: string; hint: string };
+    /** Almacén, sede y caja: de la configuración del usuario (backend), compartida con el ERP. */
+    operacion: { title: string; hint: string; error: string };
     campos: {
       almacen: string;
       sede: string;
+      caja: string;
       asesor: string;
+      /** El asesor es del equipo, no del usuario. */
+      asesorHint: string;
     };
     sinGuardar: string;
     guardar: string;
@@ -625,6 +629,7 @@ export interface AppDict
       guardada: { title: string; desc: string };
       tipoError: { title: string; desc: string };
       tirillaError: { title: string; desc: string };
+      operacionError: { title: string; desc: string };
     };
   };
 }

@@ -79,8 +79,8 @@ export class VenderComponent {
   protected readonly catalogo = inject(CatalogoStore);
   private readonly configuracionCaja = inject(ConfiguracionCajaStore);
   protected readonly configuracionCompleta = this.configuracionCaja.completa;
-  /** Lectura del tipo de documento de la empresa: mientras carga no se avisa nada. */
-  protected readonly estadoTipo = this.configuracionCaja.estadoTipo;
+  /** Lectura del tipo de la empresa y de la configuración del usuario: mientras carga no se avisa nada. */
+  protected readonly estadoConfiguracion = this.configuracionCaja.estado;
   protected readonly cantidades = this.carritos.cantidades;
 
   /** Hubo búsqueda: el vacío se explica distinto que un catálogo sin productos. */
@@ -177,8 +177,8 @@ export class VenderComponent {
     }
   }
 
-  protected recargarTipo(): void {
-    this.configuracionCaja.recargarTipo();
+  protected recargarConfiguracion(): void {
+    this.configuracionCaja.recargar();
   }
 
   protected onBuscar(criterio: CriterioBusqueda): void {

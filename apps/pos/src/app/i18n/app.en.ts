@@ -180,12 +180,12 @@ export const en: AppDict = {
     title: 'Sell',
     configuracion: {
       title: 'Setup required',
-      desc: "Before selling, choose the company's document type and this register's warehouse.",
+      desc: "Before selling, choose the company's document type and your warehouse.",
       accion: 'Go to settings',
     },
     configuracionError: {
-      title: "Couldn't read the company settings",
-      desc: "Without the document type the register can't charge.",
+      title: "Couldn't read the settings",
+      desc: "Without the document type and the warehouse the register can't charge.",
       accion: 'Retry',
     },
     turno: {
@@ -761,7 +761,7 @@ export const en: AppDict = {
   configuracion: {
     title: 'Register settings',
     subtitle:
-      'The default document type and the receipt belong to the company; the rest is stored on this device.',
+      'The document type and the receipt belong to the company; warehouse, branch and register are yours, and the advisor is stored on this device.',
     documento: {
       title: 'Document type',
       hint: 'Every sale starts with this type; you can change it when invoicing.',
@@ -787,12 +787,15 @@ export const en: AppDict = {
     },
     operacion: {
       title: 'Operation',
-      hint: 'Where goods come from and where money goes.',
+      hint: 'They belong to your user: they follow you to any device and the ERP suggests them too.',
+      error: "Couldn't read your settings.",
     },
     campos: {
       almacen: 'Warehouse',
       sede: 'Branch',
+      caja: 'Register',
       asesor: 'Default advisor',
+      asesorHint: 'Stored on this device; it can be changed when charging.',
     },
     sinGuardar: 'Unsaved changes',
     guardar: 'Save',
@@ -807,6 +810,10 @@ export const en: AppDict = {
       },
       tirillaError: {
         title: "Couldn't save the receipt texts",
+        desc: 'Everything else was saved. Try again.',
+      },
+      operacionError: {
+        title: "Couldn't save warehouse, branch and register",
         desc: 'Everything else was saved. Try again.',
       },
     },
