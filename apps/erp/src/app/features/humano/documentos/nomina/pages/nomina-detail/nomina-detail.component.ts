@@ -34,7 +34,7 @@ const DIAN_DOCUMENT_URL = 'https://catalogo-vpfe.dian.gov.co/document/searchqr?d
  *
  * La nómina no se captura a mano: la emite el proceso de liquidación, así que
  * esta página no tiene gemela de formulario ni botón de editar. Desde acá se
- * vuelve a la lista, se imprime, y se aprueba/desaprueba.
+ * vuelve a la lista, se imprime, se aprueba/desaprueba y se corrige su contabilidad.
  *
  * Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y conceptos
  * (`DocumentoDetalleService`) en paralelo, igual que las fichas de inventario.

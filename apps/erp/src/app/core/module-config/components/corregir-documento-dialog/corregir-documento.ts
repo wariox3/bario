@@ -23,6 +23,8 @@ export interface CorregirLineaRead {
   readonly id: number;
   readonly tipo_registro?: string | null;
   readonly item_nombre?: string | null;
+  /** En la nómina las líneas son conceptos, no ítems. */
+  readonly concepto_nombre?: string | null;
   readonly cuenta_codigo?: string | null;
   readonly cuenta_nombre?: string | null;
   readonly cantidad?: string | number | null;
@@ -109,7 +111,7 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
   return {
     id: read.id,
     esCuenta,
-    descripcion: (esCuenta ? cuenta : read.item_nombre) ?? '',
+    descripcion: (esCuenta ? cuenta : (read.item_nombre ?? read.concepto_nombre)) ?? '',
     cantidad: toFiniteNumber(read.cantidad),
     precio: toFiniteNumber(read.precio),
     subtotal: toFiniteNumber(read.subtotal),
