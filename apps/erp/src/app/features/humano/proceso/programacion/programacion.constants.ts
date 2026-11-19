@@ -9,12 +9,23 @@ export const PROGRAMACIONES_FILTERS_STORAGE_KEY = 'programaciones:filters:v1';
 export const PROGRAMACION_LIST_PATH = ['humano', 'proceso', 'programacion'] as const;
 
 /**
- * Filtros de la tabla de empleados: solo por ID del renglón, como el ERP
- * anterior. No se guardan en el navegador como los de un listado: la tabla vive
- * dentro de cada programación, y un filtro guardado aparecería en la siguiente.
+ * Filtros de la tabla de empleados: ID del renglón, identificación y nombre del
+ * empleado (por su contacto, como seguridad social y liquidación). No se guardan
+ * en el navegador como los de un listado: la tabla vive dentro de cada
+ * programación, y un filtro guardado aparecería en la siguiente.
  */
 export const RENGLONES_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.programacion.renglones.columns.id', type: 'number' },
+  {
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.programacion.renglones.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.programacion.renglones.columns.empleado',
+    type: 'string',
+  },
 ];
 
 /**
