@@ -949,6 +949,13 @@ max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de l
     (`border-b px-5 py-2.5`) y la tabla sin borde. Una botonera propia de la página (cierre,
     depreciación) usa la misma banda.
   - Lo que no es tabla (la pestaña Información, un paginador) pone su propio padding o filete.
+  - **Vale para toda card con tabs de tablas**, no solo documentos (2026-11-19): workspaces de
+    programación, liquidación y aporte, conciliación (form y ficha) y la ficha de nómina
+    electrónica. La card no lleva `div` con `px-5 py-5` y el componente de cada pestaña
+    (`*-tab.component`) **no** trae recuadro propio (`rounded-xl border`): toolbar y tabla van
+    sueltos. El hint de la pestaña va arriba (`px-5 pt-3`) y las leyendas/abreviaturas al pie como
+    banda (`border-t border-[rgba(20,48,73,0.08)] px-5 py-3`). Tabs con formularios
+    (Configuración, detalle de usuario) quedan fuera: ahí el padding sí corresponde.
 - **Resumen flotante, fuera de las cards**, siempre (también con un tab único): tras la card de
   líneas, la caja `w-72` alineada a la derecha. La tabla ya no lo pinta: expone `resumen` y
   `hayLineas`, y la página los lee por referencia de plantilla —`<app-…-detalles #detallesTabla>`
