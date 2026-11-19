@@ -4,6 +4,8 @@
 import { getPlanDescription, getPlanFeatures } from '@reddoc/core';
 import type { PlanFeature as CorePlanFeature } from '@reddoc/core';
 
+import { CONTACTO } from '../shared/contacto.constants';
+
 export type Lang = 'es' | 'en';
 
 export interface Module {
@@ -436,7 +438,7 @@ const es: Dict = {
     address_label: 'Oficina',
     address: 'Cll 34 N.º 66 A 33 · Of. 201 · Conquistadores · Medellín, Colombia',
     phone_label: 'Teléfono',
-    phone: '+57 333 259 0639',
+    phone: CONTACTO.telefono,
     email_label: 'Correo',
     email: 'asesor@reddoc.co',
     form_name: 'Nombre completo',
@@ -750,7 +752,7 @@ const en: Dict = {
     address_label: 'Office',
     address: 'Cll 34 No. 66 A 33 · Of. 201 · Conquistadores · Medellín, Colombia',
     phone_label: 'Phone',
-    phone: '+57 333 259 0639',
+    phone: CONTACTO.telefono,
     email_label: 'Email',
     email: 'asesor@reddoc.co',
     form_name: 'Full name',
