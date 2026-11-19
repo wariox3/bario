@@ -1122,10 +1122,8 @@ export interface AppDict
         desde: string;
         hasta: string;
         identificacion: string;
-        empleado: string;
+        entidad: string;
         salario: string;
-        devengado: string;
-        deduccion: string;
         total: string;
         aprobado: string;
         anulado: string;
