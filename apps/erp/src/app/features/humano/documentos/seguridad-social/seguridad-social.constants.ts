@@ -109,7 +109,7 @@ export const SEGURIDAD_SOCIAL_DETALLE_COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.detalle.id`, type: 'number', width: '80px', align: 'right' },
   { field: 'detalle', headerKey: `${I18N}.detalle.detalle`, type: 'text' },
   {
-    field: 'pago',
+    field: 'precio',
     headerKey: `${I18N}.detalle.pago`,
     type: 'currency',
     width: '160px',
