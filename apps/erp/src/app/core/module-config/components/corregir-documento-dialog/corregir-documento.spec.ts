@@ -4,6 +4,7 @@ import {
   cambiosCabecera,
   cambiosLinea,
   corrigeCampo,
+  corrigeCentroCosto,
   exigidosFaltantes,
   payloadContabilidad,
   rechazoCorreccion,
@@ -55,6 +56,25 @@ const LINEA_EXIGE_CC = aLineaCorregible({
   centro_costo: 5,
   centro_costo_nombre: 'Administración',
   cuenta_exige_centro_costo: true,
+});
+
+/** Concepto de nómina tal como llega: sin cuenta, con `cuenta_exige_*` en null. */
+const LINEA_NOMINA = aLineaCorregible({
+  id: 226,
+  tipo_registro: 'N',
+  item_nombre: null,
+  concepto_nombre: 'Salario ordinario',
+  cuenta_codigo: null,
+  cuenta_nombre: null,
+  cuenta_exige_base: null,
+  cuenta_exige_contacto: null,
+  cuenta_exige_centro_costo: null,
+  base: '0.000000',
+  centro_costo: 1,
+  centro_costo_nombre: 'General',
+  contacto: 2,
+  contacto_numero_identificacion: '1118260344',
+  contacto_nombre_corto: 'sebastian hoyos piedrahita',
 });
 
 describe('aLineaCorregible', () => {
@@ -270,5 +290,38 @@ describe('exigidosFaltantes', () => {
       cuenta_exige_centro_costo: true,
     });
     expect([...exigidosFaltantes([sinCc]).keys()]).toEqual([2]);
+  });
+});
+
+describe('línea de nómina', () => {
+  it('se describe por su concepto y no exige nada', () => {
+    expect(LINEA_NOMINA).toMatchObject({
+      esCuenta: false,
+      esNomina: true,
+      descripcion: 'Salario ordinario',
+      exige: { centroCosto: false, base: false, contacto: false },
+    });
+  });
+
+  it('no deja corregir base, contacto ni centro de costo', () => {
+    expect(corrigeCampo(LINEA_NOMINA, 'base')).toBe(false);
+    expect(corrigeCampo(LINEA_NOMINA, 'contacto')).toBe(false);
+    expect(corrigeCentroCosto(LINEA_NOMINA)).toBe(false);
+    expect(corrigeCentroCosto(LINEA_ITEM)).toBe(true);
+  });
+
+  it('no manda cambios aunque se editen sus campos', () => {
+    const editada = {
+      ...LINEA_NOMINA,
+      centroCosto: { id: 7, nombre: 'Ventas' },
+      contacto: { id: 22, nombre: 'EPS' },
+      base: 1000,
+    };
+    expect(cambiosLinea(LINEA_NOMINA, editada)).toBeNull();
+  });
+
+  it('no la marca como incompleta aunque quede vacía', () => {
+    const vacia = { ...LINEA_NOMINA, centroCosto: null, contacto: null, base: 0 };
+    expect(exigidosFaltantes([vacia]).size).toBe(0);
   });
 });
