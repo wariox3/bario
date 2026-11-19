@@ -793,8 +793,9 @@ export const es: AppDict = {
       error: 'No se pudieron leer los textos de la tirilla.',
     },
     operacion: {
-      title: 'Operación',
-      hint: 'Son de tu usuario: te siguen a cualquier equipo y el ERP también los propone.',
+      title: 'Tu operación',
+      hint: 'Almacén, sede y caja son solo tuyos: cada persona que vende tiene los suyos. Te siguen a cualquier equipo y el ERP también los propone.',
+      soloTuUsuario: 'Solo tu usuario',
       error: 'No se pudo leer tu configuración.',
     },
     campos: {

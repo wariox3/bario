@@ -786,8 +786,9 @@ export const en: AppDict = {
       error: "Couldn't read the receipt texts.",
     },
     operacion: {
-      title: 'Operation',
-      hint: 'They belong to your user: they follow you to any device and the ERP suggests them too.',
+      title: 'Your operation',
+      hint: 'Warehouse, branch and register are yours only: each person who sells has their own. They follow you to any device and the ERP suggests them too.',
+      soloTuUsuario: 'Your user only',
       error: "Couldn't read your settings.",
     },
     campos: {

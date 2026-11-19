@@ -614,7 +614,7 @@ export interface AppDict
       error: string;
     };
     /** Almacén, sede y caja: de la configuración del usuario (backend), compartida con el ERP. */
-    operacion: { title: string; hint: string; error: string };
+    operacion: { title: string; hint: string; error: string; soloTuUsuario: string };
     campos: {
       almacen: string;
       sede: string;
