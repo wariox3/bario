@@ -645,7 +645,7 @@ export const en: AppDict = {
       subtitle: 'Adjust the branch and accounting data without unapproving',
       empty: 'The document has no lines',
       notaCuenta:
-        'Base and contact can only be corrected on account lines whose account requires them. Item lines take them from the document header; on payroll lines the account comes from the concept and the cost center from the contract.',
+        'Base and contact can be corrected on account and payroll lines when their account requires them; on payroll lines the account is the concept one. Item lines take them from the document header, and payroll lines take the cost center from the contract.',
       fields: {
         sede: 'Branch',
         seleccionar: 'Select…',

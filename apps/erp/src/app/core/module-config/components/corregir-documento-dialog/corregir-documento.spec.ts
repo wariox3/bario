@@ -303,25 +303,33 @@ describe('línea de nómina', () => {
     });
   });
 
-  it('no deja corregir base, contacto ni centro de costo', () => {
-    expect(corrigeCampo(LINEA_NOMINA, 'base')).toBe(false);
-    expect(corrigeCampo(LINEA_NOMINA, 'contacto')).toBe(false);
+  it('deja corregir contacto y base, pero no el centro de costo', () => {
+    expect(corrigeCampo(LINEA_NOMINA, 'base')).toBe(true);
+    expect(corrigeCampo(LINEA_NOMINA, 'contacto')).toBe(true);
     expect(corrigeCentroCosto(LINEA_NOMINA)).toBe(false);
     expect(corrigeCentroCosto(LINEA_ITEM)).toBe(true);
   });
 
-  it('no manda cambios aunque se editen sus campos', () => {
+  it('manda contacto y base editados, nunca el centro de costo', () => {
     const editada = {
       ...LINEA_NOMINA,
       centroCosto: { id: 7, nombre: 'Ventas' },
       contacto: { id: 22, nombre: 'EPS' },
       base: 1000,
     };
-    expect(cambiosLinea(LINEA_NOMINA, editada)).toBeNull();
+    expect(cambiosLinea(LINEA_NOMINA, editada)).toEqual({ contacto: 22, base: 1000 });
   });
 
   it('no la marca como incompleta aunque quede vacía', () => {
     const vacia = { ...LINEA_NOMINA, centroCosto: null, contacto: null, base: 0 };
     expect(exigidosFaltantes([vacia]).size).toBe(0);
+  });
+});
+
+describe('línea de seguridad social', () => {
+  it('no deja corregir el centro de costo, que sale del contrato', () => {
+    const linea = aLineaCorregible({ id: 300, tipo_registro: 'S', centro_costo: 1 });
+    expect(corrigeCentroCosto(linea)).toBe(false);
+    expect(cambiosLinea(linea, { ...linea, centroCosto: { id: 7, nombre: 'Ventas' } })).toBeNull();
   });
 });

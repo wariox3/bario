@@ -59,6 +59,11 @@ export interface LineaCorregible {
    * que sus `cuenta_exige_*` llegan en `null` y no se valida nada contra ellos.
    */
   readonly esNomina: boolean;
+  /**
+   * El centro de costo sale del contrato al contabilizar (nómina `N` y
+   * seguridad social `S`): el de la línea no se usa y el backend lo rechaza.
+   */
+  readonly centroCostoDelContrato: boolean;
   /** Ítem o, en una línea de cuenta, código y nombre de la cuenta. */
   readonly descripcion: string;
   readonly cantidad: number | null;
@@ -100,6 +105,8 @@ export interface ActualizarContabilidadPayload extends CabeceraPatch {
 const TIPO_REGISTRO_CUENTA = 'C';
 /** Tipo de registro de una línea de nómina (concepto liquidado). */
 const TIPO_REGISTRO_NOMINA = 'N';
+/** Tipos de registro cuyo centro de costo sale del contrato. */
+const TIPOS_CENTRO_COSTO_CONTRATO: readonly string[] = [TIPO_REGISTRO_NOMINA, 'S'];
 
 /**
  * Opción con id y etiqueta. Si el backend no trae el id no hay valor, aunque
@@ -121,6 +128,7 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
     id: read.id,
     esCuenta,
     esNomina,
+    centroCostoDelContrato: TIPOS_CENTRO_COSTO_CONTRATO.includes(read.tipo_registro ?? ''),
     descripcion: (esCuenta ? cuenta : (read.item_nombre ?? read.concepto_nombre)) ?? '',
     cantidad: toFiniteNumber(read.cantidad),
     precio: toFiniteNumber(read.precio),
@@ -152,20 +160,21 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
  * su `exige` solo impide dejarlo vacío.
  */
 export function corrigeCampo(linea: LineaCorregible, campo: 'base' | 'contacto'): boolean {
-  // Nómina: el asiento toma contacto y base de la línea, pero el backend los
-  // rechaza fuera de las líneas de cuenta ("El contacto y la base solo se
-  // corrigen en una línea de cuenta."). Se muestran bloqueados hasta que los
-  // acepte; entonces se habilitan acá, sin validar exigencias.
+  // Nómina: el backend valida contra la cuenta del concepto para el tipo de
+  // costo del contrato, pero el read no la trae (`cuenta_exige_*` en null).
+  // Se ofrecen los dos sin validar acá; si la cuenta no los admite, el 400
+  // marca la línea con el motivo.
+  if (linea.esNomina) return true;
   return linea.esCuenta && linea.exige[campo];
 }
 
 /**
- * El centro de costo se corrige en cualquier línea salvo en la de nómina: al
- * contabilizarla el backend toma el del contrato, no el de la línea, así que
- * cambiarlo acá no movería el asiento.
+ * El centro de costo se corrige en cualquier línea salvo en las de nómina y
+ * seguridad social: al contabilizarlas el backend toma el del contrato, y
+ * `actualizar-contabilidad/` lo rechaza.
  */
 export function corrigeCentroCosto(linea: LineaCorregible): boolean {
-  return !linea.esNomina;
+  return !linea.centroCostoDelContrato;
 }
 
 function mismoId(a: ErpSelectOption | null, b: ErpSelectOption | null): boolean {
