@@ -80,6 +80,7 @@ import {
   SEDE_ENDPOINT,
 } from '../../factura-venta.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
+import { setupAsesorDesdeContacto } from '@erp/features/documentos/comercial/asesor-contacto';
 import {
   setupVencimientoAutocompute,
   type VencimientoAutocompute,
@@ -348,6 +349,14 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       contacto: this.form.controls.contacto,
       plazoPago: this.form.controls.plazo_pago,
       origen: 'cliente',
+      destroyRef: this.destroyRef,
+    });
+
+    // Al elegir cliente, sugiere su asesor asignado (en edición no aplica:
+    // la cabecera se puebla con `emitEvent: false`).
+    setupAsesorDesdeContacto({
+      contacto: this.form.controls.contacto,
+      asesor: this.form.controls.asesor,
       destroyRef: this.destroyRef,
     });
 

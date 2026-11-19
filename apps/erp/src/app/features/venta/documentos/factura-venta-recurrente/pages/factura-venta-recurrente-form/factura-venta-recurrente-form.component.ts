@@ -53,6 +53,7 @@ import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
+import { setupAsesorDesdeContacto } from '@erp/features/documentos/comercial/asesor-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import {
@@ -220,6 +221,14 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
       contacto: this.form.controls.contacto,
       plazoPago: this.form.controls.plazo_pago,
       origen: 'cliente',
+      destroyRef: this.destroyRef,
+    });
+
+    // Al elegir cliente, sugiere su asesor asignado (en edición no aplica:
+    // la cabecera se puebla con `emitEvent: false`).
+    setupAsesorDesdeContacto({
+      contacto: this.form.controls.contacto,
+      asesor: this.form.controls.asesor,
       destroyRef: this.destroyRef,
     });
   }

@@ -66,6 +66,7 @@ import type { RemisionRead } from '../../remision.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
+import { setupAsesorDesdeContacto } from '@erp/features/documentos/comercial/asesor-contacto';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Remisión.
@@ -216,6 +217,16 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
    * cabecera en edición. La tabla, paginada, parte de él; `null` en alta.
    */
   protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+
+  constructor() {
+    // Al elegir cliente, sugiere su asesor asignado (en edición no aplica:
+    // la cabecera se puebla con `emitEvent: false`).
+    setupAsesorDesdeContacto({
+      contacto: this.form.controls.contacto,
+      asesor: this.form.controls.asesor,
+      destroyRef: this.destroyRef,
+    });
+  }
 
   ngOnInit(): void {
     const id = this.id();
