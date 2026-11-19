@@ -28,6 +28,8 @@ import {
   precioListaDeContacto,
   resumenDesdeCabecera,
   type ResumenDocumento,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -160,6 +162,20 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
   protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta se sugiere el valor por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, manda `suggestedIndex`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {

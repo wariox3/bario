@@ -132,6 +132,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedMatch]="almacenSugerido()"
             [suggestedIndex]="almacenSuggestedIndex()"
             [placeholder]="t().entities.facturaCompraRecurrente.form.fields.almacenPlaceholder"
           />

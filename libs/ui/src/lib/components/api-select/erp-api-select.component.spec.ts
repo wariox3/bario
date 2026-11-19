@@ -18,6 +18,7 @@ const BODEGA: ErpSelectOption = { id: 2, nombre: 'Bodega' };
       [endpoint]="endpoint()"
       [catalogo]="catalogo()"
       [suggestedIndex]="sugerido()"
+      [suggestedMatch]="match()"
       (optionsLoaded)="cargas = cargas + 1"
     />
   `,
@@ -27,6 +28,7 @@ class HostComponent {
   readonly endpoint = signal('');
   readonly catalogo = signal<readonly ErpSelectOption[] | null>(null);
   readonly sugerido = signal<number | null>(null);
+  readonly match = signal<((option: ErpSelectOption) => boolean) | null>(null);
   cargas = 0;
 }
 
@@ -103,5 +105,40 @@ describe('ErpApiSelectComponent', () => {
     fixture.detectChanges();
     expect(host.control.value).toEqual(BODEGA);
     expect(host.cargas).toBe(1);
+  });
+
+  describe('sugerencia', () => {
+    beforeEach(() => host.endpoint.set('/inventario/almacen/seleccionar/'));
+
+    it('el match gana sobre el índice', () => {
+      host.sugerido.set(0);
+      host.match.set((o) => o.id === BODEGA.id);
+      fixture.detectChanges();
+
+      expect(host.control.value).toEqual(BODEGA);
+    });
+
+    it('si el match no encuentra nada, cae al índice', () => {
+      host.sugerido.set(0);
+      host.match.set((o) => o.id === 99);
+      fixture.detectChanges();
+
+      expect(host.control.value).toEqual(GENERAL);
+    });
+
+    it('sin índice y sin coincidencia, no sugiere nada', () => {
+      host.match.set((o) => o.id === 99);
+      fixture.detectChanges();
+
+      expect(host.control.value).toBeNull();
+    });
+
+    it('no pisa un valor que ya tiene el control', () => {
+      host.control.setValue(GENERAL);
+      host.match.set((o) => o.id === BODEGA.id);
+      fixture.detectChanges();
+
+      expect(host.control.value).toEqual(GENERAL);
+    });
   });
 });

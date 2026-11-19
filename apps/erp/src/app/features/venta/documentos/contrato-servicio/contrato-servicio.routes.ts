@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 
 /**
@@ -27,6 +28,8 @@ export const CONTRATO_SERVICIO_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // Valores por defecto del usuario (Configuración → Usuario); casi siempre ya en memoria.
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('../_shared/servicio/pages/servicio-documento-form/servicio-documento-form.component').then(
             (m) => m.ServicioDocumentoFormComponent,

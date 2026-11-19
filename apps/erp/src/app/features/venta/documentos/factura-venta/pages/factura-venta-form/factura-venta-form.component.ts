@@ -45,6 +45,8 @@ import {
   type ResumenDocumento,
   cantidadDesdeCabecera,
   resumenDesdeCabecera,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -225,9 +227,24 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
 
   /**
    * En alta, sede y almacén auto-seleccionan la primera opción (como el
-   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   * legacy) cuando el usuario no tiene una por defecto. En edición manda la del
+   * documento.
    */
   protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta gana la sede/almacén por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, cae a `primeraSugerida`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
 
   /**
    * En alta, el método de pago sugiere "Instrumento no definido". Se busca por

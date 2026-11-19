@@ -4,7 +4,12 @@ import { NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { DrawerModule } from 'primeng/drawer';
-import { ForbiddenPageStore, I18nService, TenantService } from '@reddoc/core';
+import {
+  ConfiguracionUsuarioStore,
+  ForbiddenPageStore,
+  I18nService,
+  TenantService,
+} from '@reddoc/core';
 import { AppSwitcherComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
@@ -55,6 +60,7 @@ export class WorkspaceLayoutComponent {
   private readonly permissions = inject(PermissionsService);
   private readonly forbiddenPage = inject(ForbiddenPageStore);
   private readonly router = inject(Router);
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
 
   protected readonly t = this.i18n.t;
 
@@ -108,6 +114,14 @@ export class WorkspaceLayoutComponent {
   protected readonly pickerOpen = signal(false);
 
   constructor() {
+    // Precarga la configuración del usuario (sede, almacén y caja por defecto)
+    // sin bloquear la entrada: al abrir un formulario de alta ya está en memoria.
+    // Se re-dispara al cambiar de contenedor; el store no repite si ya la tiene.
+    effect(() => {
+      this.tenant.currentSlug();
+      untracked(() => this.configuracionUsuario.cargar().subscribe());
+    });
+
     // Al cambiar el módulo activo, sembramos el acordeón que contiene la ruta
     // actual; si ninguno la contiene, el primero marcado `defaultExpanded: true`.
     // El resto arranca cerrado.

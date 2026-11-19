@@ -47,6 +47,8 @@ import {
   type ResumenDocumento,
   cantidadDesdeCabecera,
   resumenDesdeCabecera,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -230,6 +232,20 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
   protected readonly primeraOpcionSugerida = computed(() => (this.isEditMode() ? null : 0));
+
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta se sugiere el valor por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, manda `suggestedIndex`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
 
   /**
    * En alta, el método de pago sugiere "Instrumento no definido". Se busca por

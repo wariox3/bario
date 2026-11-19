@@ -122,6 +122,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedMatch]="sedeSugerida()"
             [suggestedIndex]="primeraSugerida()"
             [placeholder]="t().entities.facturaVentaRecurrente.form.fields.sedePlaceholder"
           />
@@ -136,6 +137,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedMatch]="almacenSugerido()"
             [suggestedIndex]="primeraSugerida()"
             [placeholder]="t().entities.facturaVentaRecurrente.form.fields.almacenPlaceholder"
           />

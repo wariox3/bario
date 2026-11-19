@@ -120,8 +120,10 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   /**
    * Opción a auto-seleccionar por **contenido**, cuando la posición no sirve
    * porque el backend no garantiza el orden (p. ej. el método de pago con
-   * `codigo === '1'`). Gana sobre `suggestedIndex`; si ninguna cumple, no
-   * sugiere nada. Mismas reglas: solo con el control vacío.
+   * `codigo === '1'`) o porque se busca un id (el valor por defecto del
+   * usuario). Gana sobre `suggestedIndex`; si ninguna cumple, cae a
+   * `suggestedIndex` (o no sugiere nada si no hay). Mismas reglas: solo con el
+   * control vacío.
    */
   readonly suggestedMatch = input<((option: ErpSelectOption) => boolean) | null>(null);
   /**
@@ -303,7 +305,8 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
     if (this.value() !== null) return;
     const match = this.suggestedMatch();
     const index = this.suggestedIndex();
-    const option = match ? options.find(match) : index !== null ? options[index] : undefined;
+    const option =
+      (match ? options.find(match) : undefined) ?? (index !== null ? options[index] : undefined);
     if (option) this.onValueChange(option);
   }
 }
