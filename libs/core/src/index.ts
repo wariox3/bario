@@ -321,3 +321,13 @@ export type {
 } from './lib/contacto';
 export { MODELO, PERMISO_APPS, ModelPermissionsService } from './lib/permisos';
 export type { ActionPredicate, ModelGrants, ModeloId, PermissionAction } from './lib/permisos';
+export { ConfiguracionUsuarioService } from './lib/configuracion-usuario/configuracion-usuario.service';
+export {
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
+  configuracionUsuarioResolver,
+} from './lib/configuracion-usuario/configuracion-usuario.store';
+export type {
+  ConfiguracionUsuarioPayload,
+  ConfiguracionUsuarioRead,
+} from './lib/configuracion-usuario/configuracion-usuario.model';

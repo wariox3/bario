@@ -30,5 +30,7 @@ export const SELECT_ENDPOINTS = {
   centroCosto: '/contabilidad/centro-costo/seleccionar/',
   almacen: '/inventario/almacen/seleccionar/',
   sede: '/general/sede/seleccionar/',
+  /** Solo las cajas activas; `sede_id` las acota a una sede. */
+  caja: '/venta/caja/seleccionar/',
   novedadTipo: '/humano/novedad-tipo/seleccionar/',
 } as const;

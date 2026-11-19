@@ -7579,7 +7579,20 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales', compra: 'Purchasing' },
+    tabs: {
+      general: 'General',
+      humano: 'Payroll',
+      venta: 'Sales',
+      compra: 'Purchasing',
+      usuario: 'User',
+    },
+    usuario: {
+      predeterminados: {
+        title: 'Defaults',
+        hint: 'Suggested when creating documents and opening the POS. They only apply to your user and can be changed on each document.',
+      },
+      fields: { sede: 'Branch', almacen: 'Warehouse', caja: 'Cash register' },
+    },
     compra: {
       recibe: {
         title: 'Receiving person',

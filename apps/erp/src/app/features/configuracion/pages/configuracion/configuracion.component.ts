@@ -7,10 +7,11 @@ import { GeneralConfigComponent } from '../../components/general-config/general-
 import { HumanoConfigComponent } from '../../components/humano-config/humano-config.component';
 import { VentaConfigComponent } from '../../components/venta-config/venta-config.component';
 import { CompraConfigComponent } from '../../components/compra-config/compra-config.component';
+import { UsuarioConfigComponent } from '../../components/usuario-config/usuario-config.component';
 import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/components/asistente-acceso/asistente-acceso.component';
 
 /** Áreas de la configuración (`?seccion=`). La primera es la de por defecto. */
-const SECCIONES = ['general', 'humano', 'venta', 'compra'] as const;
+const SECCIONES = ['general', 'humano', 'venta', 'compra', 'usuario'] as const;
 type Seccion = (typeof SECCIONES)[number];
 
 function esSeccion(value: string | undefined): value is Seccion {
@@ -22,7 +23,8 @@ function esSeccion(value: string | undefined): value is Seccion {
  *
  * Aloja las áreas en pestañas horizontales; la activa viaja en `?seccion=` para
  * deep-link. Cada área es auto-contenida (lee y guarda solo sus campos), así que
- * el shell no carga datos. Pestañas: General (UVT), Humano, Venta y Compra.
+ * el shell no carga datos. Pestañas: General (UVT), Humano, Venta, Compra y
+ * Usuario (valores por defecto de quien está autenticado, no de la empresa).
  */
 @Component({
   selector: 'app-configuracion',
@@ -33,6 +35,7 @@ function esSeccion(value: string | undefined): value is Seccion {
     HumanoConfigComponent,
     VentaConfigComponent,
     CompraConfigComponent,
+    UsuarioConfigComponent,
     AsistenteAccesoComponent,
   ],
   templateUrl: './configuracion.component.html',

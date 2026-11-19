@@ -5742,7 +5742,12 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string; venta: string; compra: string };
+    tabs: { general: string; humano: string; venta: string; compra: string; usuario: string };
+    /** Área Usuario: sede, almacén y caja por defecto de quien está autenticado. */
+    usuario: {
+      predeterminados: { title: string; hint: string };
+      fields: { sede: string; almacen: string; caja: string };
+    };
     /** Área Compra: la persona que recibe en la recepción de documentos. */
     compra: {
       recibe: { title: string; hint: string };
