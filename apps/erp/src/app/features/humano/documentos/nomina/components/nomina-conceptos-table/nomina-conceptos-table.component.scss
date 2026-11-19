@@ -34,6 +34,18 @@
   white-space: nowrap;
 }
 
+// Sin recuadro propio la tabla va de borde a borde de la card: la primera y la
+// última columna alinean con el gutter del título (px-5).
+.nomina-conceptos-table__th:first-child,
+.nomina-conceptos-table__td:first-child {
+  padding-left: 1.25rem;
+}
+
+.nomina-conceptos-table__th:last-child,
+.nomina-conceptos-table__td:last-child {
+  padding-right: 1.25rem;
+}
+
 // Separador entre filas (no border-bottom en cada celda): más limpio al scrollear.
 .nomina-conceptos-table__row + .nomina-conceptos-table__row .nomina-conceptos-table__td {
   border-top: 1px solid rgba(20, 48, 73, 0.07);
