@@ -1,8 +1,12 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
-export const CREDITOS_FILTERS_STORAGE_KEY = 'creditos:filters:v1';
-export const CREDITOS_QUICK_SEARCH_FIELD = 'contrato_nombre';
+/**
+ * `v2`: los filtros guardados con `v1` usaban nombres del serializer que el
+ * `lista/` rechaza con 400.
+ */
+export const CREDITOS_FILTERS_STORAGE_KEY = 'creditos:filters:v2';
+export const CREDITOS_QUICK_SEARCH_FIELD = 'contrato__contacto__nombre_corto';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const CREDITO_LIST_PATH = ['humano', 'creditos'] as const;
@@ -122,12 +126,25 @@ export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
+/**
+ * La `propiedad` va como ruta ORM y tiene que estar en `campos_filtrables` del
+ * backend: los nombres del serializer (`contrato_nombre`) dan 400. `total` y `saldo` no están
+ * declarados y por eso no se ofrecen.
+ */
 export const CREDITOS_FILTER_FIELDS: readonly FilterField[] = [
-  { name: 'contrato_nombre', displayNameKey: 'entities.credito.columns.nombre', type: 'string' },
-  { name: 'concepto_nombre', displayNameKey: 'entities.credito.columns.concepto', type: 'string' },
+  {
+    name: 'contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.credito.columns.nombre',
+    type: 'string',
+  },
+  {
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.credito.columns.identificacion',
+    type: 'string',
+  },
+  { name: 'concepto__nombre', displayNameKey: 'entities.credito.columns.concepto', type: 'string' },
   { name: 'fecha_inicio', displayNameKey: 'entities.credito.columns.inicio', type: 'date' },
-  { name: 'total', displayNameKey: 'entities.credito.columns.total', type: 'number' },
-  { name: 'saldo', displayNameKey: 'entities.credito.columns.saldo', type: 'number' },
+  { name: 'pagado', displayNameKey: 'entities.credito.columns.pagado', type: 'boolean' },
   { name: 'inactivo', displayNameKey: 'entities.credito.columns.inactivo', type: 'boolean' },
 ];
 

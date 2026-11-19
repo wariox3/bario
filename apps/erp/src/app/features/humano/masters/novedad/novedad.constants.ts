@@ -1,8 +1,12 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
-export const NOVEDADES_FILTERS_STORAGE_KEY = 'novedades:filters:v1';
-export const NOVEDADES_QUICK_SEARCH_FIELD = 'contrato_nombre';
+/**
+ * `v2`: los filtros guardados con `v1` usaban nombres del serializer que el
+ * `lista/` rechaza con 400.
+ */
+export const NOVEDADES_FILTERS_STORAGE_KEY = 'novedades:filters:v2';
+export const NOVEDADES_QUICK_SEARCH_FIELD = 'contrato__contacto__nombre_corto';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const NOVEDAD_LIST_PATH = ['humano', 'novedades'] as const;
@@ -104,11 +108,20 @@ export const NOVEDADES_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
+/**
+ * La `propiedad` va como ruta ORM y tiene que estar en `campos_filtrables` del
+ * backend: los nombres del serializer (`contrato_nombre`) dan 400. El tipo solo se filtra
+ * por `novedad_tipo_id` (falta `novedad_tipo__nombre`) y por eso no se ofrece.
+ */
 export const NOVEDADES_FILTER_FIELDS: readonly FilterField[] = [
-  { name: 'contrato_nombre', displayNameKey: 'entities.novedad.columns.nombre', type: 'string' },
   {
-    name: 'novedad_tipo_nombre',
-    displayNameKey: 'entities.novedad.columns.novedadTipo',
+    name: 'contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.novedad.columns.nombre',
+    type: 'string',
+  },
+  {
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.novedad.columns.identificacion',
     type: 'string',
   },
   { name: 'fecha_desde', displayNameKey: 'entities.novedad.columns.fechaDesde', type: 'date' },
