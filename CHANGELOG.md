@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.29](https://github.com/wariox3/bario/compare/v0.1.28...v0.1.29) (2026-11-20)
+
+### Features
+
+- **novedad:** aprobar, desaprobar e imprimir vacaciones desde la ficha ([8f36712](https://github.com/wariox3/bario/commit/8f3671254bb132cbb7caf80e4a3261541f7dfa2f))
+- **novedad:** interrumpir vacaciones desde Utilidades en la ficha ([f9df1c4](https://github.com/wariox3/bario/commit/f9df1c4fd4796ad24eae3a061a84f1f4741bb91c))
+
+### Bug Fixes
+
+- **novedad:** botonera de la ficha con el patrón de los documentos ([adefdc3](https://github.com/wariox3/bario/commit/adefdc361015e060e932d2ef355cd645d649a6fd))
+
+### Documentation
+
+- aclarar quién avisa cada error HTTP para no dejarlos callados ([02ed926](https://github.com/wariox3/bario/commit/02ed9263ea470872a0782a96546a10b7ca18b9e5))
+
 ## [0.1.28](https://github.com/wariox3/bario/compare/v0.1.27...v0.1.28) (2026-11-19)
 
 ### Features
