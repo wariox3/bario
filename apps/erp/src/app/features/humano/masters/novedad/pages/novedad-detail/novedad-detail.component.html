@@ -1,7 +1,17 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
-<header class="flex items-center gap-2">
+@let acc = t().documentActions.detail;
+
+<!--
+  ── Botonera ─────────────────────────────────────────────────────────────────
+  Mismo estándar que la liquidación: volver suelto y el resto en un segmento.
+  Aprobada, la novedad queda fija (el backend rechaza editarla y eliminarla), así
+  que Editar desaparece, como en la exógena presentada. Aprobar, Desaprobar e
+  Imprimir solo existen para vacaciones: en otro tipo el backend responde 400, por
+  eso se ocultan en vez de deshabilitarse. Aprobar va relleno porque cierra el
+  ciclo; Aprobar y Desaprobar se turnan según el estado.
+-->
+<lib-page-actions>
   <p-button
     type="button"
     [label]="t().common.actions.back"
@@ -22,18 +32,56 @@
         size="small"
         (onClick)="onNew()"
       />
-      <p-button
-        type="button"
-        [label]="t().common.actions.edit"
-        severity="secondary"
-        [outlined]="true"
-        icon="pi pi-pencil"
-        size="small"
-        (onClick)="onEdit()"
-      />
+      @if (modificable()) {
+        <p-button
+          type="button"
+          [label]="t().common.actions.edit"
+          severity="secondary"
+          [outlined]="true"
+          icon="pi pi-pencil"
+          size="small"
+          [disabled]="accionEnCurso() !== null"
+          (onClick)="onEdit()"
+        />
+      }
+      @if (esVacaciones()) {
+        <p-button
+          type="button"
+          [label]="acc.imprimir"
+          icon="pi pi-print"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [loading]="isPrinting()"
+          (onClick)="onImprimir()"
+        />
+        @if (n.estado_aprobado) {
+          <p-button
+            type="button"
+            [label]="acc.desaprobar"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [loading]="accionEnCurso() === 'desaprobar'"
+            [disabled]="accionEnCurso() !== null"
+            (onClick)="confirmar('desaprobar')"
+          />
+        } @else {
+          <p-button
+            type="button"
+            [label]="acc.aprobar"
+            size="small"
+            [loading]="accionEnCurso() === 'aprobar'"
+            [disabled]="accionEnCurso() !== null"
+            (onClick)="confirmar('aprobar')"
+          />
+        }
+      }
     </p-buttongroup>
   }
-</header>
+</lib-page-actions>
+
+<p-confirmDialog libAceptarConEnter />
 
 @if (isLoading()) {
   <div
@@ -83,6 +131,23 @@
             {{ n.novedad_tipo_nombre }}
           </span>
         }
+        @if (esVacaciones()) {
+          @if (n.estado_aprobado) {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              {{ t().entities.novedad.detail.estados.aprobada }}
+            </span>
+          } @else {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              {{ t().entities.novedad.detail.estados.pendiente }}
+            </span>
+          }
+        }
         @if (n.prorroga) {
           <span
             class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
@@ -116,7 +181,7 @@
               {{ t().entities.novedad.columns.identificacion }}
             </dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="!n.contrato_contacto_numero_identificacion"
             >
               {{ n.contrato_contacto_numero_identificacion || '—' }}
@@ -127,7 +192,7 @@
               {{ t().entities.novedad.detail.fields.contratoId }}
             </dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="n.contrato === null"
             >
               {{ n.contrato ?? '—' }}
@@ -138,7 +203,7 @@
               {{ t().entities.novedad.form.fields.novedadReferencia }}
             </dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="n.novedad_referencia === null"
             >
               {{ n.novedad_referencia !== null ? '#' + n.novedad_referencia : '—' }}
@@ -154,7 +219,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="!fecha(n.fecha_desde)"
             >
               {{ fecha(n.fecha_desde) || '—' }}
@@ -163,7 +228,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta)"
             >
               {{ fecha(n.fecha_hasta) || '—' }}
@@ -172,7 +237,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="!cantidad(n.dias)"
             >
               {{ cantidad(n.dias) || '—' }}
@@ -184,7 +249,7 @@
                 {{ t().entities.novedad.form.fields.fechaDesdePeriodo }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_periodo)"
               >
                 {{ fecha(n.fecha_desde_periodo) || '—' }}
@@ -195,7 +260,7 @@
                 {{ t().entities.novedad.form.fields.fechaHastaPeriodo }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_periodo)"
               >
                 {{ fecha(n.fecha_hasta_periodo) || '—' }}
@@ -212,7 +277,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="novedad-detail__label">{{ t().entities.novedad.columns.total }}</dt>
             <dd
-              class="novedad-detail__value novedad-detail__value--mono"
+              class="novedad-detail__value novedad-detail__value--num"
               [class.novedad-detail__value--empty]="!cop(n.total)"
             >
               {{ cop(n.total) || '—' }}
@@ -224,7 +289,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDisfrute }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_disfrute)"
               >
                 {{ cop(n.pago_disfrute) || '—' }}
@@ -235,7 +300,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDinero }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_dinero)"
               >
                 {{ cop(n.pago_dinero) || '—' }}
@@ -247,7 +312,7 @@
                 {{ t().entities.novedad.detail.fields.baseCotizacionPropuesto }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.base_cotizacion_propuesto)"
               >
                 {{ cop(n.base_cotizacion_propuesto) || '—' }}
@@ -258,7 +323,7 @@
                 {{ t().entities.novedad.detail.fields.baseCotizacion }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.base_cotizacion)"
               >
                 {{ cop(n.base_cotizacion) || '—' }}
@@ -306,7 +371,7 @@
                 {{ t().entities.novedad.form.fields.diasDisfrutados }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.dias_disfrutados)"
               >
                 {{ cantidad(n.dias_disfrutados) || '—' }}
@@ -317,7 +382,7 @@
                 {{ t().entities.novedad.form.fields.diasDinero }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.dias_dinero)"
               >
                 {{ cantidad(n.dias_dinero) || '—' }}
@@ -328,7 +393,7 @@
                 {{ t().entities.novedad.detail.fields.diasDisfrutadosReales }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.dias_disfrutados_reales)"
               >
                 {{ cantidad(n.dias_disfrutados_reales) || '—' }}
@@ -345,7 +410,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDiaDisfrute }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_dia_disfrute)"
               >
                 {{ cop(n.pago_dia_disfrute) || '—' }}
@@ -356,7 +421,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDisfrute }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_disfrute)"
               >
                 {{ cop(n.pago_disfrute) || '—' }}
@@ -373,7 +438,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDiaDinero }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_dia_dinero)"
               >
                 {{ cop(n.pago_dia_dinero) || '—' }}
@@ -384,7 +449,7 @@
                 {{ t().entities.novedad.detail.fields.pagoDinero }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_dinero)"
               >
                 {{ cop(n.pago_dinero) || '—' }}
@@ -420,7 +485,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_empresa)"
               >
                 {{ fecha(n.fecha_desde_empresa) || '—' }}
@@ -429,7 +494,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_empresa)"
               >
                 {{ fecha(n.fecha_hasta_empresa) || '—' }}
@@ -438,7 +503,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.dias_empresa)"
               >
                 {{ cantidad(n.dias_empresa) || '—' }}
@@ -449,7 +514,7 @@
                 {{ t().entities.novedad.detail.fields.horas }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.hora_empresa)"
               >
                 {{ cantidad(n.hora_empresa) || '—' }}
@@ -460,7 +525,7 @@
                 {{ t().entities.novedad.detail.fields.pago }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_empresa)"
               >
                 {{ cop(n.pago_empresa) || '—' }}
@@ -475,7 +540,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_entidad)"
               >
                 {{ fecha(n.fecha_desde_entidad) || '—' }}
@@ -484,7 +549,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_entidad)"
               >
                 {{ fecha(n.fecha_hasta_entidad) || '—' }}
@@ -493,7 +558,7 @@
             <div class="flex flex-col gap-0.5">
               <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.dias_entidad)"
               >
                 {{ cantidad(n.dias_entidad) || '—' }}
@@ -504,7 +569,7 @@
                 {{ t().entities.novedad.detail.fields.horas }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cantidad(n.hora_entidad)"
               >
                 {{ cantidad(n.hora_entidad) || '—' }}
@@ -515,7 +580,7 @@
                 {{ t().entities.novedad.detail.fields.pago }}
               </dt>
               <dd
-                class="novedad-detail__value novedad-detail__value--mono"
+                class="novedad-detail__value novedad-detail__value--num"
                 [class.novedad-detail__value--empty]="!cop(n.pago_entidad)"
               >
                 {{ cop(n.pago_entidad) || '—' }}

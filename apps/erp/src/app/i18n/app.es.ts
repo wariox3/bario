@@ -2435,7 +2435,7 @@ export const es: AppDict = {
         createSubtitle: 'Completa la información de la novedad',
         editSubtitle: 'Modifica la información de la novedad',
         sections: { vacaciones: 'Vacaciones' },
-        sectionsHint: { vacaciones: 'Periodo y días de disfrute y dinero' },
+        sectionsHint: { vacaciones: 'Días de disfrute y dinero' },
         fields: {
           novedadTipo: 'Tipo de novedad',
           contrato: 'Contrato',
@@ -2470,6 +2470,10 @@ export const es: AppDict = {
           createError: { title: 'Error al crear', desc: 'No se pudo crear la novedad' },
           editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
+          aprobada: {
+            title: 'Novedad aprobada',
+            desc: 'Una novedad aprobada no se puede editar',
+          },
         },
       },
       detail: {
@@ -2505,8 +2509,27 @@ export const es: AppDict = {
           title: 'Novedad no encontrada',
           desc: 'La novedad que buscas no existe o fue eliminada.',
         },
+        estados: { aprobada: 'Aprobada', pendiente: 'Pendiente' },
+        confirmaciones: {
+          aprobar: {
+            header: 'Aprobar vacaciones',
+            message:
+              'Una vez aprobadas no se pueden editar ni eliminar, y el contrato queda con las vacaciones pagas hasta el fin del periodo. ¿Continuar?',
+          },
+          desaprobar: {
+            header: 'Desaprobar vacaciones',
+            message: 'Las vacaciones vuelven a quedar pendientes y se pueden editar. ¿Continuar?',
+          },
+        },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
+          aprobarSuccess: { title: 'Vacaciones aprobadas', desc: 'La novedad quedó aprobada' },
+          desaprobarSuccess: {
+            title: 'Vacaciones desaprobadas',
+            desc: 'La novedad volvió a quedar pendiente',
+          },
+          aprobarError: { title: 'No se pudo aprobar', desc: 'Intenta de nuevo.' },
+          desaprobarError: { title: 'No se pudo desaprobar', desc: 'Intenta de nuevo.' },
         },
       },
     },

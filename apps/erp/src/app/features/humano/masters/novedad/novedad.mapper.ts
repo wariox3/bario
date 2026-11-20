@@ -32,8 +32,6 @@ export function novedadToFormValue(n: Novedad): Partial<NovedadFormRawValue> {
     fecha_desde: fromIsoDate(n.fecha_desde),
     fecha_hasta: fromIsoDate(n.fecha_hasta),
     detalle: n.detalle ?? '',
-    fecha_desde_periodo: fromIsoDate(n.fecha_desde_periodo),
-    fecha_hasta_periodo: fromIsoDate(n.fecha_hasta_periodo),
     dias_dinero: aDias(n.dias_dinero),
     dias_disfrutados: aDias(n.dias_disfrutados),
     dias_disfrutados_reales: aDias(n.dias_disfrutados_reales),
@@ -59,8 +57,6 @@ export function formValueToPayload(v: NovedadFormRawValue): NovedadPayload {
     contrato: v.contrato?.id ?? null,
     novedad_tipo: v.novedad_tipo?.id ?? null,
     detalle: v.detalle || null,
-    fecha_desde_periodo: toIsoDate(v.fecha_desde_periodo),
-    fecha_hasta_periodo: toIsoDate(v.fecha_hasta_periodo),
     // El backend nuevo espera los días desde el front (`dias` está en
     // `HumNovedadRequest`); el anterior los calculaba solo. Sin esto la novedad
     // se guarda en cero días y el total, que sí calcula el backend, con ella.

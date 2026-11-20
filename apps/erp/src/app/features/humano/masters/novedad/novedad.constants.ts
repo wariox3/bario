@@ -128,11 +128,30 @@ export const NOVEDADES_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'fecha_hasta', displayNameKey: 'entities.novedad.columns.fechaHasta', type: 'date' },
 ];
 
+/** Aprobada ya no se edita ni se borra: el backend respondería 400. */
+const noAprobada = (row: unknown): boolean =>
+  !(row as { estado_aprobado: boolean }).estado_aprobado;
+
 export const NOVEDADES_ROW_ACTIONS: readonly RowAction[] = [
-  { id: 'edit', labelKey: 'common.actions.edit', iconClass: 'pi pi-pencil', inline: true },
+  {
+    id: 'edit',
+    labelKey: 'common.actions.edit',
+    iconClass: 'pi pi-pencil',
+    inline: true,
+    visibleFor: noAprobada,
+  },
   { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
-  { id: 'delete', labelKey: 'common.actions.delete', iconClass: 'pi pi-trash', severity: 'danger' },
+  {
+    id: 'delete',
+    labelKey: 'common.actions.delete',
+    iconClass: 'pi pi-trash',
+    severity: 'danger',
+    visibleFor: noAprobada,
+  },
 ];
+
+/** Tampoco se selecciona para el borrado masivo. */
+export const NOVEDADES_SELECTABLE_FOR = noAprobada;
 
 export const NOVEDADES_PRIMARY_ACTION: ToolbarAction = {
   id: 'new',

@@ -42,6 +42,11 @@ export interface Novedad {
   readonly pago_entidad: string | number | null;
   readonly total: string | number | null;
   readonly prorroga: boolean;
+  /**
+   * Solo las vacaciones se aprueban (`aprobar/`). Aprobada queda fija: el backend
+   * rechaza editarla, eliminarla y reliquidarla.
+   */
+  readonly estado_aprobado: boolean;
   readonly detalle: string | null;
   // Foreign keys (id pelado) + companion `*_nombre`
   readonly contrato: number | null;
@@ -86,9 +91,8 @@ export interface NovedadPayload {
   contrato: number | null;
   novedad_tipo: number | null;
   detalle: string | null;
-  // Vacaciones
-  fecha_desde_periodo: string | null;
-  fecha_hasta_periodo: string | null;
+  // Vacaciones. El periodo (`fecha_desde_periodo` / `fecha_hasta_periodo`) no se
+  // envía: es readOnly y lo encadena el backend desde el contrato.
   /** Días de la novedad, extremos incluidos. Los calcula el front, no el backend. */
   dias: number | null;
   dias_dinero: number;
