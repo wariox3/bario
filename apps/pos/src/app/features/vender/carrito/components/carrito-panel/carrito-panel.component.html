@@ -54,7 +54,7 @@
       <i class="pi pi-lock mt-0.5 text-[0.8rem]" aria-hidden="true"></i>
       <p class="m-0 text-[0.75rem]">
         {{ tx.cobroPendiente }}
-        <span class="font-mono tabular-nums">{{ pendiente.documentoId }}</span
+        <span class="tabular-nums">{{ pendiente.documentoId }}</span
         >.
       </p>
     </div>
@@ -90,27 +90,27 @@
     <dl class="m-0 flex flex-col gap-1 text-[0.8rem]">
       <div class="flex justify-between text-brand-muted">
         <dt>{{ tx.resumen.productos }}</dt>
-        <dd class="m-0 font-mono tabular-nums">{{ venta.lineas.length }}</dd>
+        <dd class="m-0 tabular-nums">{{ venta.lineas.length }}</dd>
       </div>
       <div class="flex justify-between text-brand-muted">
         <dt>{{ tx.resumen.cantidad }}</dt>
-        <dd class="m-0 font-mono tabular-nums">{{ store.cantidadTotal() }}</dd>
+        <dd class="m-0 tabular-nums">{{ store.cantidadTotal() }}</dd>
       </div>
       <div class="flex justify-between text-brand-text">
         <dt>{{ tx.resumen.subtotal }}</dt>
-        <dd class="m-0 font-mono tabular-nums">{{ subtotal() }}</dd>
+        <dd class="m-0 tabular-nums">{{ subtotal() }}</dd>
       </div>
       @for (impuesto of impuestos(); track impuesto.id) {
         <div class="flex justify-between text-brand-text">
           <dt>{{ impuesto.nombre }}</dt>
-          <dd class="m-0 font-mono tabular-nums">{{ impuesto.monto }}</dd>
+          <dd class="m-0 tabular-nums">{{ impuesto.monto }}</dd>
         </div>
       }
       <div
         class="mt-1 flex items-baseline justify-between border-t border-[rgba(20,48,73,0.08)] pt-2 text-brand-text"
       >
         <dt class="text-[0.85rem] font-bold">{{ tx.resumen.total }}</dt>
-        <dd class="m-0 font-mono text-lg font-bold tabular-nums">{{ total() }}</dd>
+        <dd class="m-0 text-lg font-bold tabular-nums">{{ total() }}</dd>
       </div>
     </dl>
 

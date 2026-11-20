@@ -24,7 +24,7 @@
         </h2>
         <p class="m-0 text-[0.75rem] text-brand-muted">
           @if (numero(); as n) {
-            <span class="font-mono font-semibold text-brand-text">{{ n }}</span> ·
+            <span class="tabular-nums font-semibold text-brand-text">{{ n }}</span> ·
           }
           {{ l.subtitle }}
         </p>
@@ -54,7 +54,7 @@
           <span class="log__micro-label">{{ l.envios.title }}</span>
           @if (envios().length > 1) {
             <span
-              class="rounded-md bg-[rgba(20,48,73,0.06)] px-1.5 py-px font-mono text-[0.68rem] font-semibold tabular-nums text-brand-text"
+              class="rounded-md bg-[rgba(20,48,73,0.06)] px-1.5 py-px text-[0.68rem] font-semibold tabular-nums text-brand-text"
               >{{ envios().length }}</span
             >
           }
@@ -109,7 +109,7 @@
                       class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
                     >
                       <td
-                        class="whitespace-nowrap px-3.5 py-2 font-mono text-[0.75rem] tabular-nums text-brand-muted"
+                        class="whitespace-nowrap px-3.5 py-2 text-[0.75rem] tabular-nums text-brand-muted"
                       >
                         {{ fechaHoraSegundos(fila.fecha) }}
                       </td>
@@ -138,12 +138,12 @@
                         }
                       </td>
                       <td
-                        class="px-3.5 py-2 text-right font-mono text-[0.75rem] tabular-nums text-brand-muted"
+                        class="px-3.5 py-2 text-right text-[0.75rem] tabular-nums text-brand-muted"
                       >
                         {{ fila.envio || '' }}
                       </td>
                       <td
-                        class="whitespace-nowrap px-3.5 py-2 font-mono text-[0.72rem] tabular-nums text-brand-muted"
+                        class="whitespace-nowrap px-3.5 py-2 text-[0.72rem] tabular-nums text-brand-muted"
                       >
                         {{ fila.ip }}
                       </td>
@@ -179,10 +179,9 @@
                       >
                         <td colspan="5" class="px-3.5 py-1.5">
                           <span class="log__micro-label">{{ l.envios.envio }} {{ total - i }}</span>
-                          <span
-                            class="ml-2 font-mono text-[0.7rem] tabular-nums text-brand-muted"
-                            >{{ fechaHora(envio.fecha) }}</span
-                          >
+                          <span class="ml-2 text-[0.7rem] tabular-nums text-brand-muted">{{
+                            fechaHora(envio.fecha)
+                          }}</span>
                         </td>
                       </tr>
                     }
@@ -223,7 +222,7 @@
                         </td>
                         @for (etapa of etapas; track etapa) {
                           <td
-                            class="whitespace-nowrap px-3.5 py-2.5 font-mono text-[0.75rem] tabular-nums text-brand-text"
+                            class="whitespace-nowrap px-3.5 py-2.5 text-[0.75rem] tabular-nums text-brand-text"
                           >
                             @if (dest.hitos[etapa]; as hito) {
                               <span [attr.title]="fechaHora(hito.fecha)">{{
@@ -276,7 +275,7 @@
                       class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
                     >
                       <td
-                        class="whitespace-nowrap px-3.5 py-2.5 font-mono text-[0.75rem] tabular-nums text-brand-muted"
+                        class="whitespace-nowrap px-3.5 py-2.5 text-[0.75rem] tabular-nums text-brand-muted"
                       >
                         {{ fechaHora(v.fecha) }}
                       </td>

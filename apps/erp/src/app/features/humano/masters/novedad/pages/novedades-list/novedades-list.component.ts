@@ -38,6 +38,7 @@ import {
   NOVEDADES_QUICK_SEARCH_FIELD,
   NOVEDADES_PRIMARY_ACTION,
   NOVEDADES_ROW_ACTIONS,
+  NOVEDADES_SELECTABLE_FOR,
   NOVEDADES_TRAILING_ACTIONS,
 } from '../../novedad.constants';
 
@@ -99,6 +100,8 @@ export class NovedadesListComponent {
 
   protected readonly columns = NOVEDADES_COLUMNS;
   protected readonly filterFields = NOVEDADES_FILTER_FIELDS;
+  /** Las aprobadas no se pueden borrar: tampoco entran a la selección masiva. */
+  protected readonly selectableFor = NOVEDADES_SELECTABLE_FOR;
   protected readonly acciones = masterActions(MODELO.humano.novedad, {
     row: NOVEDADES_ROW_ACTIONS,
     primary: NOVEDADES_PRIMARY_ACTION,

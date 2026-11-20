@@ -1,5 +1,5 @@
 import { NOVEDAD_TIPO_REFERENCIA_ID, NOVEDAD_TIPO_VACACIONES_ID } from './novedad.constants';
-import { diasDeNovedad, esVacaciones, requiereReferencia } from './novedad.rules';
+import { diasDeNovedad, esModificable, esVacaciones, requiereReferencia } from './novedad.rules';
 
 const fecha = (iso: string): Date => {
   const [a, m, d] = iso.split('-').map(Number);
@@ -44,5 +44,13 @@ describe('requiereReferencia', () => {
     expect(requiereReferencia(NOVEDAD_TIPO_REFERENCIA_ID, null)).toBe(false);
     expect(requiereReferencia(NOVEDAD_TIPO_VACACIONES_ID, 10)).toBe(false);
     expect(requiereReferencia(null, 10)).toBe(false);
+  });
+});
+
+describe('esModificable', () => {
+  // Aprobada, el backend rechaza editarla y eliminarla: la UI oculta las dos.
+  it('solo la novedad sin aprobar se edita', () => {
+    expect(esModificable({ estado_aprobado: false })).toBe(true);
+    expect(esModificable({ estado_aprobado: true })).toBe(false);
   });
 });

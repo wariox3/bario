@@ -101,7 +101,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.form.fields.codigo }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!a.codigo"
             >
               {{ a.codigo || '—' }}
@@ -116,7 +116,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.form.fields.serie }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!a.serie"
             >
               {{ a.serie || '—' }}
@@ -158,7 +158,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.form.fields.duracion }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!a.duracion"
             >
               {{ a.duracion || '—' }}
@@ -169,7 +169,7 @@
               {{ t().entities.activo.form.fields.depreciacionInicial }}
             </dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!depreciacionInicialFmt()"
             >
               {{ depreciacionInicialFmt() || '—' }}
@@ -185,7 +185,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.columns.valorCompra }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!valorCompraFmt()"
             >
               {{ valorCompraFmt() || '—' }}
@@ -194,7 +194,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.form.fields.fechaCompra }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!fecha(a.fecha_compra)"
             >
               {{ fecha(a.fecha_compra) || '—' }}
@@ -205,7 +205,7 @@
               {{ t().entities.activo.form.fields.fechaActivacion }}
             </dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!fecha(a.fecha_activacion)"
             >
               {{ fecha(a.fecha_activacion) || '—' }}
@@ -214,7 +214,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="activo-detail__label">{{ t().entities.activo.form.fields.fechaBaja }}</dt>
             <dd
-              class="activo-detail__value activo-detail__value--mono"
+              class="activo-detail__value activo-detail__value--num"
               [class.activo-detail__value--empty]="!fecha(a.fecha_baja)"
             >
               {{ fecha(a.fecha_baja) || '—' }}

@@ -135,13 +135,13 @@
             <dd class="item-detail__value">{{ it.nombre }}</dd>
           </div>
           <!-- Los dos identificadores son números largos y parecidos: el rótulo
-               dice cuál es cuál y la monoespaciada con `tabular-nums` deja los
+               dice cuál es cuál y `tabular-nums` deja los
                dígitos en columna, que es lo que permite cotejar un código de
                barras carácter por carácter. -->
           <div class="flex flex-col gap-0.5">
             <dt class="item-detail__label">{{ t().entities.item.form.fields.codigo }}</dt>
             <dd
-              class="item-detail__value item-detail__value--mono"
+              class="item-detail__value item-detail__value--num"
               [class.item-detail__value--empty]="!it.codigo"
             >
               {{ it.codigo || '—' }}
@@ -150,7 +150,7 @@
           <div class="flex flex-col gap-0.5">
             <dt class="item-detail__label">{{ t().entities.item.form.fields.referencia }}</dt>
             <dd
-              class="item-detail__value item-detail__value--mono"
+              class="item-detail__value item-detail__value--num"
               [class.item-detail__value--empty]="!it.referencia"
             >
               {{ it.referencia || '—' }}

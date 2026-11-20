@@ -242,7 +242,7 @@
                  desde otra pestaña: el chip lleva el conteo y se tiñe si exceden. -->
             @if (pagos.length > 0) {
               <span
-                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+                class="ml-2 inline-block rounded-md px-2 py-0.5 text-[0.75rem] font-semibold tabular-nums"
                 [class]="
                   pagosExceden() || (pagos.invalid && pagos.touched)
                     ? 'bg-red-50 text-red-600'

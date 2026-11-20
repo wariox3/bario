@@ -92,7 +92,7 @@
           </div>
 
           <!-- Tipo + número + DV en un solo campo: `NIT 900123456-7`. El número
-               va en monoespaciada porque es un identificador que se compara y
+               va con `tabular-nums` porque es un identificador que se compara y
                se copia. -->
           <div class="flex flex-col gap-0.5">
             <dt class="mi-empresa__label">
@@ -107,7 +107,7 @@
                   {{ f.identificacion }}
                 }
                 @if (f.documento) {
-                  <span class="font-mono tabular-nums">{{ f.documento }}</span>
+                  <span class="tabular-nums">{{ f.documento }}</span>
                 }
               } @else {
                 —

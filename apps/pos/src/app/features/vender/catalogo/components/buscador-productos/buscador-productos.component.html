@@ -34,7 +34,6 @@
       enterkeyhint="search"
       autocomplete="off"
       class="h-10 w-full rounded-lg border border-[rgba(20,48,73,0.14)] bg-brand-surface px-3 pr-9 text-sm text-brand-text outline-none transition-colors placeholder:text-brand-muted focus:border-[var(--brand-blue)]"
-      [class.font-mono]="modo() === 'codigo'"
       [placeholder]="modo() === 'nombre' ? tx.placeholderNombre : tx.placeholderCodigo"
       [attr.aria-label]="modo() === 'nombre' ? tx.placeholderNombre : tx.placeholderCodigo"
       [value]="texto()"

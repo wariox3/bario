@@ -15,9 +15,7 @@ export interface NovedadFormRawValue {
   fecha_desde: Date | null;
   fecha_hasta: Date | null;
   detalle: string | null;
-  // Vacaciones
-  fecha_desde_periodo: Date | null;
-  fecha_hasta_periodo: Date | null;
+  // Vacaciones (el periodo lo calcula el backend)
   dias_dinero: number | null;
   dias_disfrutados: number | null;
   dias_disfrutados_reales: number | null;

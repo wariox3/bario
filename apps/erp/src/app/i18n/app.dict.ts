@@ -1784,6 +1784,7 @@ export interface AppDict
           createError: { title: string; desc: string };
           editError: { title: string; desc: string };
           loadError: { title: string; desc: string };
+          aprobada: { title: string; desc: string };
         };
       };
       detail: {
@@ -1812,7 +1813,42 @@ export interface AppDict
           pago: string;
         };
         notFound: { title: string; desc: string };
-        toasts: { loadError: { title: string; desc: string } };
+        estados: { aprobada: string; pendiente: string };
+        confirmaciones: {
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+        };
+        toasts: {
+          loadError: { title: string; desc: string };
+          aprobarSuccess: { title: string; desc: string };
+          desaprobarSuccess: { title: string; desc: string };
+          aprobarError: { title: string; desc: string };
+          desaprobarError: { title: string; desc: string };
+          interrumpirSuccess: { title: string; desc: string };
+        };
+        utilidades: string;
+      };
+      interrumpir: {
+        action: string;
+        title: string;
+        desc: string;
+        conDinero: string;
+        fields: {
+          fechaDesde: string;
+          fechaHasta: string;
+          diasDisfrutados: string;
+          diasDisfrutadosReales: string;
+        };
+        validation: {
+          required: string;
+          min: string;
+          maxDisfrutados: string;
+          rangoFechas: string;
+          mismasFechas: string;
+          realesExcedenRango: string;
+        };
+        submit: string;
+        toasts: { error: { title: string } };
       };
     };
     contrato: {

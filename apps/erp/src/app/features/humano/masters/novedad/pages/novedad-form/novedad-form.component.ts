@@ -34,7 +34,12 @@ import {
   NOVEDAD_REFERENCIA_ENDPOINT,
   NOVEDAD_REFERENCIA_TIPO_PARAM,
 } from '../../novedad.constants';
-import { diasDeNovedad, esVacaciones, requiereReferencia } from '../../novedad.rules';
+import {
+  diasDeNovedad,
+  esModificable,
+  esVacaciones,
+  requiereReferencia,
+} from '../../novedad.rules';
 import { dateRangeValidator } from '../../utils/date-range.validator';
 import { novedadToFormValue, formValueToPayload } from '../../novedad.mapper';
 
@@ -42,7 +47,8 @@ import { novedadToFormValue, formValueToPayload } from '../../novedad.mapper';
  * Formulario de alta/edición de novedad.
  *
  * Master del módulo Humano (camino B) con lógica condicional por tipo de novedad:
- * - **Vacaciones**: habilita y vuelve requeridos periodo + días (disfrutados/dinero).
+ * - **Vacaciones**: habilita y vuelve requeridos los días (disfrutados/dinero). El
+ *   periodo no se pide: lo encadena el backend desde el contrato.
  * - **Referencia**: cuando hay tipo+contrato, ofrece elegir otra novedad como referencia.
  *
  * La decisión "qué mostrar" vive en `novedad.rules` (puro); este componente solo
@@ -147,8 +153,6 @@ export class NovedadFormComponent implements OnInit {
       fecha_hasta: this.fb.control<Date | null>(null, Validators.required),
       detalle: ['', Validators.maxLength(NOVEDAD_DETALLE_MAX_LENGTH)],
       // Vacaciones (validadores aplicados dinámicamente según el tipo)
-      fecha_desde_periodo: this.fb.control<Date | null>(null),
-      fecha_hasta_periodo: this.fb.control<Date | null>(null),
       dias_dinero: this.fb.control<number | null>(0),
       dias_disfrutados: this.fb.control<number | null>(0),
       dias_disfrutados_reales: this.fb.control<number | null>(0),
@@ -156,10 +160,7 @@ export class NovedadFormComponent implements OnInit {
       novedad_referencia: this.fb.control<ErpSelectOption | null>(null),
     },
     {
-      validators: [
-        dateRangeValidator('fecha_desde', 'fecha_hasta'),
-        dateRangeValidator('fecha_desde_periodo', 'fecha_hasta_periodo'),
-      ],
+      validators: [dateRangeValidator('fecha_desde', 'fecha_hasta')],
     },
   );
 
@@ -259,24 +260,10 @@ export class NovedadFormComponent implements OnInit {
    * se mutan validadores → fácil de auditar y mantener.
    */
   private aplicarValidadoresVacaciones(activo: boolean): void {
-    const {
-      fecha_desde_periodo,
-      fecha_hasta_periodo,
-      dias_dinero,
-      dias_disfrutados,
-      dias_disfrutados_reales,
-    } = this.form.controls;
-    const controles = [
-      fecha_desde_periodo,
-      fecha_hasta_periodo,
-      dias_dinero,
-      dias_disfrutados,
-      dias_disfrutados_reales,
-    ];
+    const { dias_dinero, dias_disfrutados, dias_disfrutados_reales } = this.form.controls;
+    const controles = [dias_dinero, dias_disfrutados, dias_disfrutados_reales];
 
     if (activo) {
-      fecha_desde_periodo.setValidators(Validators.required);
-      fecha_hasta_periodo.setValidators(Validators.required);
       dias_dinero.setValidators([Validators.required, Validators.min(0)]);
       dias_disfrutados.setValidators([Validators.required, Validators.min(0)]);
       // El backend rechaza vacaciones sin días disfrutados reales.
@@ -311,8 +298,6 @@ export class NovedadFormComponent implements OnInit {
           dias_dinero: 0,
           dias_disfrutados: 0,
           dias_disfrutados_reales: 0,
-          fecha_desde_periodo: null,
-          fecha_hasta_periodo: null,
         },
         { emitEvent: false },
       );
@@ -325,7 +310,15 @@ export class NovedadFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (n) => {
-          // emitEvent:false → no se disparan los handlers (que pisarían días/periodo).
+          // Aprobada no se edita (el backend lo rechaza): quien llega por URL
+          // directa vuelve a la ficha en vez de llenar un formulario que no guarda.
+          if (!esModificable(n)) {
+            const aviso = this.t().entities.novedad.form.toasts.aprobada;
+            this.toast.warn(aviso.title, aviso.desc);
+            this.navigateToDetail(n.id);
+            return;
+          }
+          // emitEvent:false → no se disparan los handlers (que pisarían los días).
           this.form.patchValue(novedadToFormValue(n), { emitEvent: false });
           this.tipoId.set(n.novedad_tipo ?? null);
           this.contratoId.set(n.contrato ?? null);

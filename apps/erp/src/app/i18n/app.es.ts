@@ -2435,7 +2435,7 @@ export const es: AppDict = {
         createSubtitle: 'Completa la información de la novedad',
         editSubtitle: 'Modifica la información de la novedad',
         sections: { vacaciones: 'Vacaciones' },
-        sectionsHint: { vacaciones: 'Periodo y días de disfrute y dinero' },
+        sectionsHint: { vacaciones: 'Días de disfrute y dinero' },
         fields: {
           novedadTipo: 'Tipo de novedad',
           contrato: 'Contrato',
@@ -2470,6 +2470,10 @@ export const es: AppDict = {
           createError: { title: 'Error al crear', desc: 'No se pudo crear la novedad' },
           editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
+          aprobada: {
+            title: 'Novedad aprobada',
+            desc: 'Una novedad aprobada no se puede editar',
+          },
         },
       },
       detail: {
@@ -2505,9 +2509,55 @@ export const es: AppDict = {
           title: 'Novedad no encontrada',
           desc: 'La novedad que buscas no existe o fue eliminada.',
         },
+        estados: { aprobada: 'Aprobada', pendiente: 'Pendiente' },
+        confirmaciones: {
+          aprobar: {
+            header: 'Aprobar vacaciones',
+            message:
+              'Una vez aprobadas no se pueden editar ni eliminar, y el contrato queda con las vacaciones pagas hasta el fin del periodo. ¿Continuar?',
+          },
+          desaprobar: {
+            header: 'Desaprobar vacaciones',
+            message: 'Las vacaciones vuelven a quedar pendientes y se pueden editar. ¿Continuar?',
+          },
+        },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
+          aprobarSuccess: { title: 'Vacaciones aprobadas', desc: 'La novedad quedó aprobada' },
+          desaprobarSuccess: {
+            title: 'Vacaciones desaprobadas',
+            desc: 'La novedad volvió a quedar pendiente',
+          },
+          aprobarError: { title: 'No se pudo aprobar', desc: 'Intenta de nuevo.' },
+          desaprobarError: { title: 'No se pudo desaprobar', desc: 'Intenta de nuevo.' },
+          interrumpirSuccess: {
+            title: 'Vacaciones interrumpidas',
+            desc: 'Quedan {n} días hábiles pendientes para la reanudación.',
+          },
         },
+        utilidades: 'Utilidades',
+      },
+      interrumpir: {
+        action: 'Interrumpir',
+        title: 'Interrumpir vacaciones',
+        desc: 'Deja las vacaciones con las fechas y los días que el empleado alcanzó a disfrutar antes de la incapacidad. Los días hábiles que no tomó quedan pendientes para la reanudación.',
+        conDinero: 'Las vacaciones con días en dinero no se pueden interrumpir',
+        fields: {
+          fechaDesde: 'Fecha desde',
+          fechaHasta: 'Fecha hasta',
+          diasDisfrutados: 'Días hábiles disfrutados',
+          diasDisfrutadosReales: 'Días reales disfrutados',
+        },
+        validation: {
+          required: 'Este campo es obligatorio',
+          min: 'Debe ser mayor que cero',
+          maxDisfrutados: 'No puede pasar de {n}, los días de las vacaciones',
+          rangoFechas: 'La fecha hasta no puede ser anterior a la fecha desde',
+          mismasFechas: 'Son las mismas fechas de las vacaciones: acorta el rango',
+          realesExcedenRango: 'No puede pasar de los días entre las fechas',
+        },
+        submit: 'Interrumpir',
+        toasts: { error: { title: 'No se pudo interrumpir' } },
       },
     },
     contrato: {

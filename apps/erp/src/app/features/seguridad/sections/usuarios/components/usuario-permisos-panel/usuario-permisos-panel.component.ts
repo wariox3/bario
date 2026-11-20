@@ -423,7 +423,7 @@ export class UsuarioPermisosPanelComponent {
    */
   protected filaTodoClass(asignadas: number, total: number): string {
     const base =
-      'inline-flex shrink-0 cursor-pointer items-center rounded-md border px-1.5 py-0.5 font-mono text-[0.68rem] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(20,48,73,0.4)] disabled:cursor-wait disabled:opacity-40 ';
+      'inline-flex shrink-0 cursor-pointer items-center rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(20,48,73,0.4)] disabled:cursor-wait disabled:opacity-40';
     if (asignadas === total) return base + 'border-brand-navy bg-brand-navy text-white';
     if (asignadas > 0) return base + 'border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text';
     return (
@@ -435,7 +435,7 @@ export class UsuarioPermisosPanelComponent {
   /** Chip de permiso custom del picker: mismo criterio — geometría fija. */
   protected extraChipClass(asignado: boolean): string {
     const base =
-      'inline-flex cursor-pointer items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[0.68rem] font-medium transition-colors disabled:cursor-wait disabled:opacity-40 ';
+      'inline-flex cursor-pointer items-center gap-1 rounded px-1.5 py-0.5 tabular-nums text-[0.68rem] font-medium transition-colors disabled:cursor-wait disabled:opacity-40';
     return asignado
       ? base + 'bg-brand-navy text-white'
       : base + 'bg-[rgba(20,48,73,0.05)] text-brand-muted hover:bg-[rgba(20,48,73,0.1)]';

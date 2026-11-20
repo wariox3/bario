@@ -77,7 +77,7 @@
       <div class="flex flex-col gap-0.5">
         <dt class="resolucion-detail__label">{{ t().entities.resolucion.columns.prefijo }}</dt>
         <dd
-          class="resolucion-detail__value resolucion-detail__value--mono"
+          class="resolucion-detail__value resolucion-detail__value--num"
           [class.resolucion-detail__value--empty]="!r.prefijo"
         >
           {{ r.prefijo || '—' }}
@@ -86,7 +86,7 @@
       <div class="flex flex-col gap-0.5">
         <dt class="resolucion-detail__label">{{ t().entities.resolucion.columns.numero }}</dt>
         <dd
-          class="resolucion-detail__value resolucion-detail__value--mono"
+          class="resolucion-detail__value resolucion-detail__value--num"
           [class.resolucion-detail__value--empty]="!r.numero"
         >
           {{ r.numero || '—' }}
@@ -102,13 +102,13 @@
           {{ aplicaA() || '—' }}
         </dd>
       </div>
-      <!-- Los consecutivos acotan la numeración autorizada: van en monoespaciada
-           con `tabular-nums` para poder compararlos de un vistazo. -->
+      <!-- Los consecutivos acotan la numeración autorizada: van con
+           `tabular-nums` para poder compararlos de un vistazo. -->
       <div class="flex flex-col gap-0.5">
         <dt class="resolucion-detail__label">
           {{ t().entities.resolucion.columns.consecutivoDesde }}
         </dt>
-        <dd class="resolucion-detail__value resolucion-detail__value--mono">
+        <dd class="resolucion-detail__value resolucion-detail__value--num">
           {{ r.consecutivo_desde }}
         </dd>
       </div>
@@ -116,7 +116,7 @@
         <dt class="resolucion-detail__label">
           {{ t().entities.resolucion.columns.consecutivoHasta }}
         </dt>
-        <dd class="resolucion-detail__value resolucion-detail__value--mono">
+        <dd class="resolucion-detail__value resolucion-detail__value--num">
           {{ r.consecutivo_hasta }}
         </dd>
       </div>

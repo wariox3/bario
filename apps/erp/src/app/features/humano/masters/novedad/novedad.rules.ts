@@ -15,6 +15,14 @@ export function esVacaciones(tipoId: number | null): boolean {
 }
 
 /**
+ * ¿Se puede editar o eliminar? No, si está aprobada: el backend lo rechaza y la UI
+ * oculta las dos acciones en vez de dejar que la persona lo intente.
+ */
+export function esModificable(novedad: { readonly estado_aprobado: boolean }): boolean {
+  return !novedad.estado_aprobado;
+}
+
+/**
  * ¿Se debe ofrecer el selector de novedad de referencia? Solo para el tipo que la
  * usa y cuando ya hay un contrato elegido (la referencia se filtra por ambos).
  */

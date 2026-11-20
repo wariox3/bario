@@ -31,7 +31,7 @@
           @if (agotado()) {
             {{ tx.agotado }}
           } @else {
-            <span class="font-mono tabular-nums">{{ p.disponible }}</span> {{ tx.disponibles }}
+            <span class="tabular-nums">{{ p.disponible }}</span> {{ tx.disponibles }}
           }
         </span>
       }
@@ -39,12 +39,12 @@
 
     <div class="flex w-full flex-1 flex-col gap-1 px-3 py-2.5">
       @if (p.codigo) {
-        <span class="truncate font-mono text-[0.7rem] text-brand-muted">{{ p.codigo }}</span>
+        <span class="truncate tabular-nums text-[0.7rem] text-brand-muted">{{ p.codigo }}</span>
       }
       <span class="line-clamp-2 text-[0.85rem] font-semibold leading-tight text-brand-text">
         {{ p.nombre }}
       </span>
-      <span class="mt-auto pt-1 font-mono text-[0.95rem] font-bold tabular-nums text-brand-text">
+      <span class="mt-auto pt-1 text-[0.95rem] font-bold tabular-nums text-brand-text">
         {{ precio() }}
       </span>
     </div>
@@ -75,7 +75,7 @@
 
   @if (cantidad() > 0) {
     <span
-      class="pointer-events-none absolute left-2 top-2 flex h-7 min-w-7 shadow-sm ring-2 ring-white items-center justify-center rounded-full bg-[var(--brand-blue)] px-1.5 font-mono text-[0.72rem] font-bold tabular-nums text-white"
+      class="pointer-events-none absolute left-2 top-2 flex h-7 min-w-7 shadow-sm ring-2 ring-white items-center justify-center rounded-full bg-[var(--brand-blue)] px-1.5 text-[0.72rem] font-bold tabular-nums text-white"
       [attr.aria-label]="tx.enVenta + ': ' + cantidad()"
     >
       {{ cantidad() }}

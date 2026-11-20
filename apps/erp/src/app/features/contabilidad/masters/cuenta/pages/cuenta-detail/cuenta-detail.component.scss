@@ -34,13 +34,10 @@
   word-break: break-word;
 }
 
-// El código del PUC se compara dígito a dígito: monoespaciada con tabular-nums.
-.cuenta-detail__value--mono {
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.83rem;
+// El código del PUC se compara dígito a dígito: `tabular-nums`, sin cambiar de tipografía.
+.cuenta-detail__value--num {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
 }
 
 // Bandera apagada: un «No» es un valor, no un dato que falta. Atenuarlo deja que

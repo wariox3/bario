@@ -1,0 +1,163 @@
+@let m = t().entities.novedad.interrumpir;
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- Header: badge + título + la vacación que se interrumpe -->
+  <div class="flex items-center gap-3.5">
+    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-100">
+      <i class="pi pi-pause-circle text-[1.1rem] text-amber-700"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ m.title }}
+      </h2>
+      <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+        {{ novedad.contrato_nombre ? novedad.contrato_nombre + ' · ' : ''
+        }}<span class="tabular-nums">{{ rangoOriginal }}</span>
+      </p>
+    </div>
+  </div>
+
+  <p class="m-0 text-[0.8rem] leading-relaxed text-brand-muted">{{ m.desc }}</p>
+
+  <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+    <!-- Fecha desde -->
+    <div class="flex flex-col gap-1.5">
+      <label for="interrumpir_fecha_desde" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.fechaDesde }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-datepicker
+        inputId="interrumpir_fecha_desde"
+        formControlName="fecha_desde"
+        [showIcon]="true"
+        [minDate]="minFecha"
+        [maxDate]="maxFecha"
+        appendTo="body"
+        [fluid]="true"
+        [invalid]="form.controls.fecha_desde.invalid && form.controls.fecha_desde.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.fecha_desde"
+        [messages]="{ required: m.validation.required }"
+      />
+    </div>
+
+    <!-- Fecha hasta -->
+    <div class="flex flex-col gap-1.5">
+      <label for="interrumpir_fecha_hasta" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.fechaHasta }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-datepicker
+        inputId="interrumpir_fecha_hasta"
+        formControlName="fecha_hasta"
+        [showIcon]="true"
+        [minDate]="minFecha"
+        [maxDate]="maxFecha"
+        appendTo="body"
+        [fluid]="true"
+        [invalid]="
+          (form.controls.fecha_hasta.invalid ||
+            form.hasError('fecha_hastaRango') ||
+            form.hasError('mismasFechas')) &&
+          form.controls.fecha_hasta.touched
+        "
+      />
+      <lib-field-error
+        [control]="form.controls.fecha_hasta"
+        [messages]="{ required: m.validation.required }"
+      />
+      @if (form.controls.fecha_hasta.touched) {
+        @if (form.hasError('fecha_hastaRango')) {
+          <small class="text-[0.78rem] text-red-500">{{ m.validation.rangoFechas }}</small>
+        } @else if (form.hasError('mismasFechas')) {
+          <small class="text-[0.78rem] text-red-500">{{ m.validation.mismasFechas }}</small>
+        }
+      }
+    </div>
+
+    <!-- Días hábiles disfrutados -->
+    <div class="flex flex-col gap-1.5">
+      <label
+        for="interrumpir_dias_disfrutados"
+        class="text-[0.855rem] font-semibold text-brand-text"
+      >
+        {{ m.fields.diasDisfrutados }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="interrumpir_dias_disfrutados"
+        formControlName="dias_disfrutados"
+        [useGrouping]="false"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [fluid]="true"
+        [invalid]="form.controls.dias_disfrutados.invalid && form.controls.dias_disfrutados.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.dias_disfrutados"
+        [messages]="{
+          required: m.validation.required,
+          min: m.validation.min,
+          max: maxDisfrutadosMsg(),
+        }"
+      />
+    </div>
+
+    <!-- Días reales disfrutados -->
+    <div class="flex flex-col gap-1.5">
+      <label
+        for="interrumpir_dias_disfrutados_reales"
+        class="text-[0.855rem] font-semibold text-brand-text"
+      >
+        {{ m.fields.diasDisfrutadosReales }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="interrumpir_dias_disfrutados_reales"
+        formControlName="dias_disfrutados_reales"
+        [useGrouping]="false"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [fluid]="true"
+        [invalid]="
+          (form.controls.dias_disfrutados_reales.invalid || form.hasError('realesExcedenRango')) &&
+          form.controls.dias_disfrutados_reales.touched
+        "
+      />
+      <lib-field-error
+        [control]="form.controls.dias_disfrutados_reales"
+        [messages]="{ required: m.validation.required, min: m.validation.min }"
+      />
+      @if (form.hasError('realesExcedenRango') && form.controls.dias_disfrutados_reales.touched) {
+        <small class="text-[0.78rem] text-red-500">{{ m.validation.realesExcedenRango }}</small>
+      }
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onClose()"
+    />
+    <p-button
+      type="submit"
+      [label]="m.submit"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+    />
+  </div>
+</form>

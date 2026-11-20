@@ -212,60 +212,6 @@
 
       <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
         <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <!-- Fecha desde periodo -->
-          <div class="flex flex-col gap-1.5">
-            <label for="fecha_desde_periodo" class="novedad-form__label">
-              {{ t().entities.novedad.form.fields.fechaDesdePeriodo }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-datepicker
-              inputId="fecha_desde_periodo"
-              formControlName="fecha_desde_periodo"
-              [showIcon]="true"
-              appendTo="body"
-              [fluid]="true"
-              [invalid]="
-                form.controls.fecha_desde_periodo.invalid &&
-                form.controls.fecha_desde_periodo.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.fecha_desde_periodo"
-              [messages]="{ required: t().entities.novedad.form.validation.required }"
-            />
-          </div>
-
-          <!-- Fecha hasta periodo -->
-          <div class="flex flex-col gap-1.5">
-            <label for="fecha_hasta_periodo" class="novedad-form__label">
-              {{ t().entities.novedad.form.fields.fechaHastaPeriodo }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-datepicker
-              inputId="fecha_hasta_periodo"
-              formControlName="fecha_hasta_periodo"
-              [showIcon]="true"
-              appendTo="body"
-              [fluid]="true"
-              [invalid]="
-                (form.controls.fecha_hasta_periodo.invalid ||
-                  form.hasError('fecha_hasta_periodoRango')) &&
-                form.controls.fecha_hasta_periodo.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.fecha_hasta_periodo"
-              [messages]="{ required: t().entities.novedad.form.validation.required }"
-            />
-            @if (
-              form.hasError('fecha_hasta_periodoRango') && form.controls.fecha_hasta_periodo.touched
-            ) {
-              <small class="text-[0.78rem] text-red-500">
-                {{ t().entities.novedad.form.validation.rangoFechas }}
-              </small>
-            }
-          </div>
-
           <!-- Días disfrutados -->
           <div class="flex flex-col gap-1.5">
             <label for="dias_disfrutados" class="novedad-form__label">

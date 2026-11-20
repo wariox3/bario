@@ -100,15 +100,15 @@
           {{ c.nombre || '—' }}
         </dd>
       </div>
-      <!-- Código e id son identificadores: monoespaciada, como en el resto del
+      <!-- Código e id son identificadores: `tabular-nums`, como en el resto del
            sistema, para poder compararlos y dictarlos. -->
       <div class="flex flex-col gap-0.5">
         <dt class="cargo-detail__label">{{ t().entities.cargo.columns.codigo }}</dt>
-        <dd class="cargo-detail__value cargo-detail__value--mono">{{ c.codigo }}</dd>
+        <dd class="cargo-detail__value cargo-detail__value--num">{{ c.codigo }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="cargo-detail__label">{{ t().entities.cargo.columns.id }}</dt>
-        <dd class="cargo-detail__value cargo-detail__value--mono">{{ c.id }}</dd>
+        <dd class="cargo-detail__value cargo-detail__value--num">{{ c.id }}</dd>
       </div>
     </dl>
   </section>

@@ -226,7 +226,12 @@ Regla: lo que solo importa a un master vive dentro del master.
 
 **Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
 
-**Un error se avisa una sola vez:** el `errorInterceptor` muestra un toast para todo error HTTP (salvo 401 y 422) y lo vuelve a lanzar. Si la pantalla también lo avisa en su `error:` —como hacen los listados al eliminar, con su `deleteError`—, la petición debe ir con `{ errorToast: false }`, o salen dos toasts con el mismo `detail`. Los `remove(ids)` de los servicios y el del `HttpEntityDataGateway` (documentos) ya lo pasan; un master nuevo hace lo mismo.
+**Todo error se avisa, y una sola vez.** Ningún error HTTP puede quedar callado. El `errorInterceptor` (contrato completo en su cabecera, `libs/core/src/lib/interceptors/error.interceptor.ts`) muestra toast para red, 403, 404, 409, 429, otros 4xx y 5xx, pero **no para 400/422** (validación) ni para 401: esos los avisa la pantalla. Hay dos formas válidas, y no se mezclan:
+
+- **El componente avisa todo:** la petición va con `{ errorToast: false }` y el `error:` hace `toast.error(titulo, extractErrorMessage(err, desc))` (o `extractBlobErrorMessage` en descargas) **para cualquier status**. Así los listados al eliminar (`deleteError`, los `remove(ids)` y el `HttpEntityDataGateway` ya lo pasan) y las acciones de una ficha (aprobar, desaprobar, imprimir).
+- **Formulario con `FormErrorService.handle`:** la petición va **sin** `errorToast: false`. `handle` solo avisa la validación (400/422, inline o en toast) e ignora el resto, que lo avisa el interceptor.
+
+`errorToast: false` + `FormErrorService` deja callado todo 500/403/404 (pasó con interrumpir vacación). Antes de cerrar, revisa qué hace el `error:` con un 400 **y** con un 500.
 
 **Al guardar un documento se cae en su ficha, no en el listado:** crear y editar terminan en `routes.detail` para que la persona revise lo que quedó almacenado. En alta el id sale de la respuesta del `POST` (`extractDocumentoId`, en `@erp/core/module-config`); si no viniera, se cae al listado antes que navegar a una URL inválida. Excepción viva: depreciación y cierre, que al crear entran a `editar/:id` porque el documento nace vacío y sus líneas se cargan desde el form. Cancelar sigue volviendo al listado.
 

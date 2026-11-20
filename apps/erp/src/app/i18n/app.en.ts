@@ -2369,7 +2369,7 @@ export const en: AppDict = {
         createSubtitle: 'Fill in the event information',
         editSubtitle: 'Update the event information',
         sections: { vacaciones: 'Vacation' },
-        sectionsHint: { vacaciones: 'Period and enjoyed/paid days' },
+        sectionsHint: { vacaciones: 'Enjoyed and paid days' },
         fields: {
           novedadTipo: 'Event type',
           contrato: 'Contract',
@@ -2404,6 +2404,10 @@ export const en: AppDict = {
           createError: { title: 'Create error', desc: 'The event could not be created' },
           editError: { title: 'Save error', desc: 'The changes could not be saved' },
           loadError: { title: 'Load error', desc: 'The event could not be loaded' },
+          aprobada: {
+            title: 'Event approved',
+            desc: 'An approved event cannot be edited',
+          },
         },
       },
       detail: {
@@ -2439,9 +2443,55 @@ export const en: AppDict = {
           title: 'Event not found',
           desc: 'The event you are looking for does not exist or was deleted.',
         },
+        estados: { aprobada: 'Approved', pendiente: 'Pending' },
+        confirmaciones: {
+          aprobar: {
+            header: 'Approve vacation',
+            message:
+              'Once approved it cannot be edited or deleted, and the contract is marked as paid up to the end of the period. Continue?',
+          },
+          desaprobar: {
+            header: 'Unapprove vacation',
+            message: 'The vacation goes back to pending and can be edited again. Continue?',
+          },
+        },
         toasts: {
           loadError: { title: 'Load error', desc: 'The event could not be loaded' },
+          aprobarSuccess: { title: 'Vacation approved', desc: 'The event is now approved' },
+          desaprobarSuccess: {
+            title: 'Vacation unapproved',
+            desc: 'The event is pending again',
+          },
+          aprobarError: { title: 'Could not approve', desc: 'Please try again.' },
+          desaprobarError: { title: 'Could not unapprove', desc: 'Please try again.' },
+          interrumpirSuccess: {
+            title: 'Vacation interrupted',
+            desc: '{n} business days remain pending for the resumption.',
+          },
         },
+        utilidades: 'Utilities',
+      },
+      interrumpir: {
+        action: 'Interrupt',
+        title: 'Interrupt vacation',
+        desc: 'Sets the vacation to the dates and days the employee actually took before the sick leave. The business days not taken remain pending for the resumption.',
+        conDinero: 'A vacation with days paid in money cannot be interrupted',
+        fields: {
+          fechaDesde: 'Date from',
+          fechaHasta: 'Date to',
+          diasDisfrutados: 'Business days taken',
+          diasDisfrutadosReales: 'Actual days taken',
+        },
+        validation: {
+          required: 'This field is required',
+          min: 'Must be greater than zero',
+          maxDisfrutados: 'Cannot exceed {n}, the vacation days',
+          rangoFechas: 'Date to cannot be earlier than date from',
+          mismasFechas: 'These are the vacation dates: shorten the range',
+          realesExcedenRango: 'Cannot exceed the days between the dates',
+        },
+        submit: 'Interrupt',
+        toasts: { error: { title: 'Could not interrupt' } },
       },
     },
     contrato: {

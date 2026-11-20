@@ -6,10 +6,10 @@
       <p class="m-0 text-[0.78rem] leading-relaxed">{{ mensaje }}</p>
     }
     @if (error().emisorId !== null) {
-      <!-- El id del emisor es lo que se le cita a soporte: monoespaciada. -->
+      <!-- El id del emisor es lo que se le cita a soporte: `tabular-nums`. -->
       <p class="m-0 mt-0.5 text-[0.72rem] text-red-600">
         {{ emisorLabel() }}
-        <span class="font-mono font-semibold tabular-nums">{{ error().emisorId }}</span>
+        <span class="font-semibold tabular-nums">{{ error().emisorId }}</span>
       </p>
     }
   </div>
