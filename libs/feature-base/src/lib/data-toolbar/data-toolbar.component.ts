@@ -28,7 +28,7 @@ interface ResolvedTrailingAction extends ToolbarAction {
  *
  * Layout (una sola fila, densidad calmada de ERP administrativo):
  *
- *   [search] [filtros] ←spacer→ [delete N] │ [trailing...] [refresh] [primary]
+ *   [search] [filtros] ←spacer→ [delete N] [anular N] │ [trailing...] [refresh] [primary]
  *
  * Pasos comunes:
  *  - `searchEnabled` → input de búsqueda con icono e indicador de clear.
@@ -41,6 +41,8 @@ interface ResolvedTrailingAction extends ToolbarAction {
  *    "Limpiar" se muda al final de esa fila.
  *  - `deleteSelectedEnabled` + `deleteSelectedCount > 0` → botón danger
  *    contextual a la izquierda del divisor.
+ *  - `selectionActions` + `selectionCount > 0` → más botones danger junto a
+ *    eliminar (ej. anular), que salen por `actionInvoked`.
  *  - `trailingActions` → array declarativo (exportar, importar, etc.).
  *  - `refreshEnabled` → ícono-solo con tooltip.
  *  - `primaryAction` → un botón destacado a la derecha (Nuevo).
@@ -102,6 +104,15 @@ export class DataToolbarComponent {
   readonly deleteSelectedCount = input<number>(0);
   readonly deleteSelected = output<void>();
 
+  // ── Acciones de selección ────────────────────────────────────────────────
+  /**
+   * Acciones que, como eliminar, solo tienen sentido sobre filas marcadas
+   * (ej. anular). Aparecen en rojo junto a eliminar cuando `selectionCount > 0`
+   * y emiten su `id` por `actionInvoked`. Vacías por default.
+   */
+  readonly selectionActions = input<readonly ToolbarAction[]>([]);
+  readonly selectionCount = input<number>(0);
+
   // ── Acciones declarativas ────────────────────────────────────────────────
   readonly primaryAction = input<ToolbarAction | null>(null);
   readonly trailingActions = input<readonly ToolbarAction[]>([]);
@@ -150,6 +161,14 @@ export class DataToolbarComponent {
         : null,
     }));
   });
+
+  protected readonly showDelete = computed(
+    () => this.deleteSelectedEnabled() && this.deleteSelectedCount() > 0,
+  );
+
+  protected readonly visibleSelectionActions = computed<readonly ToolbarAction[]>(() =>
+    this.selectionCount() > 0 ? this.selectionActions() : [],
+  );
 
   /** Píldoras de la fila de condiciones; vacía si el host no pasó las condiciones. */
   protected readonly filterChips = computed<readonly FilterChip[]>(() => {

@@ -9,13 +9,15 @@ export const POS_DOCUMENTO_TIPOS = [
 export type PosDocumentoTipoId = (typeof POS_DOCUMENTO_TIPOS)[number];
 
 /**
- * Configuración con la que vende una caja. Tiene dos dueños:
+ * Configuración con la que vende una caja. Tiene tres dueños:
  *
  * - **La empresa:** el tipo de documento, en el backend
  *   (`GenConfiguracion.ven_pos_documento_tipo`). Es una decisión fiscal: todas
  *   las cajas facturan con el mismo.
- * - **La caja física:** almacén, sede y asesor, en el navegador
- *   (`ConfiguracionLocal`). Cada caja puede tener los suyos.
+ * - **El usuario:** almacén y sede, en el backend
+ *   (`/general/configuracion-usuario/`). Lo siguen a cualquier equipo y son los
+ *   mismos que propone el ERP.
+ * - **El equipo:** el asesor por defecto, en el navegador (`ConfiguracionLocal`).
  *
  * La cuenta donde entra cada cobro no se configura: sale del tipo de cuenta
  * bancaria del medio de pago (ver `medios-pago.ts`).
@@ -27,10 +29,15 @@ export interface ConfiguracionCaja extends ConfiguracionLocal {
   readonly documentoTipoId: PosDocumentoTipoId | null;
 }
 
-/** Lo que cada caja guarda en su navegador. */
+/**
+ * Lo que cada equipo guarda en su navegador. Almacén y sede son de antes de la
+ * configuración del usuario: se leen solo de respaldo y se vacían al guardar la
+ * del usuario (ver `ConfiguracionCajaStore.guardarOperacion`).
+ */
 export interface ConfiguracionLocal {
-  /** Almacén del que sale la mercancía; lo heredan las líneas. */
+  /** Respaldo: almacén del que sale la mercancía; lo heredan las líneas. */
   readonly almacen: ErpSelectOption | null;
+  /** Respaldo. */
   readonly sede: ErpSelectOption | null;
   /** Asesor que se propone en cada venta; se puede cambiar al cobrar. */
   readonly asesor: ErpSelectOption | null;

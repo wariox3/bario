@@ -36,6 +36,7 @@ import {
   aCabeceraCorregible,
   aLineaCorregible,
   corrigeCampo,
+  corrigeCentroCosto,
   exigidosFaltantes,
   payloadContabilidad,
   rechazoCorreccion,
@@ -94,6 +95,7 @@ export class CorregirDocumentoDialogComponent {
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly formatMoney = formatCop;
   protected readonly corrigeCampo = corrigeCampo;
+  protected readonly corrigeCentroCosto = corrigeCentroCosto;
 
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);

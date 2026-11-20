@@ -3,12 +3,23 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Subject, lastValueFrom, of, throwError } from 'rxjs';
-import { DOCUMENT_TYPE_ID, ENVIRONMENT, TenantService } from '@reddoc/core';
+import {
+  ConfiguracionUsuarioStore,
+  DOCUMENT_TYPE_ID,
+  ENVIRONMENT,
+  TenantService,
+  type ConfiguracionUsuarioRead,
+  type ErpSelectOption,
+  type EstadoConfiguracionUsuario,
+} from '@reddoc/core';
 import { ConfiguracionCajaStore } from './configuracion-caja.store';
 import { ConfiguracionEmpresaService } from './configuracion-empresa.service';
 import type { PosDocumentoTipoId } from './configuracion-caja.model';
 
 const almacen = { id: 2, nombre: 'Principal' };
+const bodega = { id: 4, nombre: 'Bodega' };
+const norte = { id: 7, nombre: 'Norte' };
+const asesor = { id: 5, nombre: 'Ana' };
 const cuenta = { id: 9, nombre: 'Caja general' };
 const POS = DOCUMENT_TYPE_ID.FACTURA_POS;
 const POS_ELECTRONICA = DOCUMENT_TYPE_ID.FACTURA_POS_ELECTRONICO;
@@ -20,15 +31,25 @@ describe('ConfiguracionCajaStore', () => {
       tipoDocumentoPos: jest.fn(() => of<PosDocumentoTipoId | null>(tipo)),
       guardarTipoDocumentoPos: jest.fn((t: PosDocumentoTipoId) => of<PosDocumentoTipoId | null>(t)),
     };
+    // Configuración del usuario: por defecto ya leída y vacía.
+    const usuario = {
+      almacen: signal<ErpSelectOption | null>(null),
+      sede: signal<ErpSelectOption | null>(null),
+      caja: signal<ErpSelectOption | null>(null),
+      estado: signal<EstadoConfiguracionUsuario>('listo'),
+      cargar: jest.fn(() => of(null)),
+      guardar: jest.fn(() => of({} as ConfiguracionUsuarioRead)),
+    };
     TestBed.configureTestingModule({
       providers: [
         { provide: TenantService, useValue: { currentSlug: slug } },
         { provide: ConfiguracionEmpresaService, useValue: empresa },
+        { provide: ConfiguracionUsuarioStore, useValue: usuario },
       ],
     });
     const store = TestBed.inject(ConfiguracionCajaStore);
     TestBed.tick();
-    return { store, slug, empresa };
+    return { store, slug, empresa, usuario };
   }
 
   beforeEach(() => localStorage.clear());
@@ -83,8 +104,8 @@ describe('ConfiguracionCajaStore', () => {
   });
 
   it('sin tipo en la empresa la caja no está completa', () => {
-    const { store } = preparar(null);
-    store.guardarLocal({ almacen, sede: null, asesor: null });
+    const { store, usuario } = preparar(null);
+    usuario.almacen.set(almacen);
     expect(store.completa()).toBe(false);
   });
 
@@ -125,13 +146,95 @@ describe('ConfiguracionCajaStore', () => {
     expect(store.configuracion().documentoTipoId).toBe(POS_ELECTRONICA);
   });
 
-  it('lo de la caja se guarda en el navegador, sin el tipo', () => {
+  it('el asesor se guarda en el navegador, sin el tipo', () => {
     const { store } = preparar();
-    store.guardarLocal({ almacen, sede: null, asesor: null });
+    store.guardarAsesor(asesor);
     expect(JSON.parse(localStorage.getItem('pos:config:acme') ?? 'null')).toEqual({
-      almacen,
+      almacen: null,
       sede: null,
-      asesor: null,
+      asesor,
+    });
+    expect(store.configuracion().asesor).toEqual(asesor);
+  });
+
+  describe('configuración del usuario', () => {
+    it('almacén y sede del usuario ganan sobre lo del navegador', () => {
+      localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: null, asesor }));
+      const { store, usuario } = preparar();
+      usuario.almacen.set(bodega);
+      usuario.sede.set(norte);
+      expect(store.configuracion()).toEqual({
+        documentoTipoId: POS,
+        almacen: bodega,
+        sede: norte,
+        asesor,
+      });
+    });
+
+    it('sin valor del usuario, lo del navegador queda de respaldo campo por campo', () => {
+      localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: norte, asesor }));
+      const { store, usuario } = preparar();
+      usuario.sede.set({ id: 8, nombre: 'Sur' });
+      expect(store.configuracion().almacen).toEqual(almacen);
+      expect(store.configuracion().sede).toEqual({ id: 8, nombre: 'Sur' });
+    });
+
+    it('se pide al entrar y al cambiar de empresa', () => {
+      const { slug, usuario } = preparar();
+      expect(usuario.cargar).toHaveBeenCalledTimes(1);
+      slug.set('globex');
+      TestBed.tick();
+      expect(usuario.cargar).toHaveBeenCalledTimes(2);
+    });
+
+    it('guardar la operación manda ids al usuario y borra el respaldo, no el asesor', async () => {
+      localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: norte, asesor }));
+      const { store, usuario } = preparar();
+      await lastValueFrom(store.guardarOperacion({ almacen: bodega, sede: norte, caja: null }));
+      expect(usuario.guardar).toHaveBeenCalledWith({ almacen: 4, sede: 7, caja: null });
+      expect(JSON.parse(localStorage.getItem('pos:config:acme') ?? 'null')).toEqual({
+        almacen: null,
+        sede: null,
+        asesor,
+      });
+    });
+
+    it('si falla al guardar, el respaldo se conserva', async () => {
+      localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: null, asesor }));
+      const { store, usuario } = preparar();
+      usuario.guardar.mockReturnValueOnce(throwError(() => new Error('400')));
+      await expect(
+        lastValueFrom(store.guardarOperacion({ almacen: bodega, sede: null, caja: null })),
+      ).rejects.toThrow();
+      expect(store.configuracion().almacen).toEqual(almacen);
+    });
+
+    it('mientras carga, la caja está cargando', () => {
+      const { store, usuario } = preparar();
+      usuario.estado.set('cargando');
+      expect(store.estado()).toBe('cargando');
+    });
+
+    it('si falla y no hay respaldo, la caja está en error', () => {
+      const { store, usuario } = preparar();
+      usuario.estado.set('error');
+      expect(store.estado()).toBe('error');
+    });
+
+    it('si falla pero el respaldo alcanza, la caja sigue lista', () => {
+      localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: null, asesor }));
+      const { store, usuario } = preparar();
+      usuario.estado.set('error');
+      expect(store.estado()).toBe('listo');
+      expect(store.completa()).toBe(true);
+    });
+
+    it('reintentar pide de nuevo solo lo que falló', () => {
+      const { store, usuario, empresa } = preparar();
+      usuario.estado.set('error');
+      store.recargar();
+      expect(usuario.cargar).toHaveBeenCalledTimes(2);
+      expect(empresa.tipoDocumentoPos).toHaveBeenCalledTimes(1);
     });
   });
 });

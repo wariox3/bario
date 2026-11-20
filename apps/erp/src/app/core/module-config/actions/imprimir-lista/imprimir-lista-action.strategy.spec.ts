@@ -26,6 +26,7 @@ function contexto(over: Partial<EntityActionContext> = {}): EntityActionContext 
     selectedIds: [],
     totalCount: 10,
     reload: jest.fn(),
+    clearSelection: jest.fn(),
     ...over,
   };
 }

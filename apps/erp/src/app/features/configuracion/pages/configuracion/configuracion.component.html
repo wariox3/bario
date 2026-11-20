@@ -26,6 +26,7 @@
         <p-tab value="humano">{{ t().configuracion.tabs.humano }}</p-tab>
         <p-tab value="venta">{{ t().configuracion.tabs.venta }}</p-tab>
         <p-tab value="compra">{{ t().configuracion.tabs.compra }}</p-tab>
+        <p-tab value="usuario">{{ t().configuracion.tabs.usuario }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -63,6 +64,13 @@
           @if (activeSeccion() === 'compra') {
             <div class="pt-7">
               <app-compra-config />
+            </div>
+          }
+        </p-tabpanel>
+        <p-tabpanel value="usuario">
+          @if (activeSeccion() === 'usuario') {
+            <div class="pt-7">
+              <app-usuario-config />
             </div>
           }
         </p-tabpanel>

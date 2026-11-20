@@ -51,13 +51,11 @@ export interface SeguridadSocialRead extends DocumentoReadBase {
  * la cabecera: el concepto de nómina lleva `operacion`, `porcentaje`, `dias`,
  * `hora` y tres bases; acá alcanza con qué se pagó y cuánto. Por eso no reusa
  * `nomina-conceptos-table` y trae su propia tabla, más simple.
- *
- * **Supuestos pendientes de confirmar con backend**: los tres campos.
  */
 export interface SeguridadSocialDetalleRead {
   readonly id: number;
   /** Descripción de lo aportado (la entidad y su concepto). */
   readonly detalle?: string | null;
-  /** Monto aportado por esta línea. */
-  readonly pago?: string | number | null;
+  /** Monto aportado por esta línea (el backend lo manda en `precio`). */
+  readonly precio?: string | number | null;
 }

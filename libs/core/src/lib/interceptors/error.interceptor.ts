@@ -23,7 +23,7 @@ import {
  *
  * - network (0)          → toast.error (interceptor)
  * - validation (400/422) → SIN toast; lo renderiza el formulario/banner inline
- * - unauthorized (401)   → refresh de token; sin toast
+ * - unauthorized (401)   → refresh de token; si falla, toast de sesión vencida
  * - forbidden (403)      → si niega el listado de la pantalla, la reemplaza por
  *                          el estado de acceso denegado (`ForbiddenPageStore`);
  *                          si no, toast.error (salvo cuenta sin verificar)
@@ -58,7 +58,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case 'network':
           return handleConnectionError(toast, error);
         case 'unauthorized':
-          return handleUnauthorized(req, next, authService, tokenRefresh, error, skipUrls);
+          return handleUnauthorized(req, next, authService, tokenRefresh, toast, error, skipUrls);
         case 'forbidden':
           return handleForbidden(req, toast, router, tenant, routes, forbiddenPage, error);
         case 'notFound':

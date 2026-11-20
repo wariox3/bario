@@ -21,8 +21,10 @@ import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { startWith } from 'rxjs';
 import {
+  ConfiguracionUsuarioStore,
   CUENTA_BANCO_TIPO_CAJA,
   FormErrorService,
+  coincideConOpcion,
   I18nService,
   ToastService,
   type ErpSelectOption,
@@ -77,7 +79,15 @@ export class AbrirTurnoDialogComponent {
   readonly visibleChange = output<boolean>();
   readonly abierto = output<Turno>();
 
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
   protected readonly cajaEndpoint = CAJA_SELECT_ENDPOINT;
+  /**
+   * Arranca en la caja del usuario (Configuración). El catálogo solo trae las
+   * activas: si la suya se desactivó, no se sugiere nada y se elige a mano.
+   */
+  protected readonly cajaSugerida = computed(() =>
+    coincideConOpcion(this.configuracionUsuario.caja()),
+  );
   protected readonly guardando = signal(false);
   protected readonly estadoCuentas = signal<EstadoCuentas>('cargando');
   private readonly cuentas = signal<readonly CuentaCobro[]>([]);

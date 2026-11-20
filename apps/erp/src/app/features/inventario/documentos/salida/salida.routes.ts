@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
@@ -32,6 +33,8 @@ export const SALIDA_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // Valores por defecto del usuario (Configuración → Usuario); casi siempre ya en memoria.
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('../_shared/movimiento/pages/movimiento-documento-form/movimiento-documento-form.component').then(
             (m) => m.MovimientoDocumentoFormComponent,

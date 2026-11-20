@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
@@ -31,6 +32,8 @@ export const PEDIDO_CLIENTE_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // Valores por defecto del usuario (Configuración → Usuario); casi siempre ya en memoria.
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('./pages/pedido-cliente-form/pedido-cliente-form.component').then(
             (m) => m.PedidoClienteFormComponent,

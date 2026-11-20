@@ -403,6 +403,34 @@ export const es: AppDict = {
         desc: 'Ocurrió un error al generar la impresión. Intenta de nuevo.',
       },
     },
+    anularLista: {
+      label: 'Anular',
+      confirmar: {
+        header: 'Anular documentos',
+        headerUno: 'Anular documento',
+        message:
+          'Se anularán {n} documentos. Anular es irreversible: cada documento queda congelado.',
+        messageUno: 'Se anulará 1 documento. Anular es irreversible: el documento queda congelado.',
+        accept: 'Anular',
+        reject: 'Cancelar',
+      },
+      sinSeleccion: {
+        title: 'Sin selección',
+        desc: 'Selecciona al menos un documento para anular.',
+      },
+      exito: {
+        title: 'Documentos anulados',
+        desc: 'Se anularon {n} documentos.',
+        descUno: 'Se anuló 1 documento.',
+      },
+      parcial: { title: 'Se anularon {n} de {total}' },
+      error: {
+        title: 'No se pudo anular',
+        desc: 'Ocurrió un error al anular el documento.',
+      },
+      idLabel: 'ID',
+      yMas: 'y {n} más',
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',
@@ -635,7 +663,7 @@ export const es: AppDict = {
       subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
       empty: 'El documento no tiene líneas',
       notaCuenta:
-        'La base y el contacto solo se corrigen en las líneas de cuenta (tipo C) cuya cuenta los exige. Las líneas de ítem los toman de la cabecera del documento.',
+        'La base y el contacto se corrigen en las líneas de cuenta y de nómina, si su cuenta los exige; en nómina la cuenta es la del concepto. Las líneas de ítem los toman de la cabecera del documento, y las de nómina el centro de costo del contrato.',
       fields: {
         sede: 'Sede',
         seleccionar: 'Selecciona…',
@@ -1491,10 +1519,8 @@ export const es: AppDict = {
         desde: 'Desde',
         hasta: 'Hasta',
         identificacion: 'Identificación',
-        empleado: 'Empleado',
+        entidad: 'Entidad',
         salario: 'Salario',
-        devengado: 'Devengado',
-        deduccion: 'Deducción',
         total: 'Total',
         aprobado: 'Apr',
         anulado: 'Anu',
@@ -7665,7 +7691,20 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración',
     subtitle: 'Parámetros de la empresa',
-    tabs: { general: 'General', humano: 'Humano', venta: 'Venta', compra: 'Compra' },
+    tabs: {
+      general: 'General',
+      humano: 'Humano',
+      venta: 'Venta',
+      compra: 'Compra',
+      usuario: 'Usuario',
+    },
+    usuario: {
+      predeterminados: {
+        title: 'Valores por defecto',
+        hint: 'Se proponen al crear documentos y al abrir el POS. Solo aplican a tu usuario y puedes cambiarlos en cada documento.',
+      },
+      fields: { sede: 'Sede', almacen: 'Almacén', caja: 'Caja' },
+    },
     compra: {
       recibe: {
         title: 'Persona que recibe',

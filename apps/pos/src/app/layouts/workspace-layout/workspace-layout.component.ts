@@ -13,6 +13,7 @@ import { PosStorageService } from '../../core/storage/pos-storage.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { TurnoChipComponent } from '../../features/turno/components/turno-chip/turno-chip.component';
 import { TurnoActualStore } from '../../features/turno/turno-actual.store';
+import { ConfiguracionCajaStore } from '../../features/configuracion/configuracion-caja.store';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
 import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
 
@@ -62,6 +63,12 @@ export class WorkspaceLayoutComponent {
   protected readonly items = WORKSPACE_MENU;
   /** Con turno abierto, «Turno» lleva un punto verde en el sidebar. */
   protected readonly conTurno = inject(TurnoActualStore).abierto;
+  /**
+   * Crearlo al entrar a la empresa pide ya el tipo de documento y la configuración
+   * del usuario: Vender no avisa en vano y abrir turno propone la caja aunque se
+   * entre directo a Turno.
+   */
+  private readonly configuracionCaja = inject(ConfiguracionCajaStore);
   protected readonly drawerVisible = signal(false);
   protected readonly estadoPestana = this.pestana.estado;
 

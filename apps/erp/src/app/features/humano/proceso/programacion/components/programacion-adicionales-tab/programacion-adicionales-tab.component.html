@@ -1,7 +1,7 @@
 @let a = t().entities.programacion.adicionales;
 
-<div class="flex flex-col gap-3">
-  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+<div>
+  <div>
     <lib-data-toolbar
       [primaryAction]="primaryAction()"
       [trailingActions]="trailingActions()"
@@ -29,7 +29,9 @@
   </div>
 
   <!-- Leyenda de las abreviaturas, igual que en la tabla de empleados -->
-  <p class="m-0 text-[0.72rem] leading-relaxed text-brand-muted">
+  <p
+    class="m-0 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-[0.72rem] leading-relaxed text-brand-muted max-[576px]:px-4"
+  >
     <span class="font-semibold">{{ a.leyenda.titulo }}:</span>
     {{ a.leyenda.contenido }}
   </p>

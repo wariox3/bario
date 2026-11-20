@@ -45,6 +45,8 @@ import {
   type ResumenDocumento,
   cantidadDesdeCabecera,
   resumenDesdeCabecera,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -247,6 +249,20 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
   /** En alta la sede arranca en la primera, como el almacén. */
   protected readonly sedeSuggestedIndex = this.almacenSuggestedIndex;
+
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta se sugiere el valor por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, manda `suggestedIndex`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
 
   /** En alta el método de pago arranca en "Instrumento no definido" (como la factura de venta). */
   protected readonly metodoPagoSugerido = computed(() =>

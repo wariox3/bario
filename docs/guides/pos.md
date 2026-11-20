@@ -9,24 +9,32 @@
 1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/vender`. Solo entran
    empresas con el módulo de venta (`acceso_venta`); sin él, se vuelve a contenedores
    con un aviso (`core/acceso/venta-access.guard.ts`).
-2. **Configurar la caja una vez.** `/t/<slug>/configuracion`, con dos dueños:
+2. **Configurar la caja una vez.** `/t/<slug>/configuracion`, con tres dueños:
    - **Tipo de documento** (factura POS o POS electrónica): es **de la empresa** y vive en el
      backend (`GenConfiguracion.ven_pos_documento_tipo`, por `configuracion/campos/` y
      `actualizar/`). Cambiarlo lo cambia para todas sus cajas.
-   - **Almacén, sede y asesor:** son **de la caja física** y se guardan en el navegador, por
-     empresa.
+   - **Almacén, sede y caja:** son **del usuario** y viven en el backend
+     (`/general/configuracion-usuario/`, por `ConfiguracionUsuarioStore` de `@reddoc/core`). Lo
+     siguen a cualquier equipo y son los mismos que edita y propone el ERP (Configuración →
+     Usuario). La caja tiene que ser de la sede: su catálogo se acota por `sede_id`. El almacén
+     y la sede que un navegador guardó antes de existir esto quedan **de respaldo**, campo por
+     campo, mientras el usuario no tenga los suyos; al guardar la página se suben al usuario y
+     el respaldo se borra.
+   - **Asesor por defecto:** es **del equipo** y se guarda en el navegador, por empresa. En
+     el POS el asesor es quien atiende el mostrador, no el del cliente.
 
    La cuenta de cada cobro no se configura: sale del tipo de cuenta bancaria (ver Cobrar).
-   Sin tipo y almacén, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
-   avisa con un reintento.
+   Sin tipo y almacén, la caja avisa y no deja cobrar. Mientras se leen el tipo y la
+   configuración del usuario no avisa nada; si falla el tipo (o la del usuario sin respaldo
+   que alcance), avisa con un reintento.
 
 3. **Abrir turno.** `/t/<slug>/turno`. Sin turno abierto la caja **no cobra**: Vender
    avisa con un enlace a Turno y el cobro lo frena (`TurnoActualStore`, que consulta
    `venta/turno/abierto/` al entrar a la empresa; un 404 es "sin turno", no un error). Se abre
    con la caja (`venta/caja/`, el administrador de cajas), la base y la cuenta de efectivo
    donde queda la base (obligatoria si la base es mayor que cero). Toda factura POS lleva el
-   `turno` de quien la cobra. El header muestra el turno y cuánto lleva desde cualquier
-   pantalla.
+   `turno` de quien la cobra. El diálogo propone la caja del usuario si sigue activa. El
+   header muestra el turno y cuánto lleva desde cualquier pantalla.
 
    Sobre la lista de turnos va el tablero del turno en curso: lo vendido y lo que debe haber
    en cada cuenta al cerrar (`resumen/`), y el pre-cierre (`imprimir/`, 80 mm). **Cerrar**

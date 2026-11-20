@@ -19,6 +19,7 @@
       [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
+      [canCorregir]="capacidades().puedeCorregir"
       [contabilizado]="!!estados().estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
     />
@@ -164,9 +165,6 @@
         {{ det.sections.conceptos }}
       </h2>
     </div>
-
-    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-nomina-conceptos-table [lines]="lines()" />
-    </div>
+    <app-nomina-conceptos-table [lines]="lines()" />
   </section>
 }

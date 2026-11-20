@@ -54,8 +54,8 @@
 
   <div class="lib-data-toolbar__spacer"></div>
 
-  <!-- Delete contextual -->
-  @if (deleteSelectedEnabled() && deleteSelectedCount() > 0) {
+  <!-- Acciones contextuales a la selección: eliminar y las que pida el host -->
+  @if (showDelete()) {
     <button
       type="button"
       class="lib-data-toolbar__btn lib-data-toolbar__btn--danger"
@@ -64,6 +64,20 @@
       <i class="pi pi-trash"></i>
       <span>{{ translate('common.actions.delete') }} ({{ deleteSelectedCount() }})</span>
     </button>
+  }
+  @for (action of visibleSelectionActions(); track action.id) {
+    <button
+      type="button"
+      class="lib-data-toolbar__btn lib-data-toolbar__btn--danger"
+      (click)="actionInvoked.emit(action.id)"
+    >
+      @if (action.iconClass) {
+        <i [class]="action.iconClass"></i>
+      }
+      <span>{{ translate(action.labelKey) }} ({{ selectionCount() }})</span>
+    </button>
+  }
+  @if (showDelete() || visibleSelectionActions().length > 0) {
     <span class="lib-data-toolbar__divider" aria-hidden="true"></span>
   }
 

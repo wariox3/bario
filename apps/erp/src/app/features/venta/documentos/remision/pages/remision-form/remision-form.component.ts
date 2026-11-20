@@ -33,6 +33,8 @@ import {
   precioListaDeContacto,
   resumenDesdeCabecera,
   type ResumenDocumento,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -64,6 +66,7 @@ import type { RemisionRead } from '../../remision.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
+import { setupAsesorDesdeContacto } from '@erp/features/documentos/comercial/asesor-contacto';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Remisión.
@@ -162,6 +165,20 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
    */
   protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
 
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta se sugiere el valor por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, manda `suggestedIndex`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
@@ -200,6 +217,16 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
    * cabecera en edición. La tabla, paginada, parte de él; `null` en alta.
    */
   protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+
+  constructor() {
+    // Al elegir cliente, sugiere su asesor asignado (en edición no aplica:
+    // la cabecera se puebla con `emitEvent: false`).
+    setupAsesorDesdeContacto({
+      contacto: this.form.controls.contacto,
+      asesor: this.form.controls.asesor,
+      destroyRef: this.destroyRef,
+    });
+  }
 
   ngOnInit(): void {
     const id = this.id();

@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
@@ -34,6 +35,9 @@ export const FACTURA_VENTA_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // La sede y el almacén por defecto del usuario se sugieren en alta;
+        // casi siempre ya están en memoria (los precarga el workspace).
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('./pages/factura-venta-form/factura-venta-form.component').then(
             (m) => m.FacturaVentaFormComponent,

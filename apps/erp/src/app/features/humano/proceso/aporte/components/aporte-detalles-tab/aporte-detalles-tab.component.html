@@ -1,7 +1,7 @@
 @let d = t().entities.aporte.detalles;
 
-<div class="flex flex-col gap-3">
-  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+<div>
+  <div>
     <lib-data-toolbar
       [trailingActions]="trailingActions"
       [searchEnabled]="false"
@@ -26,7 +26,9 @@
   </div>
 
   <!-- Leyenda de las abreviaturas: sale de la misma metadata que los encabezados -->
-  <details class="text-[0.72rem] leading-relaxed text-brand-muted">
+  <details
+    class="border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-[0.72rem] leading-relaxed text-brand-muted max-[576px]:px-4"
+  >
     <summary class="cursor-pointer font-semibold">{{ d.leyendaTitulo }}</summary>
     <dl class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
       @for (abreviatura of abreviaturas(); track abreviatura.sigla) {

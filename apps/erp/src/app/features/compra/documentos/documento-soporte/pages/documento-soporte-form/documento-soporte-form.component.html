@@ -190,6 +190,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedMatch]="almacenSugerido()"
             [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="t().entities.documentoSoporte.form.fields.almacenPlaceholder"
           />

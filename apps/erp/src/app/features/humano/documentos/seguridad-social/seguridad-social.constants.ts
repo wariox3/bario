@@ -25,24 +25,10 @@ export const SEGURIDAD_SOCIAL_COLUMNS: readonly ColumnDef[] = [
     type: 'text',
     width: '140px',
   },
-  { field: 'contacto_nombre_corto', headerKey: `${I18N}.columns.empleado`, type: 'text' },
+  { field: 'contacto_nombre_corto', headerKey: `${I18N}.columns.entidad`, type: 'text' },
   {
     field: 'salario',
     headerKey: `${I18N}.columns.salario`,
-    type: 'currency',
-    width: '130px',
-    align: 'right',
-  },
-  {
-    field: 'devengado',
-    headerKey: `${I18N}.columns.devengado`,
-    type: 'currency',
-    width: '130px',
-    align: 'right',
-  },
-  {
-    field: 'deduccion',
-    headerKey: `${I18N}.columns.deduccion`,
     type: 'currency',
     width: '130px',
     align: 'right',
@@ -92,7 +78,7 @@ export const SEGURIDAD_SOCIAL_FILTERS: readonly FilterField[] = [
   },
   {
     name: 'contacto__nombre_corto',
-    displayNameKey: `${I18N}.columns.empleado`,
+    displayNameKey: `${I18N}.columns.entidad`,
     type: 'string',
   },
   { name: 'estado_aprobado', displayNameKey: `${I18N}.filters.aprobado`, type: 'boolean' },
@@ -109,7 +95,7 @@ export const SEGURIDAD_SOCIAL_DETALLE_COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.detalle.id`, type: 'number', width: '80px', align: 'right' },
   { field: 'detalle', headerKey: `${I18N}.detalle.detalle`, type: 'text' },
   {
-    field: 'pago',
+    field: 'precio',
     headerKey: `${I18N}.detalle.pago`,
     type: 'currency',
     width: '160px',

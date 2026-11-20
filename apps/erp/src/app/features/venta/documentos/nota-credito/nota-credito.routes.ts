@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
@@ -32,6 +33,8 @@ export const NOTA_CREDITO_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // Valores por defecto del usuario (Configuración → Usuario); casi siempre ya en memoria.
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('../_shared/nota/pages/nota-documento-form/nota-documento-form.component').then(
             (m) => m.NotaDocumentoFormComponent,

@@ -79,8 +79,15 @@ export interface EntityDataGateway {
    *
    * **Irreversible**: un documento anulado queda congelado (no se aprueba, no se
    * desaprueba, no se emite). El caller confirma antes de llamar.
+   *
+   * `errorToast: false` apaga el toast del interceptor: lo usa el anular por
+   * lote del listado, que junta los rechazos en un solo resumen.
    */
-  anular(entity: EntityConfig, id: string | number): Observable<unknown>;
+  anular(
+    entity: EntityConfig,
+    id: string | number,
+    opts?: { readonly errorToast?: boolean },
+  ): Observable<unknown>;
 
   /**
    * Emite un documento electrónico a la DIAN vía `POST <endpoint>/emitir/`.

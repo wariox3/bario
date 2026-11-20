@@ -1,0 +1,108 @@
+@let u = t().configuracion.usuario;
+
+@if (loading()) {
+  <div class="h-52 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+} @else if (loadFailed()) {
+  <div
+    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+  >
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-user text-[1.05rem]"></i>
+        </span>
+        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+            {{ u.predeterminados.title }}
+          </h2>
+          <p class="m-0 text-[0.75rem] text-brand-muted">{{ u.predeterminados.hint }}</p>
+        </div>
+      </div>
+
+      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-3">
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="usuario-sede"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ u.fields.sede }}
+            </label>
+            <lib-api-select
+              inputId="usuario-sede"
+              formControlName="sede"
+              [endpoint]="endpoints.sede"
+              [showClear]="true"
+            />
+            <lib-field-error [control]="form.controls.sede" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="usuario-almacen"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ u.fields.almacen }}
+            </label>
+            <lib-api-select
+              inputId="usuario-almacen"
+              formControlName="almacen"
+              [endpoint]="endpoints.almacen"
+              [showClear]="true"
+            />
+            <lib-field-error [control]="form.controls.almacen" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="usuario-caja"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ u.fields.caja }}
+            </label>
+            <lib-api-select
+              inputId="usuario-caja"
+              formControlName="caja"
+              [endpoint]="endpoints.caja"
+              [params]="cajaParams()"
+              [showClear]="true"
+              [invalid]="form.controls.caja.invalid"
+            />
+            <lib-field-error [control]="form.controls.caja" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex items-center justify-end gap-3 pb-1">
+      @if (form.dirty) {
+        <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+          {{ t().configuracion.unsavedChanges }}
+        </span>
+      }
+      <p-button
+        type="submit"
+        [label]="t().configuracion.actions.save"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="isSaving()"
+      />
+    </div>
+  </form>
+}

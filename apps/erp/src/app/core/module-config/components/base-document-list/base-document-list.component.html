@@ -9,6 +9,8 @@
       [filterFields]="filterFields()"
       [deleteSelectedEnabled]="capabilities().canDelete && hasSelection()"
       [deleteSelectedCount]="selectedRows().length"
+      [selectionActions]="selectionActions()"
+      [selectionCount]="selectedRows().length"
       (actionInvoked)="onToolbarAction($event)"
       (filtersToggle)="openFilters()"
       (filterEdit)="openFilters($event)"

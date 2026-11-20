@@ -392,6 +392,33 @@ export const en: AppDict = {
         desc: 'Something went wrong while generating the print. Try again.',
       },
     },
+    anularLista: {
+      label: 'Void',
+      confirmar: {
+        header: 'Void documents',
+        headerUno: 'Void document',
+        message: '{n} documents will be voided. Voiding cannot be undone: each document is frozen.',
+        messageUno: '1 document will be voided. Voiding cannot be undone: the document is frozen.',
+        accept: 'Void',
+        reject: 'Cancel',
+      },
+      sinSeleccion: {
+        title: 'No selection',
+        desc: 'Select at least one document to void.',
+      },
+      exito: {
+        title: 'Documents voided',
+        desc: '{n} documents were voided.',
+        descUno: '1 document was voided.',
+      },
+      parcial: { title: '{n} of {total} voided' },
+      error: {
+        title: 'Could not void',
+        desc: 'Something went wrong while voiding the document.',
+      },
+      idLabel: 'ID',
+      yMas: 'and {n} more',
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',
@@ -618,7 +645,7 @@ export const en: AppDict = {
       subtitle: 'Adjust the branch and accounting data without unapproving',
       empty: 'The document has no lines',
       notaCuenta:
-        'Base and contact can only be corrected on account lines (type C) whose account requires them. Item lines take them from the document header.',
+        'Base and contact can be corrected on account and payroll lines when their account requires them; on payroll lines the account is the concept one. Item lines take them from the document header, and payroll lines take the cost center from the contract.',
       fields: {
         sede: 'Branch',
         seleccionar: 'Select…',
@@ -1458,10 +1485,8 @@ export const en: AppDict = {
         desde: 'From',
         hasta: 'To',
         identificacion: 'ID number',
-        empleado: 'Employee',
+        entidad: 'Entity',
         salario: 'Salary',
-        devengado: 'Earnings',
-        deduccion: 'Deductions',
         total: 'Total',
         aprobado: 'App',
         anulado: 'Void',
@@ -7552,7 +7577,20 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales', compra: 'Purchasing' },
+    tabs: {
+      general: 'General',
+      humano: 'Payroll',
+      venta: 'Sales',
+      compra: 'Purchasing',
+      usuario: 'User',
+    },
+    usuario: {
+      predeterminados: {
+        title: 'Defaults',
+        hint: 'Suggested when creating documents and opening the POS. They only apply to your user and can be changed on each document.',
+      },
+      fields: { sede: 'Branch', almacen: 'Warehouse', caja: 'Cash register' },
+    },
     compra: {
       recibe: {
         title: 'Receiving person',

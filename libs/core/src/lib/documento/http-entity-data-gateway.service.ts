@@ -150,10 +150,13 @@ export class HttpEntityDataGateway implements EntityDataGateway {
   }
 
   /** Anula el documento: `POST <endpoint>/anular/` con `{ id }`. */
-  anular(entity: EntityConfig, id: string | number): Observable<unknown> {
-    return this.http.post(`${entity.endpoint}/anular/`, {
-      id,
-    });
+  anular(
+    entity: EntityConfig,
+    id: string | number,
+    opts?: { readonly errorToast?: boolean },
+  ): Observable<unknown> {
+    const context = new HttpContext().set(ERROR_TOAST, opts?.errorToast ?? true);
+    return this.http.post(`${entity.endpoint}/anular/`, { id }, { context });
   }
 
   /**

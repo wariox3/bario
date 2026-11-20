@@ -23,6 +23,8 @@ export interface CorregirLineaRead {
   readonly id: number;
   readonly tipo_registro?: string | null;
   readonly item_nombre?: string | null;
+  /** En la nómina las líneas son conceptos, no ítems. */
+  readonly concepto_nombre?: string | null;
   readonly cuenta_codigo?: string | null;
   readonly cuenta_nombre?: string | null;
   readonly cantidad?: string | number | null;
@@ -51,6 +53,17 @@ export interface LineaCorregible {
    * propios. Las de ítem los toman de la cabecera.
    */
   readonly esCuenta: boolean;
+  /**
+   * Línea de nómina (`tipo_registro = 'N'`): un concepto liquidado. No tiene
+   * cuenta propia —sale del concepto y el tipo de costo al contabilizar—, así
+   * que sus `cuenta_exige_*` llegan en `null` y no se valida nada contra ellos.
+   */
+  readonly esNomina: boolean;
+  /**
+   * El centro de costo sale del contrato al contabilizar (nómina `N` y
+   * seguridad social `S`): el de la línea no se usa y el backend lo rechaza.
+   */
+  readonly centroCostoDelContrato: boolean;
   /** Ítem o, en una línea de cuenta, código y nombre de la cuenta. */
   readonly descripcion: string;
   readonly cantidad: number | null;
@@ -90,6 +103,10 @@ export interface ActualizarContabilidadPayload extends CabeceraPatch {
 
 /** Tipo de registro de una línea de cuenta en `documento-detalle`. */
 const TIPO_REGISTRO_CUENTA = 'C';
+/** Tipo de registro de una línea de nómina (concepto liquidado). */
+const TIPO_REGISTRO_NOMINA = 'N';
+/** Tipos de registro cuyo centro de costo sale del contrato. */
+const TIPOS_CENTRO_COSTO_CONTRATO: readonly string[] = [TIPO_REGISTRO_NOMINA, 'S'];
 
 /**
  * Opción con id y etiqueta. Si el backend no trae el id no hay valor, aunque
@@ -105,11 +122,14 @@ export function aCabeceraCorregible(read: CorregirCabeceraRead): CabeceraCorregi
 
 export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
   const esCuenta = read.tipo_registro === TIPO_REGISTRO_CUENTA;
+  const esNomina = read.tipo_registro === TIPO_REGISTRO_NOMINA;
   const cuenta = [read.cuenta_codigo, read.cuenta_nombre].filter(Boolean).join(' ');
   return {
     id: read.id,
     esCuenta,
-    descripcion: (esCuenta ? cuenta : read.item_nombre) ?? '',
+    esNomina,
+    centroCostoDelContrato: TIPOS_CENTRO_COSTO_CONTRATO.includes(read.tipo_registro ?? ''),
+    descripcion: (esCuenta ? cuenta : (read.item_nombre ?? read.concepto_nombre)) ?? '',
     cantidad: toFiniteNumber(read.cantidad),
     precio: toFiniteNumber(read.precio),
     subtotal: toFiniteNumber(read.subtotal),
@@ -140,7 +160,21 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
  * su `exige` solo impide dejarlo vacío.
  */
 export function corrigeCampo(linea: LineaCorregible, campo: 'base' | 'contacto'): boolean {
+  // Nómina: el backend valida contra la cuenta del concepto para el tipo de
+  // costo del contrato, pero el read no la trae (`cuenta_exige_*` en null).
+  // Se ofrecen los dos sin validar acá; si la cuenta no los admite, el 400
+  // marca la línea con el motivo.
+  if (linea.esNomina) return true;
   return linea.esCuenta && linea.exige[campo];
+}
+
+/**
+ * El centro de costo se corrige en cualquier línea salvo en las de nómina y
+ * seguridad social: al contabilizarlas el backend toma el del contrato, y
+ * `actualizar-contabilidad/` lo rechaza.
+ */
+export function corrigeCentroCosto(linea: LineaCorregible): boolean {
+  return !linea.centroCostoDelContrato;
 }
 
 function mismoId(a: ErpSelectOption | null, b: ErpSelectOption | null): boolean {
@@ -158,15 +192,16 @@ export function cambiosCabecera(
 }
 
 /**
- * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan
- * donde se pueden corregir (`corrigeCampo`): en el resto el diálogo los
- * bloquea y mandarlos haría fallar toda la corrección.
+ * Lo que cambió en una línea; `null` si nada. Cada campo solo cuenta donde
+ * se puede corregir (`corrigeCampo`, `corrigeCentroCosto`): en el resto el
+ * diálogo lo bloquea y mandarlo haría fallar —o no tendría efecto—.
  */
 export function cambiosLinea(
   original: LineaCorregible,
   actual: LineaCorregible,
 ): LineaPatch | null {
-  const cambioCentroCosto = !mismoId(original.centroCosto, actual.centroCosto);
+  const cambioCentroCosto =
+    corrigeCentroCosto(actual) && !mismoId(original.centroCosto, actual.centroCosto);
   const cambioBase = corrigeCampo(actual, 'base') && original.base !== actual.base;
   const cambioContacto =
     corrigeCampo(actual, 'contacto') && !mismoId(original.contacto, actual.contacto);
@@ -183,7 +218,7 @@ function faltaExigido(linea: LineaCorregible, campo: CampoExigible): boolean {
   if (!linea.exige[campo]) return false;
   switch (campo) {
     case 'centroCosto':
-      return linea.centroCosto == null;
+      return corrigeCentroCosto(linea) && linea.centroCosto == null;
     case 'base':
       return linea.esCuenta && (linea.base ?? 0) <= 0;
     case 'contacto':

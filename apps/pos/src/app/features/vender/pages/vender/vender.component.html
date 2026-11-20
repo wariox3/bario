@@ -15,7 +15,7 @@
 
   <div class="flex min-h-0 flex-1 gap-4">
     <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
-      @if (estadoTipo() === 'error') {
+      @if (estadoConfiguracion() === 'error') {
         <div
           class="flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
           role="alert"
@@ -30,12 +30,12 @@
           <button
             type="button"
             class="text-[0.8rem] font-semibold text-red-900 underline underline-offset-2"
-            (click)="recargarTipo()"
+            (click)="recargarConfiguracion()"
           >
             {{ tx.configuracionError.accion }}
           </button>
         </div>
-      } @else if (estadoTipo() === 'listo' && !configuracionCompleta()) {
+      } @else if (estadoConfiguracion() === 'listo' && !configuracionCompleta()) {
         <div
           class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
           role="status"

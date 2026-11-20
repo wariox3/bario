@@ -180,12 +180,12 @@ export const es: AppDict = {
     title: 'Vender',
     configuracion: {
       title: 'Configuración requerida',
-      desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén de esta caja.',
+      desc: 'Antes de vender, elige el tipo de documento de la empresa y tu almacén.',
       accion: 'Ir a configuración',
     },
     configuracionError: {
-      title: 'No se pudo leer la configuración de la empresa',
-      desc: 'Sin el tipo de documento la caja no puede cobrar.',
+      title: 'No se pudo leer la configuración',
+      desc: 'Sin el tipo de documento y el almacén la caja no puede cobrar.',
       accion: 'Reintentar',
     },
     turno: {
@@ -768,7 +768,7 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración de la caja',
     subtitle:
-      'El tipo de documento por defecto y la tirilla son de la empresa; lo demás se guarda en este dispositivo.',
+      'El tipo de documento y la tirilla son de la empresa; almacén, sede y caja son de tu usuario, y el asesor se guarda en este dispositivo.',
     documento: {
       title: 'Tipo de documento',
       hint: 'Tipo con el que arranca cada venta; puedes cambiarlo al facturar.',
@@ -793,13 +793,17 @@ export const es: AppDict = {
       error: 'No se pudieron leer los textos de la tirilla.',
     },
     operacion: {
-      title: 'Operación',
-      hint: 'De dónde sale la mercancía y a dónde entra el dinero.',
+      title: 'Tu operación',
+      hint: 'Almacén, sede y caja son solo tuyos: cada persona que vende tiene los suyos. Te siguen a cualquier equipo y el ERP también los propone.',
+      soloTuUsuario: 'Solo tu usuario',
+      error: 'No se pudo leer tu configuración.',
     },
     campos: {
       almacen: 'Almacén',
       sede: 'Sede',
+      caja: 'Caja',
       asesor: 'Asesor por defecto',
+      asesorHint: 'Se guarda en este dispositivo y se puede cambiar al cobrar.',
     },
     sinGuardar: 'Cambios sin guardar',
     guardar: 'Guardar',
@@ -814,6 +818,10 @@ export const es: AppDict = {
       },
       tirillaError: {
         title: 'No se pudieron guardar los textos de la tirilla',
+        desc: 'Lo demás quedó guardado. Intenta de nuevo.',
+      },
+      operacionError: {
+        title: 'No se pudieron guardar almacén, sede y caja',
         desc: 'Lo demás quedó guardado. Intenta de nuevo.',
       },
     },

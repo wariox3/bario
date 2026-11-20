@@ -116,7 +116,7 @@
                        corrigen solo si su cuenta los exige: si no, el backend los
                        rechaza. Bloqueados, igual muestran su valor. -->
                   <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
-                    @if (linea.esCuenta) {
+                    @if (linea.esCuenta || linea.esNomina) {
                       <p-inputnumber
                         [inputId]="'corregir-base-' + linea.id"
                         [ngModel]="linea.base"
@@ -147,6 +147,7 @@
                       [ngModel]="linea.centroCosto"
                       (ngModelChange)="setLinea(linea.id, { centroCosto: $event })"
                       [placeholder]="dict.fields.buscar"
+                      [disabled]="!corrigeCentroCosto(linea)"
                       [invalid]="faltaCentroCosto"
                     />
                     @if (faltaCentroCosto) {
@@ -156,7 +157,7 @@
                     }
                   </td>
                   <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
-                    @if (linea.esCuenta) {
+                    @if (linea.esCuenta || linea.esNomina) {
                       <lib-contacto-select
                         [inputId]="'corregir-contacto-' + linea.id"
                         [ngModel]="linea.contacto"

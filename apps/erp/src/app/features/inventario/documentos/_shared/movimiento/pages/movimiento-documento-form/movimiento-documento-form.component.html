@@ -79,6 +79,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedMatch]="almacenSugerido()"
             [suggestedIndex]="almacenSuggestedIndex()"
             [placeholder]="f.fields.almacenPlaceholder"
             [invalid]="form.controls.almacen.invalid && form.controls.almacen.touched"

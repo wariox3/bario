@@ -160,15 +160,12 @@
         {{ det.sections.aportes }}
       </h2>
     </div>
-
-    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <lib-data-table
-        [columns]="detalleColumns"
-        [items]="lines()"
-        [totalCount]="lines().length"
-        [pageSize]="lines().length || 1"
-        [currentPage]="0"
-      />
-    </div>
+    <lib-data-table
+      [columns]="detalleColumns"
+      [items]="lines()"
+      [totalCount]="lines().length"
+      [pageSize]="lines().length || 1"
+      [currentPage]="0"
+    />
   </section>
 }

@@ -28,6 +28,8 @@ import {
   precioListaDeContacto,
   resumenDesdeCabecera,
   type ResumenDocumento,
+  ConfiguracionUsuarioStore,
+  coincideConOpcion,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -51,6 +53,7 @@ import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
+import { setupAsesorDesdeContacto } from '@erp/features/documentos/comercial/asesor-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import {
@@ -161,6 +164,20 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
    */
   protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
 
+  private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+
+  /**
+   * En alta se sugiere el valor por defecto del usuario (Configuración →
+   * Usuario); si no tiene o ya no está en el catálogo, manda `suggestedIndex`.
+   * La ruta `nuevo` la espera con `configuracionUsuarioResolver`.
+   */
+  protected readonly sedeSugerida = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.sede()),
+  );
+  protected readonly almacenSugerido = computed(() =>
+    this.isEditMode() ? null : coincideConOpcion(this.configuracionUsuario.almacen()),
+  );
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
@@ -204,6 +221,14 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
       contacto: this.form.controls.contacto,
       plazoPago: this.form.controls.plazo_pago,
       origen: 'cliente',
+      destroyRef: this.destroyRef,
+    });
+
+    // Al elegir cliente, sugiere su asesor asignado (en edición no aplica:
+    // la cabecera se puebla con `emitEvent: false`).
+    setupAsesorDesdeContacto({
+      contacto: this.form.controls.contacto,
+      asesor: this.form.controls.asesor,
       destroyRef: this.destroyRef,
     });
   }

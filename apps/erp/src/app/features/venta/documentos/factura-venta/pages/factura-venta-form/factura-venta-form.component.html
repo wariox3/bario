@@ -180,6 +180,7 @@
             formControlName="sede"
             [endpoint]="sedeEndpoint"
             [suggestedIndex]="primeraSugerida()"
+            [suggestedMatch]="sedeSugerida()"
             [placeholder]="t().entities.facturaVenta.form.fields.sedePlaceholder"
           />
         </div>
@@ -194,6 +195,7 @@
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
             [suggestedIndex]="primeraSugerida()"
+            [suggestedMatch]="almacenSugerido()"
             [placeholder]="t().entities.facturaVenta.form.fields.almacenPlaceholder"
           />
         </div>

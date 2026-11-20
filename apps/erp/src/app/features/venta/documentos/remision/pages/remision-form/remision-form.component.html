@@ -104,6 +104,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedMatch]="sedeSugerida()"
             [suggestedIndex]="primeraSugerida()"
             [placeholder]="t().entities.remision.form.fields.sedePlaceholder"
           />
@@ -118,6 +119,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedMatch]="almacenSugerido()"
             [placeholder]="t().entities.remision.form.fields.almacenPlaceholder"
           />
         </div>

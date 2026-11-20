@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { configuracionUsuarioResolver } from '@reddoc/core';
 import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
@@ -31,6 +32,8 @@ export const FACTURA_COMPRA_RECURRENTE_ROUTES: Route[] = [
       },
       {
         path: 'nuevo',
+        // Valores por defecto del usuario (Configuración → Usuario); casi siempre ya en memoria.
+        resolve: { _configuracionUsuario: configuracionUsuarioResolver },
         loadComponent: () =>
           import('./pages/factura-compra-recurrente-form/factura-compra-recurrente-form.component').then(
             (m) => m.FacturaCompraRecurrenteFormComponent,

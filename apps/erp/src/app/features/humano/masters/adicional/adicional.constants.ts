@@ -1,8 +1,12 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
-export const ADICIONALES_FILTERS_STORAGE_KEY = 'adicionales:filters:v1';
-export const ADICIONALES_QUICK_SEARCH_FIELD = 'contrato_nombre';
+/**
+ * `v2`: los filtros guardados con `v1` usaban los nombres del serializer
+ * (`contrato_nombre`, `concepto_nombre`, `valor`), que el `lista/` rechaza con 400.
+ */
+export const ADICIONALES_FILTERS_STORAGE_KEY = 'adicionales:filters:v2';
+export const ADICIONALES_QUICK_SEARCH_FIELD = 'contrato__contacto__nombre_corto';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const ADICIONAL_LIST_PATH = ['humano', 'adicionales'] as const;
@@ -88,18 +92,27 @@ export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
+/**
+ * La `propiedad` va como ruta ORM y tiene que estar en `campos_filtrables` del
+ * backend: los nombres del serializer (`contrato_nombre`) dan 400. `valor` no
+ * está declarado y por eso no se ofrece.
+ */
 export const ADICIONALES_FILTER_FIELDS: readonly FilterField[] = [
   {
-    name: 'contrato_nombre',
+    name: 'contrato__contacto__nombre_corto',
     displayNameKey: 'entities.adicional.columns.nombre',
     type: 'string',
   },
   {
-    name: 'concepto_nombre',
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.adicional.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'concepto__nombre',
     displayNameKey: 'entities.adicional.columns.concepto',
     type: 'string',
   },
-  { name: 'valor', displayNameKey: 'entities.adicional.columns.valor', type: 'number' },
   { name: 'inactivo', displayNameKey: 'entities.adicional.columns.inactivo', type: 'boolean' },
 ];
 

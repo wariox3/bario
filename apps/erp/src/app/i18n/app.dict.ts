@@ -375,6 +375,28 @@ export interface AppDict
       vacio: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    anularLista: {
+      label: string;
+      /** `message` lleva `{n}`, la cantidad de documentos; `messageUno`, para uno solo. */
+      confirmar: {
+        header: string;
+        headerUno: string;
+        message: string;
+        messageUno: string;
+        accept: string;
+        reject: string;
+      };
+      sinSeleccion: { title: string; desc: string };
+      /** `desc` lleva `{n}`; `descUno`, para uno solo. */
+      exito: { title: string; desc: string; descUno: string };
+      /** `title` lleva `{n}` (anulados) y `{total}`. */
+      parcial: { title: string };
+      error: { title: string; desc: string };
+      /** Prefijo del id de cada rechazo en el aviso. */
+      idLabel: string;
+      /** Lleva `{n}`: los rechazos que no se detallan. */
+      yMas: string;
+    };
     generarRecurrente: {
       seleccionadosLabel: string;
       modalHeader: string;
@@ -1100,10 +1122,8 @@ export interface AppDict
         desde: string;
         hasta: string;
         identificacion: string;
-        empleado: string;
+        entidad: string;
         salario: string;
-        devengado: string;
-        deduccion: string;
         total: string;
         aprobado: string;
         anulado: string;
@@ -5720,7 +5740,12 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string; venta: string; compra: string };
+    tabs: { general: string; humano: string; venta: string; compra: string; usuario: string };
+    /** Área Usuario: sede, almacén y caja por defecto de quien está autenticado. */
+    usuario: {
+      predeterminados: { title: string; hint: string };
+      fields: { sede: string; almacen: string; caja: string };
+    };
     /** Área Compra: la persona que recibe en la recepción de documentos. */
     compra: {
       recibe: { title: string; hint: string };
