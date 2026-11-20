@@ -9,8 +9,8 @@
   ícono, y se deshabilita una vez aprobada; Desaprobar vive en el dropdown
   "Acciones", deshabilitado mientras no esté aprobada.
   Aprobada, la novedad queda fija (el backend rechaza editarla y eliminarla), así
-  que Editar desaparece, como en la exógena presentada. Aprobar, Imprimir y
-  Acciones solo existen para vacaciones: en otro tipo el backend responde 400,
+  que Editar desaparece, como en la exógena presentada. Aprobar, Imprimir,
+  Acciones y Utilidades (Interrumpir) solo existen para vacaciones: en otro tipo el backend responde 400,
   por eso se ocultan.
   El <p-menu> va FUERA del grupo: su CSS une los botones con
   `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
@@ -79,10 +79,21 @@
           size="small"
           (onClick)="accionesMenu.toggle($event)"
         />
+        <p-button
+          type="button"
+          [label]="t().entities.novedad.detail.utilidades"
+          icon="pi pi-chevron-down"
+          iconPos="right"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="utilidadesMenu.toggle($event)"
+        />
       }
     </p-buttongroup>
 
     <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+    <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </lib-page-actions>
 

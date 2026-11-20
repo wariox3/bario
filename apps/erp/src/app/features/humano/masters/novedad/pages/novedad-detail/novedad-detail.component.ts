@@ -1,11 +1,12 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogService } from 'primeng/dynamicdialog';
 import { MenuModule } from 'primeng/menu';
 import {
   FileDownloadService,
@@ -20,9 +21,11 @@ import {
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { AceptarConEnterDirective, PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
+import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { NovedadService } from '../../novedad.service';
 import { NOVEDAD_LIST_PATH } from '../../novedad.constants';
-import type { Novedad } from '../../novedad.model';
+import type { Novedad, NovedadInterrumpirResponse } from '../../novedad.model';
+import type { InterrumpirVacacionModalData } from '../../components/interrumpir-vacacion-modal/interrumpir-vacacion-modal.component';
 import { esModificable, esVacaciones } from '../../novedad.rules';
 
 /** Acciones del ciclo de vida de una vacación; las dos se confirman antes. */
@@ -39,7 +42,8 @@ const cantidadFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits
  * por días y pagos de disfrute/dinero; el resto (incapacidades, licencias) por
  * lo que asume la empresa y lo que reconoce la entidad.
  *
- * Las vacaciones además se aprueban, se desaprueban y se imprimen desde acá.
+ * Las vacaciones además se aprueban, se desaprueban, se imprimen y se
+ * interrumpen (Utilidades) desde acá.
  * Aprobada, la novedad no se edita ni se elimina.
  */
 @Component({
@@ -54,7 +58,7 @@ const cantidadFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits
     BreadcrumbComponent,
     PageActionsComponent,
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, DialogService],
   templateUrl: './novedad-detail.component.html',
   styleUrl: './novedad-detail.component.scss',
 })
@@ -65,6 +69,7 @@ export class NovedadDetailComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly fileDownload = inject(FileDownloadService);
+  private readonly dialog = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -93,6 +98,25 @@ export class NovedadDetailComponent implements OnInit {
         icon: 'pi pi-times-circle',
         disabled: !aprobada || this.accionEnCurso() !== null,
         command: () => this.confirmar('desaprobar'),
+      },
+    ];
+  });
+
+  /**
+   * Utilidades: lo que se corrige sobre la vacación ya registrada, como en el
+   * contrato. Interrumpir vale aprobada o no; con días en dinero el backend lo
+   * rechaza, así que queda deshabilitada y dice por qué.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => {
+    const m = this.t().entities.novedad.interrumpir;
+    const conDinero = Number(this.novedad()?.dias_dinero ?? 0) > 0;
+    return [
+      {
+        label: m.action,
+        icon: 'pi pi-pause-circle',
+        disabled: conDinero || this.accionEnCurso() !== null,
+        title: conDinero ? m.conDinero : undefined,
+        command: () => this.onInterrumpir(),
       },
     ];
   });
@@ -186,6 +210,37 @@ export class NovedadDetailComponent implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => this.ejecutar(accion),
     });
+  }
+
+  /**
+   * Abre el modal de interrupción. Responde la novedad reliquidada: se pinta tal
+   * cual y el toast dice cuántos hábiles quedan para la reanudación.
+   */
+  protected onInterrumpir(): void {
+    const n = this.novedad();
+    if (!n || this.accionEnCurso()) return;
+
+    from(import('../../components/interrumpir-vacacion-modal/interrumpir-vacacion-modal.component'))
+      .pipe(
+        switchMap(({ InterrumpirVacacionModalComponent }) => {
+          const ref = this.dialog.open(InterrumpirVacacionModalComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            width: '40rem',
+            data: { novedad: n } satisfies InterrumpirVacacionModalData,
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((r: unknown): r is NovedadInterrumpirResponse => r != null),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(({ novedad, dias_disfrutados_pendientes }) => {
+        this.novedad.set(novedad);
+        const ok = this.t().entities.novedad.detail.toasts.interrumpirSuccess;
+        this.toast.success(
+          ok.title,
+          ok.desc.replace('{n}', this.cantidad(dias_disfrutados_pendientes) || '0'),
+        );
+      });
   }
 
   /**

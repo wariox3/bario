@@ -7,7 +7,12 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Novedad, NovedadPayload } from './novedad.model';
+import type {
+  Novedad,
+  NovedadInterrumpirPayload,
+  NovedadInterrumpirResponse,
+  NovedadPayload,
+} from './novedad.model';
 
 @Injectable({ providedIn: 'root' })
 export class NovedadService extends BaseHttpService {
@@ -57,6 +62,21 @@ export class NovedadService extends BaseHttpService {
     return this.post<Novedad>(`${this.resourcePath}desaprobar/`, { id }, undefined, {
       errorToast: false,
     });
+  }
+
+  /**
+   * Deja una vacación con las fechas y los días que alcanzó a disfrutar antes de
+   * una incapacidad. Vale aprobada (si es la última aprobada del contrato), pero
+   * no con días en dinero. El 400 trae el `detail` y lo avisa el modal con
+   * `FormErrorService`; el resto (500, 403, 404) lo avisa el interceptor. Por eso
+   * **no** lleva `errorToast: false`: `FormErrorService` ignora los no-validación
+   * y, apagado el interceptor, un 500 quedaría callado.
+   */
+  interrumpir(payload: NovedadInterrumpirPayload): Observable<NovedadInterrumpirResponse> {
+    return this.post<NovedadInterrumpirResponse>(
+      `${this.resourcePath}interrumpir-vacacion/`,
+      payload,
+    );
   }
 
   remove(ids: readonly number[]): Observable<void> {

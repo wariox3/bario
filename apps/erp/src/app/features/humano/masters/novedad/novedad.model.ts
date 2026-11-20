@@ -105,3 +105,23 @@ export interface NovedadPayload {
   // Referencia
   novedad_referencia: number | null;
 }
+
+/**
+ * Cuerpo de `interrumpir-vacacion/`: las fechas y los días que la vacación
+ * alcanzó a disfrutar antes de la incapacidad. Llegan finales: el backend no
+ * prorratea nada.
+ */
+export interface NovedadInterrumpirPayload {
+  readonly id: number;
+  readonly fecha_desde: string;
+  readonly fecha_hasta: string;
+  readonly dias_disfrutados: number;
+  readonly dias_disfrutados_reales: number;
+}
+
+/** Respuesta de `interrumpir-vacacion/`: la novedad reliquidada y los días hábiles que devuelve. */
+export interface NovedadInterrumpirResponse {
+  readonly novedad: Novedad;
+  /** Decimal (string): los hábiles que quedan para registrar en la reanudación. */
+  readonly dias_disfrutados_pendientes: string | number;
+}
