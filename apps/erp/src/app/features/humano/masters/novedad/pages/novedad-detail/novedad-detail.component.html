@@ -4,12 +4,16 @@
 
 <!--
   ── Botonera ─────────────────────────────────────────────────────────────────
-  Mismo estándar que la liquidación: volver suelto y el resto en un segmento.
+  Mismo patrón que las fichas de documento (document-detail-actions): volver
+  suelto y el resto en un segmento. Aprobar va siempre visible, relleno y con
+  ícono, y se deshabilita una vez aprobada; Desaprobar vive en el dropdown
+  "Acciones", deshabilitado mientras no esté aprobada.
   Aprobada, la novedad queda fija (el backend rechaza editarla y eliminarla), así
-  que Editar desaparece, como en la exógena presentada. Aprobar, Desaprobar e
-  Imprimir solo existen para vacaciones: en otro tipo el backend responde 400, por
-  eso se ocultan en vez de deshabilitarse. Aprobar va relleno porque cierra el
-  ciclo; Aprobar y Desaprobar se turnan según el estado.
+  que Editar desaparece, como en la exógena presentada. Aprobar, Imprimir y
+  Acciones solo existen para vacaciones: en otro tipo el backend responde 400,
+  por eso se ocultan.
+  El <p-menu> va FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
 -->
 <lib-page-actions>
   <p-button
@@ -47,37 +51,38 @@
       @if (esVacaciones()) {
         <p-button
           type="button"
+          [label]="acc.aprobar"
+          icon="pi pi-check-circle"
+          size="small"
+          [loading]="accionEnCurso() === 'aprobar'"
+          [disabled]="n.estado_aprobado || accionEnCurso() !== null"
+          (onClick)="confirmar('aprobar')"
+        />
+        <p-button
+          type="button"
           [label]="acc.imprimir"
           icon="pi pi-print"
           severity="secondary"
           [outlined]="true"
           size="small"
           [loading]="isPrinting()"
+          [disabled]="accionEnCurso() !== null"
           (onClick)="onImprimir()"
         />
-        @if (n.estado_aprobado) {
-          <p-button
-            type="button"
-            [label]="acc.desaprobar"
-            severity="secondary"
-            [outlined]="true"
-            size="small"
-            [loading]="accionEnCurso() === 'desaprobar'"
-            [disabled]="accionEnCurso() !== null"
-            (onClick)="confirmar('desaprobar')"
-          />
-        } @else {
-          <p-button
-            type="button"
-            [label]="acc.aprobar"
-            size="small"
-            [loading]="accionEnCurso() === 'aprobar'"
-            [disabled]="accionEnCurso() !== null"
-            (onClick)="confirmar('aprobar')"
-          />
-        }
+        <p-button
+          type="button"
+          [label]="acc.acciones"
+          icon="pi pi-chevron-down"
+          iconPos="right"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="accionesMenu.toggle($event)"
+        />
       }
     </p-buttongroup>
+
+    <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
   }
 </lib-page-actions>
 

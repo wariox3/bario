@@ -2,10 +2,11 @@ import { Component, DestroyRef, type OnInit, computed, inject, input, signal } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MenuModule } from 'primeng/menu';
 import {
   FileDownloadService,
   I18nService,
@@ -48,6 +49,7 @@ const cantidadFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits
     ButtonGroupModule,
     ButtonModule,
     ConfirmDialogModule,
+    MenuModule,
     AceptarConEnterDirective,
     BreadcrumbComponent,
     PageActionsComponent,
@@ -76,6 +78,24 @@ export class NovedadDetailComponent implements OnInit {
   /** Acción del ciclo en curso: muestra su spinner y bloquea las demás. */
   protected readonly accionEnCurso = signal<AccionCiclo | null>(null);
   protected readonly isPrinting = signal(false);
+
+  /**
+   * Entradas del dropdown "Acciones", como en las fichas de documento. `computed`
+   * (ref estable salvo cambio de idioma o de estado) para que `p-menu` no pierda
+   * el primer click al recrear el array en cada CD.
+   */
+  protected readonly accionesItems = computed<MenuItem[]>(() => {
+    const a = this.t().documentActions.detail;
+    const aprobada = this.novedad()?.estado_aprobado ?? false;
+    return [
+      {
+        label: a.desaprobar,
+        icon: 'pi pi-times-circle',
+        disabled: !aprobada || this.accionEnCurso() !== null,
+        command: () => this.confirmar('desaprobar'),
+      },
+    ];
+  });
 
   /** Aprobada, ni Editar ni Eliminar: el backend lo rechaza. */
   protected readonly modificable = computed(() => {
