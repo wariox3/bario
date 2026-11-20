@@ -52,7 +52,7 @@
 
   <!--
     El recibo. Nombre a la izquierda, guía punteada que estira, cantidad a la
-    derecha en monoespaciada tabular: las cifras quedan en columna aunque tengan
+    derecha con `tabular-nums`: las cifras quedan en columna aunque tengan
     distinto ancho, que es lo que hace que se puedan comparar de un vistazo.
     Cada línea entra escalonada — el recibo se escribe solo.
   -->
@@ -67,7 +67,7 @@
           aria-hidden="true"
           class="min-w-4 flex-1 translate-y-[-0.15rem] border-b border-dotted border-[rgba(20,48,73,0.25)]"
         ></span>
-        <span class="shrink-0 font-mono text-[0.85rem] font-semibold tabular-nums text-brand-text">
+        <span class="shrink-0 text-[0.85rem] font-semibold tabular-nums text-brand-text">
           {{ linea.cantidad }}
         </span>
       </div>
@@ -81,7 +81,7 @@
   <div class="mx-6 mt-3 border-t-2 border-[rgba(20,48,73,0.12)] pt-3">
     <div class="flex items-baseline gap-2">
       <span class="flex-1 text-[0.82rem] font-semibold text-brand-navy">{{ res.totalLabel }}</span>
-      <span class="font-mono text-[1.05rem] font-bold tabular-nums text-brand-navy">
+      <span class="text-[1.05rem] font-bold tabular-nums text-brand-navy">
         {{ total() }}
       </span>
     </div>

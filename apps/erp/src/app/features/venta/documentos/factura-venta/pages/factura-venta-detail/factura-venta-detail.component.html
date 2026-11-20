@@ -212,7 +212,7 @@
           <!-- Mismo chip que el formulario: conteo, en rojo si lo recibido supera el total. -->
           @if (pagos().length > 0) {
             <span
-              class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+              class="ml-2 inline-block rounded-md px-2 py-0.5 text-[0.75rem] font-semibold tabular-nums"
               [class]="
                 pagosResumen().excede
                   ? 'bg-red-50 text-red-600'

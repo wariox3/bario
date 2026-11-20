@@ -77,11 +77,11 @@
             id="cliente-numero"
             formControlName="numero_identificacion"
             autocomplete="off"
-            class="min-w-0 flex-1 font-mono"
+            class="min-w-0 flex-1 tabular-nums"
             [class.ng-invalid]="f.numero_identificacion.invalid && f.numero_identificacion.touched"
           />
           <span
-            class="flex h-10 min-w-12 items-center justify-center rounded-lg bg-[rgba(20,48,73,0.05)] px-2 font-mono text-sm tabular-nums text-brand-muted"
+            class="flex h-10 min-w-12 items-center justify-center rounded-lg bg-[rgba(20,48,73,0.05)] px-2 text-sm tabular-nums text-brand-muted"
             [attr.aria-label]="tx.campos.dv"
             [title]="tx.campos.dv"
           >

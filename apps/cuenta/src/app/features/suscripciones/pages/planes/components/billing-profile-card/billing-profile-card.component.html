@@ -19,16 +19,14 @@
 
   <!-- Tipo + hint -->
   <div class="flex items-baseline gap-2 pr-7">
-    <span class="text-[0.7rem] font-bold tracking-[0.12em] uppercase text-brand-blue font-mono">
+    <span class="text-[0.7rem] font-bold tracking-[0.12em] uppercase text-brand-blue tabular-nums">
       {{ profile().tipo }}
     </span>
     <span class="text-[0.65rem] text-brand-muted/80 tracking-tight"> · {{ tipoHint() }} </span>
   </div>
 
   <!-- Identificación: typographic anchor -->
-  <div
-    class="font-mono text-[1.1rem] font-semibold text-brand-text tracking-tight tabular-nums leading-none"
-  >
+  <div class="text-[1.1rem] font-semibold text-brand-text tracking-tight tabular-nums leading-none">
     {{ profile().numero }}
   </div>
 

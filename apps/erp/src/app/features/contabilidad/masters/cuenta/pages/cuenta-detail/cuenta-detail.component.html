@@ -106,11 +106,11 @@
               {{ c.nombre || '—' }}
             </dd>
           </div>
-          <!-- El código del PUC se compara dígito a dígito: monoespaciada. -->
+          <!-- El código del PUC se compara dígito a dígito: `tabular-nums`. -->
           <div class="flex flex-col gap-0.5">
             <dt class="cuenta-detail__label">{{ t().entities.cuenta.columns.codigo }}</dt>
             <dd
-              class="cuenta-detail__value cuenta-detail__value--mono"
+              class="cuenta-detail__value cuenta-detail__value--num"
               [class.cuenta-detail__value--empty]="!c.codigo"
             >
               {{ c.codigo || '—' }}
@@ -136,7 +136,7 @@
                   {{ t().entities.cuenta.detail.fields[nivel.codigoKey] }}
                 </dt>
                 <dd
-                  class="cuenta-detail__value cuenta-detail__value--mono"
+                  class="cuenta-detail__value cuenta-detail__value--num"
                   [class.cuenta-detail__value--empty]="nivel.codigo === null"
                 >
                   {{ nivel.codigo ?? '—' }}

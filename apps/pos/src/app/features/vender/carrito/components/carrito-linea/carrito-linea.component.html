@@ -13,7 +13,7 @@
         {{ l.item.nombre }}
       </span>
       <span class="mt-0.5 flex items-center gap-1.5 text-[0.75rem] text-brand-muted">
-        <span class="font-mono tabular-nums">{{ precio() }}</span>
+        <span class="tabular-nums">{{ precio() }}</span>
         @if (l.precioEditado) {
           <span class="rounded bg-amber-50 px-1 text-[0.65rem] font-medium text-amber-800">
             {{ tx.precioEditado }}
@@ -58,9 +58,7 @@
       >
         <i class="pi pi-minus text-[0.7rem]"></i>
       </button>
-      <span
-        class="min-w-9 text-center font-mono text-[0.85rem] font-semibold tabular-nums text-brand-text"
-      >
+      <span class="min-w-9 text-center text-[0.85rem] font-semibold tabular-nums text-brand-text">
         {{ l.cantidad }}
       </span>
       <button
@@ -73,6 +71,6 @@
         <i class="pi pi-plus text-[0.7rem]"></i>
       </button>
     </div>
-    <span class="font-mono text-[0.9rem] font-bold tabular-nums text-brand-text">{{ neto() }}</span>
+    <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">{{ neto() }}</span>
   </div>
 </div>

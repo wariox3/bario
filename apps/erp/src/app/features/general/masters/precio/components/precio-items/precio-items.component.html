@@ -16,7 +16,7 @@
     <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ dict.title }}</h2>
     @if (!isLoading() && total() > 0) {
       <span
-        class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
+        class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 text-[0.75rem] font-semibold tabular-nums text-brand-text"
       >
         {{ total() }}
       </span>
@@ -72,7 +72,7 @@
                      La fila que todavía no se guardó no tiene id: va raya. -->
                 <td class="precio-items-table__td">
                   @if (linea.controls.id.value; as id) {
-                    <span class="font-mono text-[0.78rem] tabular-nums text-brand-text">
+                    <span class="text-[0.78rem] tabular-nums text-brand-text">
                       {{ id }}
                     </span>
                   } @else {
@@ -94,7 +94,7 @@
                      confundirla con una columna que no cargó. -->
                 <td class="precio-items-table__td">
                   @if (linea.controls.itemReferencia.value; as referencia) {
-                    <span class="font-mono text-[0.78rem] tabular-nums text-brand-text">
+                    <span class="text-[0.78rem] tabular-nums text-brand-text">
                       {{ referencia }}
                     </span>
                   } @else {

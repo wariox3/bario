@@ -27,7 +27,7 @@
           @if (contrato(); as c) {
             {{ c.nombre || '—' }}
             @if (c.numeroIdentificacion) {
-              <span class="font-mono tabular-nums">· {{ c.numeroIdentificacion }}</span>
+              <span class="tabular-nums">· {{ c.numeroIdentificacion }}</span>
             }
           }
           @if (periodoEtiqueta(); as p) {

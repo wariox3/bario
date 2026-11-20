@@ -52,13 +52,10 @@
   opacity: 0.55;
 }
 
-// El dato identificador va siempre en monoespaciada (regla del sistema), con
+// Identificadores: misma tipografía que el resto (una sola en la pantalla), con
 // `tabular-nums` para que los dígitos queden en columna: así un código de barras
 // se coteja carácter por carácter contra la etiqueta física.
-.item-detail__value--mono {
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.83rem;
+.item-detail__value--num {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
 }

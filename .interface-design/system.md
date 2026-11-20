@@ -92,10 +92,10 @@ lee de un vistazo el patrón completo y ocupa poco alto.
   Único divisor: `border-b border-[rgba(20,48,73,0.1)]` (sin grilla vertical).
 - **Cuerpo** (`<td>` `text-center align-middle`, `pt-2.5`):
   - **Dato presente → ficha:** `<span class="inline-block rounded-md bg-[rgba(20,48,73,0.06)]
-px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text">`. El tinte navy = "tiene
+px-2 py-0.5 text-[0.8rem] font-semibold tabular-nums text-brand-text">`. El tinte navy = "tiene
     valor"; las fichas dan el ritmo visual sin necesidad de bordes de columna.
   - **Dato vacío → punto tenue:** `<span class="text-[0.9rem] text-[rgba(20,48,73,0.25)]">·</span>`.
-- **Regla:** el dato siempre en monoespaciada; etiqueta en muted. Borders-only (solo el divisor
+- **Regla:** el dato con `tabular-nums` (nunca `font-mono`: una sola tipografía en la pantalla); etiqueta en muted. Borders-only (solo el divisor
   bajo el encabezado). Mostrar el set completo (incluidos los vacíos como punto) para que el patrón
   se lea como una tira. Usar solo para valores cortos; si son largos, volver al `<dl>` vertical.
 
@@ -228,7 +228,7 @@ días del mes de la programación de un contrato.
   `flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2`.
   Ícono navy en contenedor (`h-[1.35rem] w-[1.35rem] rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-primary`,
   `pi pi-calendar`) + micro-label uppercase muted + **ficha navy** con el rango
-  (`inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold tabular-nums text-brand-text`)
+  (`inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 text-[0.8rem] font-semibold tabular-nums text-brand-text`)
   - hint muted a la derecha (`ml-auto text-[0.72rem] text-brand-muted`) que **justifica** los días
     bloqueados. El rango se formatea con `Intl.DateTimeFormat` según `i18n.lang()` (`es-CO`/`en-US`),
     **sin año** y con día+mes corto en ambos extremos: `15 de jul - 31 de jul` (es) / `Jul 15 - Jul
@@ -271,7 +271,7 @@ Para matrices `entidad × acción` donde cada celda es un toggle independiente y
 text-white`; libre: borde `rgba(20,48,73,0.2)`, texto transparente, el check se **insinúa** al
   hover). Así el toggle no salta de tamaño ni de posición.
 - **Contador de fila = estado + switch:** en la celda de la entidad, alineado a la derecha, una
-  **ficha mono** `n/total` (`rounded-md border px-1.5 py-0.5 font-mono text-[0.68rem] font-semibold
+  **ficha** `n/total` (`rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold
 tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados, **misma geometría**:
   - `0/n` → borde `rgba(20,48,73,0.12)` + texto muted (hover sube borde a `0.35` y texto a `text`).
   - parcial → `border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text` (ficha navy tenue).
@@ -458,7 +458,7 @@ gap-3">` con pares `<dt>`/`<dd>` (`__label` `0.7rem/500` muted, `__value` `0.85r
     Ahí la ausencia significa algo y pintar guiones inventaría campos que la entidad no tiene.
 - **Colapsar lo que se lee junto** (es lo que de verdad achica la ficha, y no pierde ningún valor):
   - Identificador compuesto → **un** campo (`Documento` = tipo + número + DV), con el número en
-    `font-mono tabular-nums`. Regla del sistema: el dato identificador siempre en monoespaciada.
+    `tabular-nums`. Regla del sistema: una sola tipografía; el identificador alinea dígitos con `tabular-nums`, nunca con `font-mono`.
   - Dirección → **bloque de sobre** en `<address class="not-italic">`, no cuatro campos sueltos:
     `dirección · barrio` / `ciudad — departamento · código postal`. Ahí el `—` aplica al bloque
     entero, no a cada parte. Armar las líneas en un `computed` del componente, no encadenando un
@@ -630,7 +630,7 @@ tampoco en la página: va a un **modal**. Ejemplo vivo:
   fatiga posible. No extender esta licencia a pantallas de trabajo.
 - **La forma es un recibo contable, no un dashboard.** Nombre a la izquierda, **guía punteada** que
   estira (`min-w-4 flex-1 translate-y-[-0.15rem] border-b border-dotted
-border-[rgba(20,48,73,0.25)]`), cantidad a la derecha en `font-mono text-[0.85rem] font-semibold
+border-[rgba(20,48,73,0.25)]`), cantidad a la derecha en `text-[0.85rem] font-semibold
 tabular-nums`. La **suma al pie**, tras `border-t-2 border-[rgba(20,48,73,0.12)]`, en
   `--brand-navy` y un punto más grande. Es el idioma en el que ya lee quien usa un ERP —el ojo baja
   buscando el total— y no vocabulario prestado de un panel de métricas.
@@ -969,7 +969,7 @@ max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de l
 - **Resumen fuera de los tabs:** el mismo en todas las vistas, como en el ERP anterior. Lo calcula
   la página (dueña de los `FormArray`), no la tabla: `calcularResumen` + `totalCantidad` para las
   líneas y `calcularPagos` (`@reddoc/core`) para recibido/saldo/exceso. Si además tiene pagos, la página lo calcula ella misma.
-- **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
+- **Chip de conteo en el tab** que esconde algo que importa (Pagos): `tabular-nums` sobre
   `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde necesita atención (pagos que superan el total —no se podrá aprobar— o filas inválidas ya tocadas). El error se ve desde otra pestaña.
 - **Guardar nunca queda muerto:** el botón solo espera a `isSaving` y a las tablas
   ocupadas (`ocupado()` de líneas y pagos). Con errores, `pestanaConPrimerError`

@@ -109,7 +109,7 @@ function toOption(row: ContratoApiRow): ContratoOption {
           <div class="flex flex-col gap-0.5 py-0.5">
             <span class="text-[0.85rem] leading-tight text-brand-text">{{ option.nombre }}</span>
             @if (option.numero_identificacion) {
-              <span class="font-mono text-[0.72rem] leading-tight tabular-nums text-brand-muted">
+              <span class="text-[0.72rem] leading-tight tabular-nums text-brand-muted">
                 C.C. {{ option.numero_identificacion }}
               </span>
             }
@@ -126,7 +126,7 @@ function toOption(row: ContratoApiRow): ContratoOption {
           [attr.aria-label]="contratoIdAriaLabel() + (contratoId() ? ': ' + contratoId() : '')"
         >
           <i class="pi pi-hashtag text-[0.85rem]"></i>
-          <span class="font-mono text-[0.8rem] tabular-nums">{{ contratoId() ?? '—' }}</span>
+          <span class="text-[0.8rem] tabular-nums">{{ contratoId() ?? '—' }}</span>
         </span>
       </p-inputgroup-addon>
 
@@ -136,7 +136,7 @@ function toOption(row: ContratoApiRow): ContratoOption {
           [attr.aria-label]="idAriaLabel() + (identificacion() ? ': ' + identificacion() : '')"
         >
           <i class="pi pi-id-card text-[0.85rem]"></i>
-          <span class="font-mono text-[0.8rem] tabular-nums">{{ identificacion() || '—' }}</span>
+          <span class="text-[0.8rem] tabular-nums">{{ identificacion() || '—' }}</span>
         </span>
       </p-inputgroup-addon>
     </p-inputgroup>

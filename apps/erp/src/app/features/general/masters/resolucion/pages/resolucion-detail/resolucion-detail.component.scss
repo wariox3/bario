@@ -22,14 +22,11 @@
   word-break: break-word;
 }
 
-// El dato identificador va siempre en monoespaciada (regla del sistema), con
-// `tabular-nums` para que los dígitos queden en columna y se puedan comparar.
-.resolucion-detail__value--mono {
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.83rem;
+// Identificadores y cifras: misma tipografía que el resto (una sola en la
+// pantalla), con `tabular-nums` para que los dígitos queden en columna.
+.resolucion-detail__value--num {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
 }
 
 // Dato ausente: presente en la ficha pero sin competir al escanear la columna.

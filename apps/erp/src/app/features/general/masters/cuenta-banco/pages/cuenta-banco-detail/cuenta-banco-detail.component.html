@@ -82,13 +82,13 @@
           {{ c.nombre || '—' }}
         </dd>
       </div>
-      <!-- El número de cuenta se dicta y se compara: monoespaciada. -->
+      <!-- El número de cuenta se dicta y se compara: `tabular-nums`. -->
       <div class="flex flex-col gap-0.5">
         <dt class="cuenta-banco-detail__label">
           {{ t().entities.cuentaBanco.columns.numeroCuenta }}
         </dt>
         <dd
-          class="cuenta-banco-detail__value cuenta-banco-detail__value--mono"
+          class="cuenta-banco-detail__value cuenta-banco-detail__value--num"
           [class.cuenta-banco-detail__value--empty]="!c.numero_cuenta"
         >
           {{ c.numero_cuenta || '—' }}
