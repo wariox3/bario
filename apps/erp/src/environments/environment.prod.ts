@@ -3,7 +3,7 @@ import { SENTRY_PRODUCCION, type ReddocEnvironment } from '@reddoc/core';
 export const environment: ReddocEnvironment & { production: boolean } = {
   production: true,
   apiUrl: '/api',
-  turnstileSiteKey: '0x4AAAAAADn7-Pp__E0gDidF',
+  turnstileSiteKey: '0x4AAAAAAGNy9XOEJpOisnrx',
   landingUrl: 'https://reddoc.co',
   cuentaUrl: 'https://cuenta.reddoc.co',
   turnosUrl: 'https://turnos.reddoc.co',
