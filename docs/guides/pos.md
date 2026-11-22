@@ -163,5 +163,5 @@ El workflow `deploy.yml` despliega cualquier app afectada.
 
 - **Staging:** `https://pos.reddoc.uk`, con secrets de deploy y clave de Turnstile
   configurados. El ERP y turnos lo ofrecen en el app-switcher (`posUrl`).
-- **Producción:** `https://pos.reddoc2.co`, también ofrecido por el ERP y turnos
+- **Producción:** `https://pos.reddoc.co`, también ofrecido por el ERP y turnos
   (`posUrl` en sus `environment.prod.ts`).
