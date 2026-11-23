@@ -26,6 +26,11 @@ export interface ConfiguracionRead {
   readonly hum_entidad_riesgo: number | null;
   /** Si una licencia no remunerada sigue cotizando a pensión. */
   readonly hum_licencia_no_remunerada_afecta_pension: boolean;
+  /**
+   * Si la PILA cotiza caja (4 %) también en los días de incapacidad general y
+   * laboral; apagado, esos días van sin caja.
+   */
+  readonly hum_aporte_parafiscales_novedad: boolean;
 
   // Facturación electrónica (área General)
   /**

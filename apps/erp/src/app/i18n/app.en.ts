@@ -7780,6 +7780,10 @@ export const en: AppDict = {
         label: 'Unpaid leave affects pension',
         hint: 'Pension contributions continue during unpaid leave.',
       },
+      aporteParafiscalesNovedad: {
+        label: 'Contribute to family fund during disability',
+        hint: 'PILA also contributes to the family fund (4 %) on general and work-related disability days.',
+      },
       validation: { required: 'This field is required' },
       tabs: {
         conceptosNomina: 'Payroll concepts',

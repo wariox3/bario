@@ -5867,6 +5867,7 @@ export interface AppDict
       section: { title: string; hint: string };
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
       licenciaNoRemuneradaAfectaPension: { label: string; hint: string };
+      aporteParafiscalesNovedad: { label: string; hint: string };
       validation: { required: string };
       tabs: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
       hints: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };

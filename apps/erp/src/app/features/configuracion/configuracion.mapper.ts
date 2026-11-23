@@ -41,6 +41,7 @@ export interface HumanoConfigFormValue {
   readonly factor: number | null;
   readonly auxilio_transporte: number | null;
   readonly licencia_no_remunerada_afecta_pension: boolean;
+  readonly aporte_parafiscales_novedad: boolean;
 }
 
 export function configuracionToHumanoForm(
@@ -52,6 +53,7 @@ export function configuracionToHumanoForm(
     auxilio_transporte: toFiniteNumber(config.hum_auxilio_transporte),
     licencia_no_remunerada_afecta_pension:
       config.hum_licencia_no_remunerada_afecta_pension ?? false,
+    aporte_parafiscales_novedad: config.hum_aporte_parafiscales_novedad ?? false,
   };
 }
 
@@ -61,6 +63,7 @@ export function humanoFormToPayload(form: HumanoConfigFormValue): ConfiguracionP
     hum_factor: form.factor,
     hum_auxilio_transporte: form.auxilio_transporte,
     hum_licencia_no_remunerada_afecta_pension: form.licencia_no_remunerada_afecta_pension,
+    hum_aporte_parafiscales_novedad: form.aporte_parafiscales_novedad,
   };
 }
 
