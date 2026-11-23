@@ -43,9 +43,9 @@ import {
 /**
  * Listado de **aportes a seguridad social**.
  *
- * Filtros, paginación, Excel, abrir un aporte y eliminar. Solo se elimina un
- * aporte en borrador (`aporteEliminable`, que lee `capacidadesDe`): los generados
- * o aprobados no pintan checkbox ni acción de eliminar en su fila.
+ * Filtros, paginación, Excel, abrir, editar y eliminar un aporte. Solo se edita o
+ * elimina un aporte en borrador (las dos reglas salen de `capacidadesDe`): los
+ * generados o aprobados no pintan checkbox ni acciones de editar o eliminar.
  */
 @Component({
   selector: 'app-aportes-list',
@@ -156,6 +156,9 @@ export class AportesListComponent {
   protected onRowAction(event: RowActionInvokedEvent): void {
     const aporte = event.row as Aporte;
     switch (event.actionId) {
+      case 'edit':
+        this.navigateTo('editar', aporte.id);
+        break;
       case 'view':
         this.navigateTo('detalle', aporte.id);
         break;
