@@ -7898,6 +7898,10 @@ export const es: AppDict = {
         label: 'Licencia no remunerada afecta pensión',
         hint: 'Durante una licencia no remunerada se sigue cotizando a pensión.',
       },
+      aporteParafiscalesNovedad: {
+        label: 'Cotizar caja en incapacidades',
+        hint: 'La PILA cotiza caja (4 %) también en los días de incapacidad general y laboral.',
+      },
       validation: { required: 'Este campo es obligatorio' },
       tabs: {
         conceptosNomina: 'Conceptos de nómina',

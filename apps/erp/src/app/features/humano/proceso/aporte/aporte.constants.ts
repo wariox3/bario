@@ -128,8 +128,15 @@ export const APORTES_FILTER_FIELDS: readonly FilterField[] = [
 export const aporteEliminable = (row: unknown): boolean =>
   capacidadesDe(row as Aporte).puedeEliminar;
 
-/** Acciones de fila. Eliminar solo aparece en los aportes en borrador. */
+/** Acciones de fila. Editar y eliminar solo aparecen en los aportes en borrador. */
 export const APORTES_ROW_ACTIONS: readonly RowAction[] = [
+  {
+    id: 'edit',
+    labelKey: 'common.actions.edit',
+    iconClass: 'pi pi-pencil',
+    inline: true,
+    visibleFor: (row) => capacidadesDe(row as Aporte).puedeEditarCabecera,
+  },
   { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
   {
     id: 'delete',
