@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.32](https://github.com/wariox3/bario/compare/v0.1.31...v0.1.32) (2026-11-24)
+
+### Features
+
+- **erp:** configurar si la PILA cotiza caja en incapacidades ([02d9e93](https://github.com/wariox3/bario/commit/02d9e93f6d4c77f7d40bad2f736a48c2e766fafd))
+
+### Bug Fixes
+
+- **erp:** mostrar editar en el listado de aportes en borrador ([e3a874c](https://github.com/wariox3/bario/commit/e3a874c357bc393f792c991c9e0813fa2e07d586))
+
 ## [0.1.31](https://github.com/wariox3/bario/compare/v0.1.30...v0.1.31) (2026-11-22)
 
 ## [0.1.30](https://github.com/wariox3/bario/compare/v0.1.29...v0.1.30) (2026-11-22)

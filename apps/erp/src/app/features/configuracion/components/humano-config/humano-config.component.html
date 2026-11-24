@@ -115,24 +115,45 @@
             </div>
           </div>
 
-          <label
-            for="licencia_no_remunerada_afecta_pension"
-            class="mt-5 flex cursor-pointer items-start gap-2.5"
-          >
-            <p-checkbox
-              inputId="licencia_no_remunerada_afecta_pension"
-              formControlName="licencia_no_remunerada_afecta_pension"
-              [binary]="true"
-            />
-            <span class="flex flex-col gap-[0.15rem]">
-              <span class="text-[0.85rem] font-medium text-brand-text">
-                {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.label }}
+          <div class="mt-5 grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+            <label
+              for="licencia_no_remunerada_afecta_pension"
+              class="flex cursor-pointer items-start gap-2.5"
+            >
+              <p-checkbox
+                inputId="licencia_no_remunerada_afecta_pension"
+                formControlName="licencia_no_remunerada_afecta_pension"
+                [binary]="true"
+              />
+              <span class="flex flex-col gap-[0.15rem]">
+                <span class="text-[0.85rem] font-medium text-brand-text">
+                  {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.label }}
+                </span>
+                <span class="text-[0.75rem] text-brand-muted">
+                  {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.hint }}
+                </span>
               </span>
-              <span class="text-[0.75rem] text-brand-muted">
-                {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.hint }}
+            </label>
+
+            <label
+              for="aporte_parafiscales_novedad"
+              class="flex cursor-pointer items-start gap-2.5"
+            >
+              <p-checkbox
+                inputId="aporte_parafiscales_novedad"
+                formControlName="aporte_parafiscales_novedad"
+                [binary]="true"
+              />
+              <span class="flex flex-col gap-[0.15rem]">
+                <span class="text-[0.85rem] font-medium text-brand-text">
+                  {{ t().configuracion.humano.aporteParafiscalesNovedad.label }}
+                </span>
+                <span class="text-[0.75rem] text-brand-muted">
+                  {{ t().configuracion.humano.aporteParafiscalesNovedad.hint }}
+                </span>
               </span>
-            </span>
-          </label>
+            </label>
+          </div>
         </div>
       </section>
 

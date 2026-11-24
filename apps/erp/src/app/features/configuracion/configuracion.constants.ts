@@ -23,6 +23,7 @@ export const HUMANO_CAMPOS = [
   'hum_factor',
   'hum_auxilio_transporte',
   'hum_licencia_no_remunerada_afecta_pension',
+  'hum_aporte_parafiscales_novedad',
 ] as const satisfies readonly ConfiguracionCampo[];
 
 // ── Área Venta ────────────────────────────────────────────────────────────────

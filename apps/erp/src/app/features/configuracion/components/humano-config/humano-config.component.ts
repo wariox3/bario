@@ -23,6 +23,7 @@ const HUMANO_FIELD_MAP = {
   hum_factor: 'factor',
   hum_auxilio_transporte: 'auxilio_transporte',
   hum_licencia_no_remunerada_afecta_pension: 'licencia_no_remunerada_afecta_pension',
+  hum_aporte_parafiscales_novedad: 'aporte_parafiscales_novedad',
 };
 
 /** Pestañas de la tarjeta de cuentas y conceptos (`?tab=`). La primera es la de por defecto. */
@@ -36,7 +37,7 @@ function esCuentasTab(value: string | null): value is CuentasTab {
 /**
  * Área "Humano" de la configuración: parámetros de nómina
  * (`hum_salario_minimo`, `hum_factor`, `hum_auxilio_transporte`,
- * `hum_licencia_no_remunerada_afecta_pension`).
+ * `hum_licencia_no_remunerada_afecta_pension`, `hum_aporte_parafiscales_novedad`).
  *
  * Auto-contenida: lee y guarda solo sus campos (`HUMANO_CAMPOS`). Estos valores
  * alimentan los cálculos de prestaciones/nómina.
@@ -95,6 +96,7 @@ export class HumanoConfigComponent {
       Validators.min(0),
     ]),
     licencia_no_remunerada_afecta_pension: this.fb.nonNullable.control(false),
+    aporte_parafiscales_novedad: this.fb.nonNullable.control(false),
   });
 
   constructor() {
