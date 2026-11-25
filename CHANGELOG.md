@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.33](https://github.com/wariox3/bario/compare/v0.1.32...v0.1.33) (2026-11-25)
+
+### Features
+
+- **erp:** advertir si el código de la cuenta no coincide con su clasificación ([0d553a3](https://github.com/wariox3/bario/commit/0d553a31d08368eda0f1fd6f4f66bdc6e8750bc1))
+
+### Bug Fixes
+
+- **cuenta:** leer la fecha con hora de los movimientos de facturación ([9f1818f](https://github.com/wariox3/bario/commit/9f1818fc03696066d3b5f3f348d02a6095ad54d2))
+- **cuenta:** precargar tipo y número de documento en el checkout de Wompi ([ab07c6b](https://github.com/wariox3/bario/commit/ab07c6be37409fcec950ef8659dc954d4568ceb1))
+- **erp:** filtrar pendiente por facturar con las rutas ORM del backend ([6cf9c89](https://github.com/wariox3/bario/commit/6cf9c892d1af23fcab7fb7d006ed17534a110140))
+- **erp:** filtrar ventas por ítem con las rutas ORM del backend ([eff1f33](https://github.com/wariox3/bario/commit/eff1f33a678e5f410834e35bc9dbc6cbcec4b2e5))
+
 ## [0.1.32](https://github.com/wariox3/bario/compare/v0.1.31...v0.1.32) (2026-11-24)
 
 ### Features
