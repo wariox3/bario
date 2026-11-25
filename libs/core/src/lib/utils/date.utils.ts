@@ -52,7 +52,7 @@ const ISO_FECHA_SOLA = /^\d{4}-\d{2}-\d{2}$/;
  * El ISO sin hora pasa por `fromIsoDate` a propósito: `new Date('2026-08-05')` lo
  * interpreta como UTC y al oeste de Greenwich —Colombia— retrocede un día.
  */
-function aDate(value: string | number | Date | null | undefined): Date | null {
+export function aDate(value: string | number | Date | null | undefined): Date | null {
   if (value === null || value === undefined || value === '') return null;
   if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
   if (typeof value === 'string' && ISO_FECHA_SOLA.test(value)) return fromIsoDate(value);
