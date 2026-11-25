@@ -1,4 +1,4 @@
-import { formatCop, fromIsoDate } from '@reddoc/core';
+import { aDate, formatCop } from '@reddoc/core';
 import { Movimiento, MovimientoTipo } from '../models/movimiento.model';
 
 export interface MovimientoGroup {
@@ -41,17 +41,24 @@ export function formatMonto(valor: string | number): string {
   return formatCop(valor);
 }
 
+/**
+ * `fecha` llega como datetime con zona (`2026-11-19T08:46:51.007000-05:00`), no
+ * como `yyyy-MM-dd`: `fromIsoDate` la parte por `-` y devuelve `null`. `aDate`
+ * acepta las dos formas.
+ */
 export function formatDia(fecha: string): string {
-  return String(fromIsoDate(fecha).getDate());
+  const d = aDate(fecha);
+  return d ? String(d.getDate()) : '';
 }
 
 export function formatMesCorto(fecha: string): string {
-  return MESES_CORTOS[fromIsoDate(fecha).getMonth()];
+  const d = aDate(fecha);
+  return d ? MESES_CORTOS[d.getMonth()] : '';
 }
 
 export function formatMesLargo(fecha: string): string {
-  const d = fromIsoDate(fecha);
-  return `${MESES_LARGOS[d.getMonth()]} ${d.getFullYear()}`;
+  const d = aDate(fecha);
+  return d ? `${MESES_LARGOS[d.getMonth()]} ${d.getFullYear()}` : '';
 }
 
 export function tipoLabel(tipo: MovimientoTipo): string {
@@ -83,8 +90,8 @@ export function groupByMonth(movimientos: readonly Movimiento[]): MovimientoGrou
   const buckets = new Map<string, { items: Movimiento[]; firstFecha: string }>();
 
   for (const m of movimientos) {
-    const d = fromIsoDate(m.fecha);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const d = aDate(m.fecha);
+    const key = d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : '';
     const bucket = buckets.get(key);
     if (bucket) {
       bucket.items.push(m);

@@ -1883,6 +1883,10 @@ export const es: AppDict = {
           longitudPar: 'El código debe tener una longitud par',
           noIniciaCero: 'El primer carácter no puede ser "0"',
         },
+        advertencia: {
+          codigoNoCoincide: 'El código debería empezar por {prefijo}, como {nivel} {nombre}',
+          niveles: { clase: 'la clase', grupo: 'el grupo', cuenta: 'la cuenta' },
+        },
         toasts: {
           createSuccess: { title: 'Cuenta creada', desc: 'La cuenta se creó correctamente' },
           editSuccess: {
