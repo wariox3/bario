@@ -1,7 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
 
-export const VENTA_ITEM_FILTERS_STORAGE_KEY = 'venta-item:filters:v1';
+export const VENTA_ITEM_FILTERS_STORAGE_KEY = 'venta-item:filters:v2';
 
 /**
  * Columnas del informe, en el orden del informe original: identificación del
@@ -90,24 +90,28 @@ export const VENTA_ITEM_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
-/** Campos por los que se puede filtrar (columnas descriptivas; no los montos calculados). */
+/**
+ * Campos por los que se puede filtrar (columnas descriptivas; no los montos calculados).
+ * El nombre es la ruta ORM que declara `campos_filtrables` del backend
+ * (`documento__numero`), no la columna aplanada del read (`documento_numero`).
+ */
 export const VENTA_ITEM_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.ventaItem.columns.id', type: 'number' },
   {
-    name: 'documento_numero',
+    name: 'documento__numero',
     displayNameKey: 'entities.ventaItem.columns.numero',
     type: 'string',
   },
-  { name: 'documento_fecha', displayNameKey: 'entities.ventaItem.columns.fecha', type: 'date' },
+  { name: 'documento__fecha', displayNameKey: 'entities.ventaItem.columns.fecha', type: 'date' },
   { name: 'item_id', displayNameKey: 'entities.ventaItem.columns.itemId', type: 'number' },
-  { name: 'item_nombre', displayNameKey: 'entities.ventaItem.columns.item', type: 'string' },
+  { name: 'item__nombre', displayNameKey: 'entities.ventaItem.columns.item', type: 'string' },
   {
-    name: 'contacto_nombre_corto',
+    name: 'documento__contacto__nombre_corto',
     displayNameKey: 'entities.ventaItem.columns.contacto',
     type: 'string',
   },
   {
-    name: 'contacto_numero_identificacion',
+    name: 'documento__contacto__numero_identificacion',
     displayNameKey: 'entities.ventaItem.columns.identificacion',
     type: 'string',
   },
