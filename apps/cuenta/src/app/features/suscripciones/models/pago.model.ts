@@ -18,7 +18,10 @@ export interface IntegridadResponse {
 export interface WompiCustomerData {
   readonly email: string;
   readonly full_name: string;
+  /** Número nacional, sin indicativo: va junto a `phone_number_prefix`. */
   readonly phone_number?: string;
+  /** Indicativo con `+` (`+57`). */
+  readonly phone_number_prefix?: string;
   readonly legal_id?: string;
   readonly legal_id_type?: string;
 }

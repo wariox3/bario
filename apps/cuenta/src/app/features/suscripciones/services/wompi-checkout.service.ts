@@ -44,9 +44,17 @@ export class WompiCheckoutService {
     const customer = input.intencion.customer_data;
     if (customer?.email) params.set('customer-data:email', customer.email);
     if (customer?.full_name) params.set('customer-data:full-name', customer.full_name);
-    if (customer?.phone_number) params.set('customer-data:phone-number', customer.phone_number);
-    if (customer?.legal_id) params.set('customer-data:legal-id', customer.legal_id);
-    if (customer?.legal_id_type) params.set('customer-data:legal-id-type', customer.legal_id_type);
+    if (customer?.phone_number && customer.phone_number_prefix) {
+      params.set('customer-data:phone-number', customer.phone_number);
+      params.set('customer-data:phone-number-prefix', customer.phone_number_prefix);
+    }
+    if (customer?.legal_id && customer.legal_id_type) {
+      // Sin `collect-customer-legal-id` Wompi no muestra el campo de documento
+      // en "Ingresa tus datos", y entonces no hay dónde precargarlo.
+      params.set('collect-customer-legal-id', 'true');
+      params.set('customer-data:legal-id', customer.legal_id);
+      params.set('customer-data:legal-id-type', customer.legal_id_type);
+    }
 
     return `${WOMPI_CHECKOUT_BASE}?${params.toString()}`;
   }
