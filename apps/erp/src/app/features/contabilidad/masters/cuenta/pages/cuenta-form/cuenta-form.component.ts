@@ -1,5 +1,5 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,6 +24,7 @@ import {
 import { cuentaToFormValue, formValueToPayload } from '../../cuenta.mapper';
 import { calcularRangoIds } from '../../utils/calcular-rango-ids';
 import { longitudPar, noIniciaCon, soloDigitos } from '../../utils/cuenta-codigo.validators';
+import { desajusteClasificacion } from '../../utils/clasificacion-codigo';
 
 /**
  * Formulario de alta/edición de cuenta (PUC).
@@ -157,6 +158,27 @@ export class CuentaFormComponent implements OnInit {
     exige_contacto: this.fb.control<boolean>(false),
     exige_centro_costo: this.fb.control<boolean>(false),
     permite_movimiento: this.fb.control<boolean>(false),
+  });
+
+  /** Cualquier cambio del form (valor, tocado, estado): reloj de la advertencia. */
+  private readonly formEvent = toSignal(this.form.events);
+
+  /**
+   * Advertencia (no bloquea el guardado) cuando el código no empieza por la
+   * clasificación elegida: clase 1 + código 4105. Sale solo con el código válido
+   * y ya tocado, para no saltar mientras se escribe ni pisar un error del campo.
+   */
+  protected readonly avisoClasificacion = computed<string | null>(() => {
+    this.formEvent();
+    const codigo = this.form.controls.codigo;
+    if (codigo.invalid || !codigo.touched) return null;
+    const desajuste = desajusteClasificacion(codigo.value, this.form.getRawValue());
+    if (!desajuste) return null;
+    const textos = this.t().entities.cuenta.form.advertencia;
+    return textos.codigoNoCoincide
+      .replace('{prefijo}', desajuste.prefijo)
+      .replace('{nivel}', textos.niveles[desajuste.nivel])
+      .replace('{nombre}', `${desajuste.prefijo} - ${desajuste.nombre}`);
   });
 
   constructor() {

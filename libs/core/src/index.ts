@@ -77,6 +77,7 @@ export {
   startOfToday,
   toIsoDate,
   fromIsoDate,
+  aDate,
   FORMATO_FECHA,
   formatFechaCorta,
   formatFechaLarga,

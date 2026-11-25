@@ -1,7 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
 
-export const PENDIENTE_FACTURAR_FILTERS_STORAGE_KEY = 'pendiente-facturar:filters:v1';
+export const PENDIENTE_FACTURAR_FILTERS_STORAGE_KEY = 'pendiente-facturar:filters:v2';
 
 /**
  * Columnas del informe, en el orden pedido por negocio. Identifica el documento
@@ -107,28 +107,28 @@ export const PENDIENTE_FACTURAR_COLUMNS: readonly ColumnDef[] = [
 /** Campos por los que se puede filtrar (columnas descriptivas; no los montos calculados). */
 export const PENDIENTE_FACTURAR_FILTER_FIELDS: readonly FilterField[] = [
   {
-    name: 'documento_numero',
+    name: 'documento__numero',
     displayNameKey: 'entities.pendienteFacturar.columns.numero',
     type: 'string',
   },
   {
-    name: 'documento_fecha',
+    name: 'documento__fecha',
     displayNameKey: 'entities.pendienteFacturar.columns.fecha',
     type: 'date',
   },
   { name: 'puesto_id', displayNameKey: 'entities.pendienteFacturar.columns.cod', type: 'number' },
   {
-    name: 'puesto_nombre',
+    name: 'puesto__nombre',
     displayNameKey: 'entities.pendienteFacturar.columns.puesto',
     type: 'string',
   },
   {
-    name: 'item_nombre',
+    name: 'item__nombre',
     displayNameKey: 'entities.pendienteFacturar.columns.item',
     type: 'string',
   },
   {
-    name: 'modalidad_nombre',
+    name: 'modalidad__nombre',
     displayNameKey: 'entities.pendienteFacturar.columns.modalidad',
     type: 'string',
   },

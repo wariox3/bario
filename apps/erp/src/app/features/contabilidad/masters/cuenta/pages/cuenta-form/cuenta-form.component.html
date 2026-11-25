@@ -79,6 +79,13 @@
               primerCaracterInvalido: t().entities.cuenta.form.validation.noIniciaCero,
             }"
           />
+          @if (avisoClasificacion(); as aviso) {
+            <span
+              class="mt-1 flex items-start gap-1 text-[0.7rem] tracking-[0.01em] text-amber-700"
+            >
+              <i class="pi pi-exclamation-triangle mt-px text-[0.7rem]"></i>{{ aviso }}
+            </span>
+          }
         </div>
 
         <!-- Nombre -->

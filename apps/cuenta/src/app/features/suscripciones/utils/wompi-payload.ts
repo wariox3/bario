@@ -1,4 +1,4 @@
-import { normalizarCelular } from '@reddoc/core';
+import { partirCelular } from '@reddoc/core';
 import { BillingProfile } from '../models/billing-profile.model';
 import { PeriodoPago, WompiCustomerData } from '../models/pago.model';
 import { annualTotal, displayedMonthly } from '../pages/planes/utils/plan-pricing';
@@ -47,18 +47,24 @@ export function clearPagoIntent(): void {
   sessionStorage.removeItem(WOMPI_INTENT_STORAGE_KEY);
 }
 
-// Wompi exige el código corto en `customer-data:legal-id-type`. Si recibe el
-// nombre largo cae al primer item del select ("Registro civil"), por eso
-// mapeamos del nombre que devuelve /api/general/identificacion/ al código.
-const LEGAL_ID_TYPE_TO_WOMPI: Record<string, string> = {
-  'cédula de ciudadanía': 'CC',
+// Wompi exige el código corto en `customer-data:legal-id-type` (CC, CE, NIT,
+// PP, TI, DNI, RG, OTHER). Si recibe el nombre largo cae al primer item del
+// select, por eso mapeamos del nombre que devuelve
+// `/contenedor/identificacion/seleccionar/` (catálogo `CtnIdentificacion`) al
+// código. Ese seleccionar no trae el `codigo` DIAN; cuando lo traiga conviene
+// mapear por él en vez de por el nombre. Los tipos sin equivalente en Wompi
+// van como `OTHER`; "Sin identificación del exterior" no se manda.
+const LEGAL_ID_TYPE_TO_WOMPI: Readonly<Record<string, string>> = {
+  // Claves sin tildes: `claveTipo` normaliza igual el nombre que llega.
   'cedula de ciudadania': 'CC',
-  'cédula de extranjería': 'CE',
   'cedula de extranjeria': 'CE',
+  'numero de identificacion tributaria': 'NIT',
   nit: 'NIT',
   pasaporte: 'PP',
   'tarjeta de identidad': 'TI',
-  'registro civil': 'RC',
+  'registro civil de nacimiento': 'OTHER',
+  'tarjeta de extranjeria': 'OTHER',
+  'tipo de documento extranjero': 'OTHER',
 };
 
 export function calcularMontoCents(precio: string, anual: boolean): number {
@@ -67,16 +73,41 @@ export function calcularMontoCents(precio: string, anual: boolean): number {
 }
 
 export function armarCustomerData(bp: BillingProfile): WompiCustomerData {
+  const legalIdType = mapLegalIdType(bp.tipo);
+  const legalId = bp.numero?.trim();
+  // Wompi exige el documento y su tipo juntos: uno sin el otro no se precarga.
+  const conDocumento = !!legalIdType && !!legalId;
   return {
     email: bp.email,
     full_name: bp.nombre,
-    phone_number: normalizarCelular(bp.celular) || undefined,
-    legal_id: bp.numero || undefined,
-    legal_id_type: mapLegalIdType(bp.tipo),
+    ...partirTelefono(bp.celular),
+    legal_id: conDocumento ? legalId : undefined,
+    legal_id_type: conDocumento ? legalIdType : undefined,
   };
+}
+
+/**
+ * Wompi pide el celular en dos campos (`phone-number` nacional y
+ * `phone-number-prefix` como `+57`) y uno sin el otro no se precarga. Un
+ * indicativo fuera del catálogo no se puede partir con certeza: se omite.
+ */
+function partirTelefono(
+  celular: string | undefined,
+): Pick<WompiCustomerData, 'phone_number' | 'phone_number_prefix'> {
+  const { pais, nacional, enCatalogo } = partirCelular(celular);
+  if (!nacional || !enCatalogo) return {};
+  return { phone_number: nacional, phone_number_prefix: `+${pais.indicativo}` };
 }
 
 function mapLegalIdType(tipo: string | undefined): string | undefined {
   if (!tipo) return undefined;
-  return LEGAL_ID_TYPE_TO_WOMPI[tipo.trim().toLowerCase()];
+  return LEGAL_ID_TYPE_TO_WOMPI[claveTipo(tipo)];
+}
+
+function claveTipo(tipo: string): string {
+  return tipo
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
