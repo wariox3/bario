@@ -1829,6 +1829,10 @@ export const en: AppDict = {
           longitudPar: 'The code must have an even length',
           noIniciaCero: 'The first character cannot be "0"',
         },
+        advertencia: {
+          codigoNoCoincide: 'The code should start with {prefijo}, like {nivel} {nombre}',
+          niveles: { clase: 'the class', grupo: 'the group', cuenta: 'the account' },
+        },
         toasts: {
           createSuccess: { title: 'Account created', desc: 'The account was created successfully' },
           editSuccess: { title: 'Account updated', desc: 'The changes were saved successfully' },

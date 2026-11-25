@@ -1369,6 +1369,10 @@ export interface AppDict
           longitudPar: string;
           noIniciaCero: string;
         };
+        advertencia: {
+          codigoNoCoincide: string;
+          niveles: { clase: string; grupo: string; cuenta: string };
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
