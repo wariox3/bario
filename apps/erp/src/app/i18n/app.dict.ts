@@ -5,6 +5,7 @@ import type {
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
   SaludoTranslationsHost,
+  SoporteTranslationsHost,
 } from '@reddoc/ui/i18n';
 
 /**
@@ -64,6 +65,7 @@ export interface AppDict
   extends
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
+    SoporteTranslationsHost,
     PhoneInputTranslationsHost,
     SaludoTranslationsHost,
     ContenedoresTranslationsHost,

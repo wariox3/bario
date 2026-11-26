@@ -21,109 +21,15 @@
     </p>
   </header>
 
-  <!-- Context header: render inmediato si vino por router state, luego refresca con el GET. -->
+  <!-- Contexto: pinta al instante si vino por router state; luego lo refresca el GET. -->
   @if (suscripcion(); as s) {
-    <div
-      class="mb-6 rounded-[10px] border border-[rgba(20,48,73,0.12)] bg-brand-surface overflow-hidden"
-    >
-      <!-- Fila superior: avatar + cliente + plan -->
-      <div class="flex items-center gap-3 p-3.5">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[rgba(20,48,73,0.12)] bg-brand-bg text-[0.82rem] font-semibold text-brand-text tracking-[0.02em]"
-        >
-          {{ clienteIniciales() }}
-        </span>
-        <div class="flex-1 min-w-0">
-          <div
-            class="tabular-nums text-[0.62rem] tracking-[0.16em] uppercase text-brand-muted font-semibold mb-0.5"
-          >
-            Suscripción actual
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-[0.92rem] font-semibold text-brand-text truncate">
-              {{ s.cliente_nombre }}
-            </span>
-            <span class="text-brand-muted/60 text-[0.75rem]">·</span>
-            <span class="text-[0.78rem] text-brand-muted">
-              Plan actual: {{ s.suscripcion_tipo_nombre }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Fila inferior: stats de la suscripción vigente -->
-      @if (suscripcionStats(); as stats) {
-        <div
-          class="border-t border-[rgba(20,48,73,0.07)] bg-[rgba(20,48,73,0.02)] grid grid-cols-2 sm:grid-cols-4 divide-x divide-[rgba(20,48,73,0.07)]"
-        >
-          <!-- Días restantes -->
-          <div class="flex flex-col gap-0.5 px-4 py-2.5">
-            <span
-              class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
-            >
-              Días restantes
-            </span>
-            <span
-              class="text-[0.88rem] font-bold tabular-nums"
-              [class.text-emerald-600]="stats.tone === 'success'"
-              [class.text-amber-600]="stats.tone === 'warn'"
-              [class.text-rose-600]="stats.tone === 'danger'"
-            >
-              @if (stats.expired) {
-                Vencida
-              } @else {
-                {{ stats.daysLeft }}
-                <span class="text-[0.7rem] font-normal text-brand-muted">
-                  {{ stats.daysLeft === 1 ? 'día' : 'días' }}
-                </span>
-              }
-            </span>
-          </div>
-
-          <!-- Fecha de vencimiento -->
-          <div class="flex flex-col gap-0.5 px-4 py-2.5">
-            <span
-              class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
-            >
-              Vence
-            </span>
-            <span class="text-[0.88rem] font-semibold text-brand-text">
-              {{ stats.fechaFin }}
-            </span>
-          </div>
-
-          <!-- Frecuencia -->
-          <div class="flex flex-col gap-0.5 px-4 py-2.5">
-            <span
-              class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
-            >
-              Frecuencia
-            </span>
-            <span class="text-[0.88rem] font-semibold text-brand-text">
-              {{ stats.frecuenciaLabel }}
-            </span>
-          </div>
-
-          <!-- Saldo restante -->
-          <div class="flex flex-col gap-0.5 px-4 py-2.5">
-            <span
-              class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
-            >
-              Saldo restante
-            </span>
-            <span class="text-[0.88rem] font-semibold text-brand-text tabular-nums">
-              {{ stats.saldoRestante }}
-            </span>
-          </div>
-        </div>
-      }
-    </div>
+    <app-suscripcion-actual-header class="mb-6" [suscripcion]="s" />
   }
 
   <!-- Stepper -->
   <app-plan-stepper class="block mb-7" [current]="step()" [labels]="stepLabels" />
 
-  <!-- Step card + (optional) summary card as siblings -->
+  <!-- Card del paso + (opcional) resumen al lado -->
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 mb-3.5 items-start">
     <section
       class="bg-brand-surface border border-[rgba(20,48,73,0.12)] rounded-[14px] p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
@@ -138,190 +44,86 @@
         </p>
       </header>
 
-      <!-- STEP 1: PLAN -->
-      @if (step() === 0) {
-        <div class="animate-fade-up">
-          <!-- Controls: category tabs + frequency toggle -->
-          <div class="flex items-center justify-between gap-4 mb-5 flex-wrap">
-            <!-- Category tabs -->
-            <div
-              class="inline-flex bg-brand-bg border border-[rgba(20,48,73,0.12)] rounded-[8px] p-[3px] gap-0.5"
-              role="tablist"
-              aria-label="Categoría"
-            >
-              <button
-                type="button"
-                role="tab"
-                [attr.aria-selected]="track() === 'facturacion'"
-                (click)="setTrack('facturacion')"
-                class="px-5 py-1.5 rounded-md text-[0.82rem] transition-all duration-150"
-                [class]="
-                  track() === 'facturacion'
-                    ? 'bg-brand-blue text-white font-semibold'
-                    : 'text-brand-muted font-medium hover:text-brand-blue'
-                "
-              >
-                Facturación
-              </button>
-              <button
-                type="button"
-                role="tab"
-                [attr.aria-selected]="track() === 'erp'"
-                (click)="setTrack('erp')"
-                class="px-5 py-1.5 rounded-md text-[0.82rem] transition-all duration-150"
-                [class]="
-                  track() === 'erp'
-                    ? 'bg-brand-blue text-white font-semibold'
-                    : 'text-brand-muted font-medium hover:text-brand-blue'
-                "
-              >
-                ERP
-              </button>
-            </div>
-
-            <!-- Frequency toggle -->
-            <div class="inline-flex items-center gap-2.5">
-              <span
-                class="text-[0.82rem] transition-colors duration-150"
-                [class]="
-                  !annual() ? 'font-semibold text-brand-text' : 'font-normal text-brand-muted'
-                "
-              >
-                Mensual
-              </span>
-
-              <button
-                type="button"
-                role="switch"
-                [attr.aria-checked]="annual()"
-                (click)="toggleAnnual()"
-                class="relative w-[42px] h-[24px] rounded-full border-0 cursor-pointer transition-colors duration-200"
-                [class]="annual() ? 'bg-brand-blue' : 'bg-[rgba(20,48,73,0.18)]'"
-              >
-                <span
-                  class="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.18)] transition-[left] duration-200"
-                  [style.left.px]="annual() ? 20 : 2"
-                ></span>
-              </button>
-
-              <span
-                class="text-[0.82rem] transition-colors duration-150"
-                [class]="
-                  annual() ? 'font-semibold text-brand-text' : 'font-normal text-brand-muted'
-                "
-              >
-                Anual
-              </span>
-
-              <span
-                class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.68rem] font-semibold tracking-[0.02em] border transition-all duration-150"
-                [class]="
-                  annual()
-                    ? 'border-brand-blue text-brand-blue bg-brand-blue/10'
-                    : 'border-[rgba(20,48,73,0.18)] text-brand-muted'
-                "
-              >
-                Ahorra 10%
-              </span>
-            </div>
-          </div>
-
-          <!-- Loading skeleton -->
-          @if (isLoading()) {
-            <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-              @for (cell of skeletonCells; track $index) {
-                <div
-                  class="border border-[rgba(20,48,73,0.12)] rounded-xl p-5 flex flex-col gap-3 bg-brand-surface min-h-[180px] animate-pulse"
-                >
-                  <div class="h-[0.55rem] w-12 rounded bg-[rgba(20,48,73,0.07)]"></div>
-                  <div class="h-[0.9rem] w-2/3 rounded bg-[rgba(20,48,73,0.09)]"></div>
-                  <div class="mt-auto flex items-baseline gap-2">
-                    <div class="h-6 w-20 rounded bg-[rgba(20,48,73,0.09)]"></div>
-                    <div class="h-[0.55rem] w-8 rounded bg-[rgba(20,48,73,0.05)]"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Empty -->
-          @else if (visiblePlanes().length === 0) {
-            <div class="py-10 text-center">
-              <p class="m-0 text-[0.85rem] font-semibold text-brand-text mb-1">Sin planes</p>
-              <p class="m-0 text-[0.76rem] text-brand-muted">
-                No hay planes disponibles en esta categoría.
-              </p>
-            </div>
-          }
-
-          <!-- Grid -->
-          @else {
-            <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 pt-2.5">
-              @for (plan of visiblePlanes(); track plan.id) {
-                <app-plan-card
-                  [plan]="plan"
-                  [annual]="annual()"
-                  [selected]="isSelected(plan)"
-                  [current]="isCurrent(plan)"
-                  [popular]="isPopular(plan)"
-                  (planSelected)="onPlanSelected($event)"
-                />
-              }
-            </div>
-          }
-        </div>
-      }
-
-      <!-- STEP 2: BILLING PROFILES (summary va fuera del section) -->
-      @else if (step() === 1) {
-        <div class="animate-fade-up">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-            @for (profile of billingProfiles(); track profile.id) {
-              <app-billing-profile-card
-                [profile]="profile"
-                [selected]="isBillingProfileSelected(profile)"
-                (profileSelected)="selectBillingProfile($event)"
-                (edit)="onEditBillingProfile($event)"
-                (remove)="onRequestRemoveBillingProfile($event)"
+      @switch (step()) {
+        <!-- Paso 1: plan -->
+        @case (0) {
+          <div class="animate-fade-up">
+            @if (planFijo(); as fijo) {
+              <!-- Plan fijo (personalizado, contador): solo se elige la frecuencia -->
+              <app-plan-fijo-panel
+                [plan]="fijo.plan"
+                [etiqueta]="fijo.etiqueta"
+                [descripcion]="fijo.descripcion"
+                [annual]="annual()"
+                (annualChange)="setAnnual($event)"
+              />
+            } @else {
+              <app-plan-catalogo-step
+                [planes]="visiblePlanes()"
+                [track]="track()"
+                [annual]="annual()"
+                [loading]="isLoading()"
+                [selectedId]="selectedPlanId()"
+                [currentId]="currentSuscripcionTipoId()"
+                (trackChange)="setTrack($event)"
+                (annualChange)="setAnnual($event)"
+                (planSelected)="onPlanSelected($event)"
               />
             }
-            <button
-              type="button"
-              (click)="openCreateBillingDialog()"
-              class="relative rounded-xl transition-all duration-150 font-sans w-full h-full border-2 border-dashed border-[rgba(20,48,73,0.22)] bg-brand-bg/40 hover:border-brand-blue/45 hover:bg-brand-blue/[0.02] cursor-pointer"
-            >
-              <div
-                class="flex flex-col items-center justify-center text-center gap-2 px-4 py-10 min-h-[200px]"
-              >
-                <span
-                  class="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(20,48,73,0.06)] text-brand-muted"
-                >
-                  <i class="pi pi-plus text-[0.85rem]"></i>
-                </span>
-                <p class="m-0 text-[0.88rem] font-semibold text-brand-text tracking-tight">
-                  Nuevos datos de facturación
-                </p>
-                <p class="m-0 text-[0.72rem] text-brand-muted leading-snug max-w-[200px]">
-                  Registra otro destinatario para esta factura.
-                </p>
-              </div>
-            </button>
           </div>
-        </div>
-      }
+        }
 
-      <!-- STEP 3: CONFIRM -->
-      @else {
-        @if (selectedPlan(); as plan) {
-          <app-plan-confirm-step
-            [plan]="plan"
-            [billingProfile]="selectedBillingProfile()"
-            [annual]="annual()"
-            [saldoNoConsumido]="cambioPlanCalc()?.saldoNoConsumido ?? 0"
-            [totalAPagar]="cambioPlanCalc()?.totalAPagar ?? null"
-            (cambiarPlan)="goToStep(0)"
-            (cambiarFacturacion)="goToStep(1)"
-          />
+        <!-- Paso 2: datos de facturación (el resumen va fuera del section) -->
+        @case (1) {
+          <div class="animate-fade-up">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+              @for (profile of billingProfiles(); track profile.id) {
+                <app-billing-profile-card
+                  [profile]="profile"
+                  [selected]="isBillingProfileSelected(profile)"
+                  (profileSelected)="selectBillingProfile($event)"
+                  (edit)="onEditBillingProfile($event)"
+                  (remove)="onRequestRemoveBillingProfile($event)"
+                />
+              }
+              <button
+                type="button"
+                (click)="openCreateBillingDialog()"
+                class="relative rounded-xl transition-all duration-150 font-sans w-full h-full border-2 border-dashed border-[rgba(20,48,73,0.22)] bg-brand-bg/40 hover:border-brand-blue/45 hover:bg-brand-blue/[0.02] cursor-pointer"
+              >
+                <div
+                  class="flex flex-col items-center justify-center text-center gap-2 px-4 py-10 min-h-[200px]"
+                >
+                  <span
+                    class="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(20,48,73,0.06)] text-brand-muted"
+                  >
+                    <i class="pi pi-plus text-[0.85rem]"></i>
+                  </span>
+                  <p class="m-0 text-[0.88rem] font-semibold text-brand-text tracking-tight">
+                    Nuevos datos de facturación
+                  </p>
+                  <p class="m-0 text-[0.72rem] text-brand-muted leading-snug max-w-[200px]">
+                    Registra otro destinatario para esta factura.
+                  </p>
+                </div>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Paso 3: confirmar -->
+        @case (2) {
+          @if (selectedPlan(); as plan) {
+            <app-plan-confirm-step
+              [plan]="plan"
+              [billingProfile]="selectedBillingProfile()"
+              [annual]="annual()"
+              [saldoNoConsumido]="cambioPlanCalc()?.saldoNoConsumido ?? 0"
+              [totalAPagar]="cambioPlanCalc()?.totalAPagar ?? null"
+              (cambiarPlan)="goToStep(0)"
+              (cambiarFacturacion)="goToStep(1)"
+            />
+          }
         }
       }
     </section>
@@ -337,104 +139,20 @@
     }
   </div>
 
-  <!-- Bottom navigation -->
-  <div class="flex justify-between items-center gap-3 flex-wrap">
-    <button
-      type="button"
-      (click)="goBack()"
-      class="px-4 py-2.5 rounded-lg border border-[rgba(20,48,73,0.18)] bg-transparent text-brand-text text-[0.85rem] font-medium cursor-pointer inline-flex items-center gap-1.5 transition-all duration-150 hover:border-brand-blue/40 hover:bg-[rgba(20,48,73,0.03)]"
-    >
-      <i class="pi pi-arrow-left text-[0.7rem]"></i>
-      {{ step() === 0 ? 'Volver' : 'Atrás' }}
-    </button>
-
-    <div class="flex items-center gap-2.5 flex-wrap justify-end">
-      @if (step() === 0 && !canGoNext()) {
-        <span class="text-[0.75rem] text-brand-muted">Selecciona un plan para continuar</span>
-      } @else if (step() === 0 && selectedPlan(); as plan) {
-        <span class="text-[0.78rem] text-brand-muted tabular-nums">
-          {{ plan.nombre }} ·
-          <strong class="text-brand-text font-semibold">{{ selectedMonthlyLabel() }}/mes</strong>
-        </span>
-      } @else if (step() === 1 && !canGoNext()) {
-        <span class="text-[0.75rem] text-brand-muted"> Selecciona un perfil de facturación </span>
-      } @else if (step() === 1 && selectedBillingProfile(); as bp) {
-        <span class="text-[0.78rem] text-brand-muted">
-          Facturar a
-          <strong class="text-brand-text font-semibold">{{ bp.nombre }}</strong>
-        </span>
-      } @else if (step() === 2 && cobroSinPagoWompi()) {
-        <span class="text-[0.78rem] text-emerald-700 font-semibold tabular-nums">
-          Cubierto con saldo
-        </span>
-      } @else if (step() === 2 && selectedPlan(); as plan) {
-        <span class="text-[0.78rem] text-brand-muted tabular-nums">
-          Total
-          <strong class="text-brand-text font-semibold">{{ selectedMonthlyLabel() }}</strong>
-          {{ annual() ? '/mes (anual)' : '/mes' }}
-        </span>
-      }
-
-      @if (step() < 2) {
-        <button
-          type="button"
-          (click)="goNext()"
-          [disabled]="!canGoNext()"
-          class="px-5 py-2.5 rounded-lg border-0 text-[0.85rem] font-semibold inline-flex items-center gap-1.5 transition-all duration-150"
-          [class]="
-            canGoNext()
-              ? 'bg-brand-blue text-white cursor-pointer hover:bg-[#0086d4]'
-              : 'bg-[rgba(20,48,73,0.12)] text-brand-muted cursor-not-allowed'
-          "
-        >
-          Continuar
-          <i class="pi pi-arrow-right text-[0.7rem]"></i>
-        </button>
-      } @else if (cobroSinPagoWompi()) {
-        <button
-          type="button"
-          (click)="confirmarCambio()"
-          [disabled]="isUpdatingPlan()"
-          class="px-5 py-2.5 rounded-lg border-0 text-[0.85rem] font-semibold inline-flex items-center gap-2 transition-all duration-150 min-w-[200px] justify-center"
-          [class]="
-            isUpdatingPlan()
-              ? 'bg-[rgba(20,48,73,0.12)] text-brand-muted cursor-not-allowed'
-              : 'bg-brand-blue text-white cursor-pointer hover:bg-[#0086d4]'
-          "
-        >
-          @if (isUpdatingPlan()) {
-            <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
-            Actualizando…
-          } @else {
-            <i class="pi pi-refresh text-[0.7rem]"></i>
-            Actualizar plan
-            <i class="pi pi-arrow-right text-[0.7rem]"></i>
-          }
-        </button>
-      } @else {
-        <button
-          type="button"
-          (click)="confirmarCambio()"
-          [disabled]="isStartingPayment()"
-          class="px-5 py-2.5 rounded-lg border-0 text-[0.85rem] font-semibold inline-flex items-center gap-2 transition-all duration-150 min-w-[200px] justify-center"
-          [class]="
-            isStartingPayment()
-              ? 'bg-[rgba(20,48,73,0.12)] text-brand-muted cursor-not-allowed'
-              : 'bg-brand-blue text-white cursor-pointer hover:bg-[#0086d4]'
-          "
-        >
-          @if (isStartingPayment()) {
-            <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
-            Redirigiendo a Wompi…
-          } @else {
-            <i class="pi pi-lock text-[0.7rem]"></i>
-            Pagar y activar
-            <i class="pi pi-arrow-right text-[0.7rem]"></i>
-          }
-        </button>
-      }
-    </div>
-  </div>
+  <app-plan-wizard-actions
+    [step]="step()"
+    [canGoNext]="canGoNext()"
+    [plan]="selectedPlan()"
+    [montoMensualLabel]="selectedMonthlyLabel()"
+    [planSinPrecio]="planSinPrecio()"
+    [billingProfile]="selectedBillingProfile()"
+    [annual]="annual()"
+    [cubiertoConSaldo]="cobroSinPagoWompi()"
+    [enviando]="cobroSinPagoWompi() ? isUpdatingPlan() : isStartingPayment()"
+    (volver)="goBack()"
+    (continuar)="goNext()"
+    (confirmar)="confirmarCambio()"
+  />
 </div>
 
 @if (showCreateBillingDialog()) {

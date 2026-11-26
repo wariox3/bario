@@ -1,18 +1,14 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { getInitials, resolvePlanCategory, ToastService } from '@reddoc/core';
-import {
-  formatSuscripcionFechaFin,
-  getSuscripcionFrecuenciaLabel,
-  getSuscripcionStatus,
-} from '../../suscripcion.utils';
+import { resolvePlanCategory, ToastService } from '@reddoc/core';
 import { BillingProfile } from '../../models/billing-profile.model';
 import { WompiCheckoutError } from '../../models/pago.model';
 import { Suscripcion } from '../../models/suscripcion.model';
 import {
   SUSCRIPCION_CATEGORIA_ERP,
   SUSCRIPCION_CATEGORIA_FACTURACION,
+  SUSCRIPCION_CLASE,
   SuscripcionTipo,
 } from '../../models/suscripcion-tipo.model';
 import { BillingProfilesService } from '../../services/billing-profiles.service';
@@ -20,18 +16,26 @@ import { CambioPlanService } from '../../services/cambio-plan.service';
 import { SuscripcionTiposService } from '../../services/suscripcion-tipos.service';
 import { SuscripcionesService } from '../../services/suscripciones.service';
 import { WompiPaymentOrchestrator } from '../../services/wompi-payment-orchestrator.service';
-import { calcularCambioPlan, calcularSaldoNoConsumido } from '../../utils/cambio-plan';
+import { calcularCambioPlan } from '../../utils/cambio-plan';
+import { PlanFijo, planFijoDeSuscripcion } from '../../utils/plan-por-clase';
 import { BillingProfileCardComponent } from './components/billing-profile-card/billing-profile-card.component';
 import { BillingProfileCreateDialogComponent } from './components/billing-profile-create-dialog/billing-profile-create-dialog.component';
 import { BillingProfileDeleteDialogComponent } from './components/billing-profile-delete-dialog/billing-profile-delete-dialog.component';
-import { PlanCardComponent } from './components/plan-card/plan-card.component';
+import {
+  PlanCatalogoStepComponent,
+  PlanTrack,
+} from './components/plan-catalogo-step/plan-catalogo-step.component';
+import { PlanFijoPanelComponent } from './components/plan-fijo-panel/plan-fijo-panel.component';
 import { PlanConfirmStepComponent } from './components/plan-confirm-step/plan-confirm-step.component';
 import { PlanStepperComponent } from './components/plan-stepper/plan-stepper.component';
 import { PlanSummaryCardComponent } from './components/plan-summary-card/plan-summary-card.component';
+import {
+  PlanWizardActionsComponent,
+  PlanWizardStep,
+} from './components/plan-wizard-actions/plan-wizard-actions.component';
+import { SuscripcionActualHeaderComponent } from './components/suscripcion-actual-header/suscripcion-actual-header.component';
 import { PlanUpdateConfirmDialogComponent } from './components/plan-update-confirm-dialog/plan-update-confirm-dialog.component';
-import { displayedMonthly, formatCop } from './utils/plan-pricing';
-
-type Track = 'facturacion' | 'erp';
+import { displayedMonthly, formatCop, tienePrecio } from './utils/plan-pricing';
 
 const STEP_LABELS = ['Plan', 'Facturación', 'Confirmar'] as const;
 
@@ -39,15 +43,13 @@ const STEP_LABELS = ['Plan', 'Facturación', 'Confirmar'] as const;
 // planes comprables), preseleccionamos Expansión Facturación.
 const FALLBACK_PRESELECTED_PLAN_ID = 5;
 
-// Clase comercial: agrupa todos los planes de Facturación y ERP comprables.
-const SUSCRIPCION_CLASE_COMERCIAL = 1;
-
 @Component({
   selector: 'app-planes',
   standalone: true,
   imports: [
     RouterLink,
-    PlanCardComponent,
+    PlanCatalogoStepComponent,
+    PlanFijoPanelComponent,
     PlanStepperComponent,
     BillingProfileCardComponent,
     BillingProfileCreateDialogComponent,
@@ -55,6 +57,8 @@ const SUSCRIPCION_CLASE_COMERCIAL = 1;
     PlanSummaryCardComponent,
     PlanConfirmStepComponent,
     PlanUpdateConfirmDialogComponent,
+    PlanWizardActionsComponent,
+    SuscripcionActualHeaderComponent,
   ],
   templateUrl: './planes.component.html',
 })
@@ -69,13 +73,34 @@ export class PlanesComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly isLoading = signal(true);
+  private readonly cargandoCatalogo = signal(true);
+  /** El GET de la suscripción terminó (bien o mal): ya se sabe qué modo de plan aplica. */
+  private readonly suscripcionResuelta = signal(false);
   readonly allPlanes = signal<SuscripcionTipo[]>([]);
   readonly suscripcionId = signal<number | null>(null);
   readonly suscripcion = signal<Suscripcion | null>(null);
 
-  readonly step = signal<0 | 1 | 2>(0);
-  readonly track = signal<Track>('facturacion');
+  /**
+   * Plan de una suscripción que no elige del catálogo (Personalizado, Contador): se renueva
+   * el mismo, con el precio que define su clase. `null` → se elige del catálogo.
+   */
+  readonly planFijo = computed<PlanFijo | null>(() => {
+    const s = this.suscripcion();
+    return s ? planFijoDeSuscripcion(s) : null;
+  });
+
+  // Hasta saber la clase de la suscripción no se pinta el catálogo, que no aplica a todas.
+  readonly isLoading = computed(
+    () => this.cargandoCatalogo() || (this.suscripcionId() !== null && !this.suscripcionResuelta()),
+  );
+
+  private readonly planesDisponibles = computed<readonly SuscripcionTipo[]>(() => {
+    const fijo = this.planFijo();
+    return fijo ? [fijo.plan] : this.allPlanes();
+  });
+
+  readonly step = signal<PlanWizardStep>(0);
+  readonly track = signal<PlanTrack>('facturacion');
   readonly annual = signal(false);
   readonly selectedPlanId = signal<number | null>(null);
 
@@ -94,7 +119,9 @@ export class PlanesComponent implements OnInit {
 
   readonly stepLabels = STEP_LABELS;
 
-  readonly visiblePlanes = computed(() => {
+  readonly visiblePlanes = computed<readonly SuscripcionTipo[]>(() => {
+    const fijo = this.planFijo();
+    if (fijo) return [fijo.plan];
     const categoria =
       this.track() === 'erp' ? SUSCRIPCION_CATEGORIA_ERP : SUSCRIPCION_CATEGORIA_FACTURACION;
     return this.allPlanes().filter((p) => p.suscripcion_categoria_id === categoria);
@@ -103,31 +130,10 @@ export class PlanesComponent implements OnInit {
   readonly selectedPlan = computed<SuscripcionTipo | null>(() => {
     const id = this.selectedPlanId();
     if (id === null) return null;
-    return this.allPlanes().find((p) => p.id === id) ?? null;
-  });
-
-  readonly clienteIniciales = computed(() => {
-    const s = this.suscripcion();
-    return s ? getInitials(s.cliente_nombre) : '';
+    return this.planesDisponibles().find((p) => p.id === id) ?? null;
   });
 
   readonly currentSuscripcionTipoId = computed(() => this.suscripcion()?.suscripcion_tipo ?? null);
-
-  readonly suscripcionStats = computed(() => {
-    const s = this.suscripcion();
-    if (!s) return null;
-    const status = getSuscripcionStatus(s);
-    const frecuenciaLabel = getSuscripcionFrecuenciaLabel(s.frecuencia);
-    const saldoRestante = formatCop(calcularSaldoNoConsumido(s));
-    return {
-      daysLeft: status.left,
-      tone: status.tone,
-      fechaFin: formatSuscripcionFechaFin(s.fecha_fin),
-      frecuenciaLabel,
-      saldoRestante,
-      expired: status.expired,
-    };
-  });
 
   readonly cambioPlanCalc = computed(() => {
     const sus = this.suscripcion();
@@ -151,8 +157,17 @@ export class PlanesComponent implements OnInit {
     return this.billingProfiles().find((p) => p.id === id) ?? null;
   });
 
+  /**
+   * El plan elegido llega sin precio (p. ej. un personalizado al que aún no le fijaron valor).
+   * No se deja avanzar: con costo 0 el cambio saldría «cubierto con saldo» y se activaría gratis.
+   */
+  readonly planSinPrecio = computed(() => {
+    const plan = this.selectedPlan();
+    return plan !== null && !tienePrecio(plan.precio);
+  });
+
   readonly canGoNext = computed(() => {
-    if (this.step() === 0) return this.selectedPlanId() !== null;
+    if (this.step() === 0) return this.selectedPlan() !== null && !this.planSinPrecio();
     if (this.step() === 1) return this.selectedBillingProfileId() !== null;
     return true;
   });
@@ -162,6 +177,12 @@ export class PlanesComponent implements OnInit {
   readonly stepHeader = computed<{ title: string; subtitle: string }>(() => {
     switch (this.step()) {
       case 0:
+        if (this.planFijo()) {
+          return {
+            title: 'Renueva tu plan',
+            subtitle: 'Elige cada cuánto quieres pagar.',
+          };
+        }
         return {
           title: 'Selecciona un plan',
           subtitle: 'Elige entre planes de Facturación o ERP y la frecuencia de facturación.',
@@ -179,8 +200,6 @@ export class PlanesComponent implements OnInit {
         };
     }
   });
-
-  readonly skeletonCells = [0, 1, 2, 3];
 
   readonly selectedMonthlyLabel = computed(() => {
     const plan = this.selectedPlan();
@@ -211,25 +230,29 @@ export class PlanesComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.suscripcion.set(res);
+          this.suscripcionResuelta.set(true);
           this.tryPreselectPlan();
         },
-        error: (err) => console.error('[planes] error GET suscripcion detalle:', err),
+        error: (err) => {
+          this.suscripcionResuelta.set(true);
+          console.error('[planes] error GET suscripcion detalle:', err);
+        },
       });
   }
 
   private loadPlanes(): void {
     this.tiposService
-      .getClase(SUSCRIPCION_CLASE_COMERCIAL)
+      .getClase(SUSCRIPCION_CLASE.COMERCIAL)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.allPlanes.set([...res.results]);
-          this.isLoading.set(false);
+          this.cargandoCatalogo.set(false);
           this.tryPreselectPlan();
         },
         error: (err) => {
           console.error('[planes] error:', err);
-          this.isLoading.set(false);
+          this.cargandoCatalogo.set(false);
           this.toast.error('Error', 'No se pudieron cargar los planes.');
         },
       });
@@ -251,10 +274,16 @@ export class PlanesComponent implements OnInit {
   }
 
   private tryPreselectPlan(): void {
-    const planes = this.allPlanes();
     const sus = this.suscripcion();
-    if (planes.length === 0 || sus === null) return;
-    if (this.selectedPlanId() !== null) return;
+    if (sus === null || this.selectedPlanId() !== null) return;
+    const fijo = this.planFijo();
+    if (fijo) {
+      this.selectedPlanId.set(fijo.plan.id);
+      if (sus.frecuencia === 'A') this.annual.set(true);
+      return;
+    }
+    const planes = this.allPlanes();
+    if (planes.length === 0) return;
     const current = planes.find((p) => p.id === sus.suscripcion_tipo);
     if (current) {
       this.selectedPlanId.set(current.id);
@@ -333,12 +362,12 @@ export class PlanesComponent implements OnInit {
     return this.selectedBillingProfileId() === profile.id;
   }
 
-  setTrack(t: Track): void {
+  setTrack(t: PlanTrack): void {
     this.track.set(t);
   }
 
-  toggleAnnual(): void {
-    this.annual.update((v) => !v);
+  setAnnual(annual: boolean): void {
+    this.annual.set(annual);
   }
 
   onPlanSelected(plan: SuscripcionTipo): void {
@@ -348,7 +377,7 @@ export class PlanesComponent implements OnInit {
   goNext(): void {
     if (!this.canGoNext()) return;
     if (this.step() < 2) {
-      this.step.update((s) => (s + 1) as 0 | 1 | 2);
+      this.step.update((s) => (s + 1) as PlanWizardStep);
     }
   }
 
@@ -357,23 +386,10 @@ export class PlanesComponent implements OnInit {
       this.router.navigate(['/suscripciones']);
       return;
     }
-    this.step.update((s) => (s - 1) as 0 | 1 | 2);
+    this.step.update((s) => (s - 1) as PlanWizardStep);
   }
 
-  isPopular(plan: SuscripcionTipo): boolean {
-    return plan.nombre.startsWith('Expansión');
-  }
-
-  isCurrent(plan: SuscripcionTipo): boolean {
-    const tipoId = this.currentSuscripcionTipoId();
-    return tipoId !== null && tipoId === plan.id;
-  }
-
-  isSelected(plan: SuscripcionTipo): boolean {
-    return this.selectedPlanId() === plan.id;
-  }
-
-  goToStep(step: 0 | 1 | 2): void {
+  goToStep(step: PlanWizardStep): void {
     this.step.set(step);
   }
 

@@ -28,7 +28,7 @@ import {
   provideObservabilidad,
   provideI18n,
 } from '@reddoc/core';
-import { authEs, authEn, phoneInputEs, phoneInputEn } from '@reddoc/ui';
+import { authEs, authEn, phoneInputEs, phoneInputEn, soporteEs, soporteEn } from '@reddoc/ui';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 
@@ -54,8 +54,8 @@ export const appConfig: ApplicationConfig = {
     }),
     MessageService,
     provideI18n({
-      es: { auth: authEs, phoneInput: phoneInputEs },
-      en: { auth: authEn, phoneInput: phoneInputEn },
+      es: { auth: authEs, phoneInput: phoneInputEs, soporte: soporteEs },
+      en: { auth: authEn, phoneInput: phoneInputEn, soporte: soporteEn },
     }),
     { provide: ENVIRONMENT, useValue: environment },
     {

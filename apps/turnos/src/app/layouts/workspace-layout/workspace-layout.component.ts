@@ -3,7 +3,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { I18nService, TenantService } from '@reddoc/core';
-import { AppSwitcherComponent } from '@reddoc/ui';
+import { AppSwitcherComponent, SoporteComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import type { AppDict } from '@turnos/i18n';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
@@ -34,6 +34,7 @@ import type {
     DrawerModule,
     UserMenuComponent,
     AppSwitcherComponent,
+    SoporteComponent,
     TenantBadgeComponent,
   ],
   templateUrl: './workspace-layout.component.html',

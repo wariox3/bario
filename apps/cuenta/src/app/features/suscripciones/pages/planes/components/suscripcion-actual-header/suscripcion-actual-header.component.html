@@ -1,0 +1,95 @@
+<div
+  class="mb-6 rounded-[10px] border border-[rgba(20,48,73,0.12)] bg-brand-surface overflow-hidden"
+>
+  <!-- Fila superior: avatar + cliente + plan -->
+  <div class="flex items-center gap-3 p-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[rgba(20,48,73,0.12)] bg-brand-bg text-[0.82rem] font-semibold text-brand-text tracking-[0.02em]"
+    >
+      {{ iniciales() }}
+    </span>
+    <div class="flex-1 min-w-0">
+      <div
+        class="tabular-nums text-[0.62rem] tracking-[0.16em] uppercase text-brand-muted font-semibold mb-0.5"
+      >
+        Suscripción actual
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[0.92rem] font-semibold text-brand-text truncate">
+          {{ suscripcion().cliente_nombre }}
+        </span>
+        <span class="text-brand-muted/60 text-[0.75rem]">·</span>
+        <span class="text-[0.78rem] text-brand-muted">
+          Plan actual: {{ suscripcion().suscripcion_tipo_nombre }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila inferior: stats de la suscripción vigente -->
+  @if (estadisticas(); as stats) {
+    <div
+      class="border-t border-[rgba(20,48,73,0.07)] bg-[rgba(20,48,73,0.02)] grid grid-cols-2 sm:grid-cols-4 divide-x divide-[rgba(20,48,73,0.07)]"
+    >
+      <!-- Días restantes -->
+      <div class="flex flex-col gap-0.5 px-4 py-2.5">
+        <span
+          class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
+        >
+          Días restantes
+        </span>
+        <span
+          class="text-[0.88rem] font-bold tabular-nums"
+          [class.text-emerald-600]="stats.tone === 'success'"
+          [class.text-amber-600]="stats.tone === 'warn'"
+          [class.text-rose-600]="stats.tone === 'danger'"
+        >
+          @if (stats.expired) {
+            Vencida
+          } @else {
+            {{ stats.daysLeft }}
+            <span class="text-[0.7rem] font-normal text-brand-muted">
+              {{ stats.daysLeft === 1 ? 'día' : 'días' }}
+            </span>
+          }
+        </span>
+      </div>
+
+      <!-- Fecha de vencimiento -->
+      <div class="flex flex-col gap-0.5 px-4 py-2.5">
+        <span
+          class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
+        >
+          Vence
+        </span>
+        <span class="text-[0.88rem] font-semibold text-brand-text">
+          {{ stats.fechaFin }}
+        </span>
+      </div>
+
+      <!-- Frecuencia -->
+      <div class="flex flex-col gap-0.5 px-4 py-2.5">
+        <span
+          class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
+        >
+          Frecuencia
+        </span>
+        <span class="text-[0.88rem] font-semibold text-brand-text">
+          {{ stats.frecuenciaLabel }}
+        </span>
+      </div>
+
+      <!-- Saldo restante -->
+      <div class="flex flex-col gap-0.5 px-4 py-2.5">
+        <span
+          class="tabular-nums text-[0.58rem] tracking-[0.14em] uppercase font-semibold text-brand-muted"
+        >
+          Saldo restante
+        </span>
+        <span class="text-[0.88rem] font-semibold text-brand-text tabular-nums">
+          {{ stats.saldoRestante }}
+        </span>
+      </div>
+    </div>
+  }
+</div>

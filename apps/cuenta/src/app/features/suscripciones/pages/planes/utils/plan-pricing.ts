@@ -7,6 +7,11 @@ export function parsePrecio(precio: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
+/** Un plan sin precio (0, vacío o inválido) no se puede cobrar ni activar. */
+export function tienePrecio(precio: string): boolean {
+  return parsePrecio(precio) > 0;
+}
+
 export function displayedMonthly(precio: string, annual: boolean): number {
   const base = parsePrecio(precio);
   return annual ? Math.round(base * (1 - ANNUAL_DISCOUNT)) : Math.round(base);
