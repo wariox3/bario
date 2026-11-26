@@ -126,12 +126,19 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
     ];
   });
 
-  /** Las filas que esperan respuesta de la DIAN no pintan check. */
-  protected readonly esSeleccionable = esSeleccionable;
+  /**
+   * Las filas que esperan respuesta de la DIAN no pintan check, salvo que la
+   * pantalla las reemita (nómina). `undefined` deja todas marcables.
+   */
+  protected readonly esSeleccionable = computed(() =>
+    this.config().reemitePendientes ? undefined : esSeleccionable,
+  );
 
-  /** Seleccionadas que aún se pueden emitir; resguardo si una cambió de estado. */
+  /** Seleccionadas que se pueden emitir; resguardo si una cambió de estado. */
   private readonly emitibles = computed(() =>
-    this.selectedRows().filter((row) => !esperaRespuesta(row)),
+    this.config().reemitePendientes
+      ? this.selectedRows()
+      : this.selectedRows().filter((row) => !esperaRespuesta(row)),
   );
 
   protected readonly canEmitir = computed(
@@ -214,6 +221,9 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
           switch (clasificarEmision(resultado)) {
             case 'exito':
               this.toast.success(toast.success.title, toast.success.desc);
+              break;
+            case 'pendiente':
+              this.toast.info(conError.pendiente.title, conError.pendiente.desc);
               break;
             case 'parcial':
               this.toast.warn(conError.parcial.title, conError.parcial.desc);

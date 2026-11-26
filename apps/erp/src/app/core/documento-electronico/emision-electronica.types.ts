@@ -70,5 +70,12 @@ export interface EmitirDocumentoElectronicoConfig {
   readonly storageKey: string;
   /** Ofrece "Descartar" (irreversible). Exige `textos.descartar` y `toasts.descartar`. */
   readonly descartable: boolean;
+  /**
+   * Lo que espera respuesta de la DIAN se puede volver a marcar y emitir. Solo la
+   * nómina: rededoc no avisa su veredicto, y reemitirla es como se consulta (no
+   * se crea de nuevo). En venta y compra el veredicto llega solo y `emitir/` salta
+   * las ya enviadas, así que ahí quedan sin check.
+   */
+  readonly reemitePendientes?: boolean;
   readonly textos: (t: AppDict) => EmisionElectronicaTextos;
 }
