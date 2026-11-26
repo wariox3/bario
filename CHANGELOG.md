@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.34](https://github.com/wariox3/bario/compare/v0.1.33...v0.1.34) (2026-11-26)
+
+### Features
+
+- **cuenta:** elegir el plan según la clase de la suscripción ([17d678d](https://github.com/wariox3/bario/commit/17d678dec25a06fa0d4edae54906a80175e7a871))
+- **ui:** contacto con soporte en el header de las apps ([012c6f5](https://github.com/wariox3/bario/commit/012c6f51b78b0ab84891bfb5425bc2a2f692312f))
+
 ## [0.1.33](https://github.com/wariox3/bario/compare/v0.1.32...v0.1.33) (2026-11-25)
 
 ### Features
