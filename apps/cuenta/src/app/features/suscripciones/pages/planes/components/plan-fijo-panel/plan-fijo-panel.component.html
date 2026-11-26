@@ -1,0 +1,136 @@
+<div class="rounded-xl border border-[rgba(20,48,73,0.12)] bg-brand-surface overflow-hidden">
+  <!-- Identidad del plan -->
+  <div class="flex items-start gap-4 p-5 max-[576px]:p-4">
+    <span
+      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-brand-text text-[0.85rem] font-semibold text-white tracking-[0.02em]"
+      aria-hidden="true"
+    >
+      {{ iniciales() }}
+    </span>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap mb-0.5">
+        <span class="text-[0.62rem] font-semibold tracking-[0.14em] uppercase text-brand-muted">
+          {{ etiqueta() }}
+        </span>
+        <span
+          class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-[2px] text-[0.62rem] font-semibold text-emerald-700"
+        >
+          <i class="pi pi-check-circle text-[0.58rem]"></i>
+          Plan actual
+        </span>
+      </div>
+      <h3 class="m-0 text-[1.05rem] font-semibold text-brand-text tracking-[-0.01em] leading-tight">
+        {{ plan().nombre }}
+      </h3>
+      <p class="m-0 mt-1 text-[0.78rem] text-brand-muted leading-snug max-w-[56ch]">
+        {{ descripcion() }}
+      </p>
+    </div>
+  </div>
+
+  @if (sinPrecio()) {
+    <!-- Sin precio no hay nada que elegir: mostrar $0 por mes invitaría a activarlo gratis -->
+    <div
+      class="flex items-start gap-3 border-t border-[rgba(20,48,73,0.08)] bg-amber-50/60 p-5 max-[576px]:p-4"
+      role="status"
+    >
+      <span
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700"
+      >
+        <i class="pi pi-exclamation-circle text-[0.85rem]"></i>
+      </span>
+      <div>
+        <p class="m-0 text-[0.82rem] font-semibold text-brand-text">
+          Tu plan aún no tiene un precio definido
+        </p>
+        <p class="m-0 mt-0.5 text-[0.76rem] text-brand-muted leading-snug">
+          No es posible renovarlo hasta que se le asigne uno. Comunícate con soporte para definirlo.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <!-- Frecuencia: la única decisión -->
+    <div
+      class="border-t border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] p-5 max-[576px]:p-4"
+      role="radiogroup"
+      aria-label="Frecuencia de pago"
+    >
+      <div class="text-[0.78rem] font-semibold text-brand-text mb-3">
+        ¿Cada cuánto quieres pagar?
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Mensual -->
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="!annual()"
+          (click)="elegir(false)"
+          class="relative text-left rounded-[10px] px-4 py-3.5 cursor-pointer transition-all duration-150"
+          [class]="
+            !annual()
+              ? 'border-2 border-brand-blue bg-brand-blue/6'
+              : 'border border-[rgba(20,48,73,0.18)] bg-brand-surface hover:border-brand-blue/40'
+          "
+        >
+          <span
+            class="absolute top-3.5 right-3.5 h-[17px] w-[17px] rounded-full bg-brand-surface transition-all duration-150"
+            [class]="
+              !annual() ? 'border-[5px] border-brand-blue' : 'border-[1.5px] border-brand-muted/50'
+            "
+          ></span>
+          <div class="text-[0.82rem] font-semibold text-brand-text mb-1.5">Mensual</div>
+          <div class="flex items-baseline gap-1">
+            <span
+              class="text-[1.35rem] font-bold text-brand-text tracking-[-0.02em] leading-none tabular-nums"
+            >
+              {{ mensualLabel() }}
+            </span>
+            <span class="text-[0.75rem] text-brand-muted">/mes</span>
+          </div>
+          <div class="mt-1 text-[0.7rem] text-brand-muted">Se cobra cada mes</div>
+        </button>
+
+        <!-- Anual -->
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="annual()"
+          (click)="elegir(true)"
+          class="relative text-left rounded-[10px] px-4 py-3.5 cursor-pointer transition-all duration-150"
+          [class]="
+            annual()
+              ? 'border-2 border-brand-blue bg-brand-blue/6'
+              : 'border border-[rgba(20,48,73,0.18)] bg-brand-surface hover:border-brand-blue/40'
+          "
+        >
+          <span
+            class="absolute top-3.5 right-3.5 h-[17px] w-[17px] rounded-full bg-brand-surface transition-all duration-150"
+            [class]="
+              annual() ? 'border-[5px] border-brand-blue' : 'border-[1.5px] border-brand-muted/50'
+            "
+          ></span>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[0.82rem] font-semibold text-brand-text">Anual</span>
+            <span
+              class="inline-flex items-center rounded-full border border-brand-blue/40 bg-brand-blue/10 px-2 py-[1px] text-[0.62rem] font-semibold text-brand-blue"
+            >
+              {{ descuentoLabel }}
+            </span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span
+              class="text-[1.35rem] font-bold text-brand-text tracking-[-0.02em] leading-none tabular-nums"
+            >
+              {{ anualMensualLabel() }}
+            </span>
+            <span class="text-[0.75rem] text-brand-muted">/mes</span>
+          </div>
+          <div class="mt-1 text-[0.7rem] text-brand-muted tabular-nums">
+            {{ anualTotalLabel() }} facturados al año
+          </div>
+        </button>
+      </div>
+    </div>
+  }
+</div>

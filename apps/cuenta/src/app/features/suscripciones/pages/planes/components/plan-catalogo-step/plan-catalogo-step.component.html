@@ -1,0 +1,126 @@
+<div class="animate-fade-up">
+  <!-- Controls: category tabs + frequency toggle -->
+  <div class="flex items-center justify-between gap-4 mb-5 flex-wrap">
+    <!-- Category tabs -->
+    <div
+      class="inline-flex bg-brand-bg border border-[rgba(20,48,73,0.12)] rounded-[8px] p-[3px] gap-0.5"
+      role="tablist"
+      aria-label="Categoría"
+    >
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="track() === 'facturacion'"
+        (click)="trackChange.emit('facturacion')"
+        class="px-5 py-1.5 rounded-md text-[0.82rem] transition-all duration-150"
+        [class]="
+          track() === 'facturacion'
+            ? 'bg-brand-blue text-white font-semibold'
+            : 'text-brand-muted font-medium hover:text-brand-blue'
+        "
+      >
+        Facturación
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="track() === 'erp'"
+        (click)="trackChange.emit('erp')"
+        class="px-5 py-1.5 rounded-md text-[0.82rem] transition-all duration-150"
+        [class]="
+          track() === 'erp'
+            ? 'bg-brand-blue text-white font-semibold'
+            : 'text-brand-muted font-medium hover:text-brand-blue'
+        "
+      >
+        ERP
+      </button>
+    </div>
+
+    <!-- Frequency toggle -->
+    <div class="inline-flex items-center gap-2.5">
+      <span
+        class="text-[0.82rem] transition-colors duration-150"
+        [class]="!annual() ? 'font-semibold text-brand-text' : 'font-normal text-brand-muted'"
+      >
+        Mensual
+      </span>
+
+      <button
+        type="button"
+        role="switch"
+        [attr.aria-checked]="annual()"
+        (click)="annualChange.emit(!annual())"
+        class="relative w-[42px] h-[24px] rounded-full border-0 cursor-pointer transition-colors duration-200"
+        [class]="annual() ? 'bg-brand-blue' : 'bg-[rgba(20,48,73,0.18)]'"
+      >
+        <span
+          class="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.18)] transition-[left] duration-200"
+          [style.left.px]="annual() ? 20 : 2"
+        ></span>
+      </button>
+
+      <span
+        class="text-[0.82rem] transition-colors duration-150"
+        [class]="annual() ? 'font-semibold text-brand-text' : 'font-normal text-brand-muted'"
+      >
+        Anual
+      </span>
+
+      <span
+        class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.68rem] font-semibold tracking-[0.02em] border transition-all duration-150"
+        [class]="
+          annual()
+            ? 'border-brand-blue text-brand-blue bg-brand-blue/10'
+            : 'border-[rgba(20,48,73,0.18)] text-brand-muted'
+        "
+      >
+        {{ descuentoLabel }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading skeleton -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+      @for (cell of skeletonCells; track $index) {
+        <div
+          class="border border-[rgba(20,48,73,0.12)] rounded-xl p-5 flex flex-col gap-3 bg-brand-surface min-h-[180px] animate-pulse"
+        >
+          <div class="h-[0.55rem] w-12 rounded bg-[rgba(20,48,73,0.07)]"></div>
+          <div class="h-[0.9rem] w-2/3 rounded bg-[rgba(20,48,73,0.09)]"></div>
+          <div class="mt-auto flex items-baseline gap-2">
+            <div class="h-6 w-20 rounded bg-[rgba(20,48,73,0.09)]"></div>
+            <div class="h-[0.55rem] w-8 rounded bg-[rgba(20,48,73,0.05)]"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty -->
+  @else if (planes().length === 0) {
+    <div class="py-10 text-center">
+      <p class="m-0 text-[0.85rem] font-semibold text-brand-text mb-1">Sin planes</p>
+      <p class="m-0 text-[0.76rem] text-brand-muted">
+        No hay planes disponibles en esta categoría.
+      </p>
+    </div>
+  }
+
+  <!-- Grid -->
+  @else {
+    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 pt-2.5">
+      @for (plan of planes(); track plan.id) {
+        <app-plan-card
+          [plan]="plan"
+          [annual]="annual()"
+          [selected]="plan.id === selectedId()"
+          [current]="plan.id === currentId()"
+          [popular]="esRecomendado(plan)"
+          (planSelected)="planSelected.emit($event)"
+        />
+      }
+    </div>
+  }
+</div>

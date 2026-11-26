@@ -1,0 +1,102 @@
+<div class="flex justify-between items-center gap-3 flex-wrap">
+  <button
+    type="button"
+    (click)="volver.emit()"
+    class="px-4 py-2.5 rounded-lg border border-[rgba(20,48,73,0.18)] bg-transparent text-brand-text text-[0.85rem] font-medium cursor-pointer inline-flex items-center gap-1.5 transition-all duration-150 hover:border-brand-blue/40 hover:bg-[rgba(20,48,73,0.03)]"
+  >
+    <i class="pi pi-arrow-left text-[0.7rem]"></i>
+    {{ step() === 0 ? 'Volver' : 'Atrás' }}
+  </button>
+
+  <div class="flex items-center gap-2.5 flex-wrap justify-end">
+    @switch (step()) {
+      @case (0) {
+        @if (plan() && planSinPrecio()) {
+          <span class="inline-flex items-center gap-1.5 text-[0.75rem] text-amber-700">
+            <i class="pi pi-exclamation-circle text-[0.72rem]"></i>
+            Este plan no tiene un precio definido
+          </span>
+        } @else if (plan(); as p) {
+          <span class="text-[0.78rem] text-brand-muted tabular-nums">
+            {{ p.nombre }} ·
+            <strong class="text-brand-text font-semibold">{{ montoMensualLabel() }}/mes</strong>
+          </span>
+        } @else {
+          <span class="text-[0.75rem] text-brand-muted">Selecciona un plan para continuar</span>
+        }
+      }
+      @case (1) {
+        @if (billingProfile(); as bp) {
+          <span class="text-[0.78rem] text-brand-muted">
+            Facturar a
+            <strong class="text-brand-text font-semibold">{{ bp.nombre }}</strong>
+          </span>
+        } @else {
+          <span class="text-[0.75rem] text-brand-muted">Selecciona un perfil de facturación</span>
+        }
+      }
+      @case (2) {
+        @if (cubiertoConSaldo()) {
+          <span class="text-[0.78rem] text-emerald-700 font-semibold tabular-nums">
+            Cubierto con saldo
+          </span>
+        } @else if (plan()) {
+          <span class="text-[0.78rem] text-brand-muted tabular-nums">
+            Total
+            <strong class="text-brand-text font-semibold">{{ montoMensualLabel() }}</strong>
+            {{ annual() ? '/mes (anual)' : '/mes' }}
+          </span>
+        }
+      }
+    }
+
+    @if (step() < 2) {
+      <button
+        type="button"
+        (click)="continuar.emit()"
+        [disabled]="!canGoNext()"
+        class="px-5 py-2.5 rounded-lg border-0 text-[0.85rem] font-semibold inline-flex items-center gap-1.5 transition-all duration-150"
+        [class]="
+          canGoNext()
+            ? 'bg-brand-blue text-white cursor-pointer hover:bg-[#0086d4]'
+            : 'bg-[rgba(20,48,73,0.12)] text-brand-muted cursor-not-allowed'
+        "
+      >
+        Continuar
+        <i class="pi pi-arrow-right text-[0.7rem]"></i>
+      </button>
+    } @else {
+      <button
+        type="button"
+        (click)="confirmar.emit()"
+        [disabled]="enviando()"
+        class="px-5 py-2.5 rounded-lg border-0 text-[0.85rem] font-semibold inline-flex items-center gap-2 transition-all duration-150 min-w-[200px] justify-center"
+        [class]="
+          enviando()
+            ? 'bg-[rgba(20,48,73,0.12)] text-brand-muted cursor-not-allowed'
+            : 'bg-brand-blue text-white cursor-pointer hover:bg-[#0086d4]'
+        "
+      >
+        @if (cubiertoConSaldo()) {
+          @if (enviando()) {
+            <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+            Actualizando…
+          } @else {
+            <i class="pi pi-refresh text-[0.7rem]"></i>
+            Actualizar plan
+            <i class="pi pi-arrow-right text-[0.7rem]"></i>
+          }
+        } @else {
+          @if (enviando()) {
+            <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+            Redirigiendo a Wompi…
+          } @else {
+            <i class="pi pi-lock text-[0.7rem]"></i>
+            Pagar y activar
+            <i class="pi pi-arrow-right text-[0.7rem]"></i>
+          }
+        }
+      </button>
+    }
+  </div>
+</div>
