@@ -6,7 +6,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { DrawerModule } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
 import { I18nService, TenantService } from '@reddoc/core';
-import { AppSwitcherComponent } from '@reddoc/ui';
+import { AppSwitcherComponent, SoporteComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { PestanaUnicaService } from '../../core/pestana/pestana-unica.service';
 import { PosStorageService } from '../../core/storage/pos-storage.service';
@@ -46,6 +46,7 @@ import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
     TooltipModule,
     UserMenuComponent,
     AppSwitcherComponent,
+    SoporteComponent,
     TenantBadgeComponent,
     TurnoChipComponent,
   ],

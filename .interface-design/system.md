@@ -182,6 +182,42 @@ El componente es **agnóstico de app**. Lo único que cambia por app son sus pro
   saltar hay que reelegir empresa. Y reemplazar el monograma por SVG real cuando exista en
   `libs/ui/src/assets/logos/`.
 
+## Patrón: contacto con soporte (`<lib-soporte>` en el header)
+
+`libs/ui/src/lib/soporte/` (`<lib-soporte>`, vía `@reddoc/ui`) — va en `app-header__actions`,
+**antes** del app-switcher. Lo consumen erp, turnos y pos (workspace y shell) y cuenta.
+
+- **Por qué en el header y no al pie del sidebar:** el sidebar no es constante. En el ERP solo
+  existe con módulo activo, el selector de empresas (`shell-layout`) no tiene, bajo 768px es un
+  drawer y en el POS se colapsa a riel. El header está en todas las pantallas.
+- **Trigger:** `pi pi-headphones` + texto «Soporte» (`0.8rem/500` muted), alto `32px`, radius `6px`,
+  hover/abierto `rgba(19 38 60 / 0.06)` — la familia del waffle. Bajo `lg` queda solo el ícono
+  (`hidden lg:inline`). Para el cliente los audífonos significan soporte; el otro uso del ícono
+  (pill «Acceso de soporte») solo lo ve nuestro equipo.
+- **Interacción:** hover con gracia de 150ms + clic + `Escape` + clic-fuera, como el app-switcher.
+  Diferencia: un clic a menos de 400ms de la apertura por hover **no cierra** (con mouse el hover
+  ya abrió; en touch el tap dispara `mouseenter` justo antes del `click`).
+- **Panel:** el chrome del app-switcher (`absolute top-[calc(100%+8px)] right-0 z-[60]`, `280px`,
+  blanco, borde `0.08`, radius `10px`, whisper-shadow, entrada `0.12s`). Encabezado `group-label`
+  y debajo una línea de invitación en `text-brand-text`.
+- **Canales = filas** (`rounded-lg px-1 py-1.5`, hover `0.04`): chip `h-8 w-8 rounded-lg` + etiqueta
+  (`0.68rem` muted) + valor (`0.85rem/500`). **Cada chip lleva el color de su canal, tintado, no
+  sólido:** WhatsApp `bg-[rgba(37,211,102,0.14)] text-[#128c4b]`; correo `bg-sky-50 text-sky-700`
+  (el chip de las fichas). Con chips navy el panel se veía plano; aquí el color sí significa algo
+  (identifica el canal), por eso es la excepción al acento único.
+  - **WhatsApp primero**, enlace directo `wa.me` en pestaña nueva, con `pi-arrow-up-right` muted
+    al final de la fila (sale de la app).
+  - **Correo** con `mailto:` + botón de copiar (`pi-copy` → `pi-check` 1.6s, `aria-live`): sin
+    cliente de correo configurado el `mailto:` no abre nada.
+- **El mensaje sale con contexto:** empresa (`cliente_nombre` o slug), aplicación
+  (`APP_BRANDING.appName`) y pantalla (`location.pathname` al abrir) viajan precargados en ambos
+  canales — es lo primero que soporte pregunta. El pie del panel los muestra como **recibo**
+  (etiqueta · guía punteada · valor) para que se sepa qué viaja. Sin empresa ni app, el pie no
+  se pinta.
+- **Datos de contacto:** única fuente en `soporte.constants.ts` (`SOPORTE_CONTACTO`).
+- **i18n:** dict propio (`SoporteTranslationsHost` + `soporteEs/En`, desde `@reddoc/ui/i18n`),
+  como el app-switcher. Una app nueva lo suma a su `AppDict` y pone `<lib-soporte />` en su header.
+
 ## Patrón: banda de vigencia + tabla de días acotada por rango
 
 Para tablas de "un input por día del mes" (calendario editable) donde solo un **subrango** de

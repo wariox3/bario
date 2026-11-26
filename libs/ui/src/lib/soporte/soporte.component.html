@@ -1,0 +1,123 @@
+<button
+  type="button"
+  class="flex h-8 cursor-pointer items-center gap-1.5 rounded-md border-none bg-transparent px-2 text-[0.8rem] font-medium text-brand-muted transition-colors duration-[120ms] hover:bg-[rgba(19,38,60,0.06)] hover:text-brand-text data-[open=true]:bg-[rgba(19,38,60,0.06)] data-[open=true]:text-brand-text"
+  [attr.data-open]="open()"
+  (click)="toggle()"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="open()"
+  aria-controls="soporte-panel"
+  [attr.aria-label]="t().soporte.trigger"
+>
+  <i class="pi pi-headphones text-[1rem]" aria-hidden="true"></i>
+  <!-- Bajo `lg` el header no tiene aire para el texto: queda el ícono solo. -->
+  <span class="hidden leading-none lg:inline">{{ t().soporte.trigger }}</span>
+</button>
+
+@if (open()) {
+  <div
+    id="soporte-panel"
+    role="dialog"
+    [attr.aria-label]="t().soporte.trigger"
+    class="soporte-panel absolute top-[calc(100%+8px)] right-0 z-[60] w-[280px] rounded-[10px] border border-[rgba(19,38,60,0.08)] bg-white p-3 shadow-[0_10px_30px_rgba(19,38,60,0.1)]"
+  >
+    <p
+      class="m-0 px-1 text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
+    >
+      {{ t().soporte.trigger }}
+    </p>
+    <p class="m-0 mt-1 px-1 text-[0.8rem] leading-snug text-brand-text">
+      {{ t().soporte.lede }}
+    </p>
+
+    <div class="mt-2.5 flex flex-col gap-0.5">
+      <a
+        class="flex items-center gap-2.5 rounded-lg px-1 py-1.5 no-underline transition-colors duration-[120ms] hover:bg-[rgba(19,38,60,0.04)]"
+        [href]="whatsappHref()"
+        target="_blank"
+        rel="noopener"
+      >
+        <span
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgba(37,211,102,0.14)] text-[#128c4b]"
+        >
+          <i class="pi pi-whatsapp text-[1.05rem]" aria-hidden="true"></i>
+        </span>
+        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span class="text-[0.68rem] leading-none font-medium text-brand-muted">
+            {{ t().soporte.whatsapp }}
+          </span>
+          <span class="text-[0.85rem] leading-tight font-medium text-brand-text tabular-nums">
+            {{ contacto.whatsapp }}
+          </span>
+        </span>
+        <i class="pi pi-arrow-up-right mr-2 text-[0.7rem] text-brand-muted" aria-hidden="true"></i>
+      </a>
+
+      <div class="flex items-center gap-1">
+        <a
+          class="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1 py-1.5 no-underline transition-colors duration-[120ms] hover:bg-[rgba(19,38,60,0.04)]"
+          [href]="correoHref()"
+        >
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700"
+          >
+            <i class="pi pi-envelope text-[0.95rem]" aria-hidden="true"></i>
+          </span>
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="text-[0.68rem] leading-none font-medium text-brand-muted">
+              {{ t().soporte.correo }}
+            </span>
+            <span class="truncate text-[0.85rem] leading-tight font-medium text-brand-text">
+              {{ contacto.correo }}
+            </span>
+          </span>
+        </a>
+        <!-- Sin cliente de correo configurado el `mailto:` no abre nada: copiar es la salida. -->
+        <button
+          type="button"
+          class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-brand-muted transition-colors duration-[120ms] hover:bg-[rgba(19,38,60,0.06)] hover:text-brand-text"
+          [title]="copiado() ? t().soporte.copiado : t().soporte.copiar"
+          [attr.aria-label]="t().soporte.copiar"
+          (click)="copiarCorreo()"
+        >
+          <i
+            class="pi text-[0.8rem]"
+            [class.pi-copy]="!copiado()"
+            [class.pi-check]="copiado()"
+            aria-hidden="true"
+          ></i>
+        </button>
+        <span class="sr-only" aria-live="polite">{{ copiado() ? t().soporte.copiado : '' }}</span>
+      </div>
+    </div>
+
+    @if (empresa() || app) {
+      <div class="mt-2.5 border-t border-[rgba(19,38,60,0.08)] px-1 pt-2.5">
+        <p class="m-0 text-[0.72rem] leading-snug text-brand-muted">{{ t().soporte.contexto }}</p>
+        <dl class="m-0 mt-2 flex flex-col gap-1.5">
+          @if (empresa()) {
+            <div class="flex items-baseline gap-2">
+              <dt class="shrink-0 text-[0.72rem] text-brand-muted">{{ t().soporte.empresa }}</dt>
+              <span
+                class="min-w-4 flex-1 translate-y-[-0.15rem] border-b border-dotted border-[rgba(20,48,73,0.25)]"
+                aria-hidden="true"
+              ></span>
+              <dd class="m-0 max-w-[9.5rem] truncate text-[0.78rem] font-semibold text-brand-text">
+                {{ empresa() }}
+              </dd>
+            </div>
+          }
+          @if (app) {
+            <div class="flex items-baseline gap-2">
+              <dt class="shrink-0 text-[0.72rem] text-brand-muted">{{ t().soporte.aplicacion }}</dt>
+              <span
+                class="min-w-4 flex-1 translate-y-[-0.15rem] border-b border-dotted border-[rgba(20,48,73,0.25)]"
+                aria-hidden="true"
+              ></span>
+              <dd class="m-0 text-[0.78rem] font-semibold text-brand-text">{{ app }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+    }
+  </div>
+}

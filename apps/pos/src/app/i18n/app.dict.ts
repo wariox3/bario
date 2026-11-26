@@ -5,6 +5,7 @@ import type {
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
   SaludoTranslationsHost,
+  SoporteTranslationsHost,
 } from '@reddoc/ui/i18n';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
 import type { FaseCobro } from '../features/vender/cobro/cobro.model';
@@ -18,6 +19,7 @@ export interface AppDict
   extends
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
+    SoporteTranslationsHost,
     PhoneInputTranslationsHost,
     SaludoTranslationsHost,
     ContenedoresTranslationsHost,

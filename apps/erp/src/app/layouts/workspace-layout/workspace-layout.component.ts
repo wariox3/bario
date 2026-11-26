@@ -10,7 +10,7 @@ import {
   I18nService,
   TenantService,
 } from '@reddoc/core';
-import { AppSwitcherComponent } from '@reddoc/ui';
+import { AppSwitcherComponent, SoporteComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import { PermissionsService, visibleSections } from '@erp/core/permissions';
@@ -45,6 +45,7 @@ import type {
     DrawerModule,
     UserMenuComponent,
     AppSwitcherComponent,
+    SoporteComponent,
     ModuleBarComponent,
     ModulePickerComponent,
     TenantBadgeComponent,
