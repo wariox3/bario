@@ -348,6 +348,10 @@ export const en: AppDict = {
       fase: { validacion: 'Validation', emision: 'Emission' },
       cols: { fase: 'Phase', mensaje: 'Message', fecha: 'Date' },
       toasts: {
+        pendiente: {
+          title: 'Waiting for the DIAN response',
+          desc: 'Some documents were sent but have no verdict yet. Emit them again later to check it.',
+        },
         parcial: {
           title: 'Some documents were not emitted',
           desc: 'The ones that failed are in Error status: click it to see why.',

@@ -4,10 +4,6 @@ import { APP_BRANDING, I18nService, TenantService } from '@reddoc/core';
 import type { SoporteTranslationsHost } from './i18n';
 import { SOPORTE_CONTACTO } from './soporte.constants';
 
-/** Gracia al salir con el mouse antes de cerrar; la misma del app-switcher. */
-const CLOSE_DELAY_MS = 150;
-/** Un clic tan cerca de la apertura por hover es el mismo gesto, no un cierre. */
-const HOVER_CLICK_MS = 400;
 const COPIADO_MS = 1600;
 
 /**
@@ -17,6 +13,9 @@ const COPIADO_MS = 1600;
  *
  * El mensaje (WhatsApp o correo) sale con la empresa, la app y la pantalla ya
  * escritas: es lo primero que soporte pregunta. El panel muestra esos datos para que se sepa qué viaja.
+ *
+ * Abre solo con clic, como el app-switcher. Cierra con otro clic, clic afuera o
+ * Escape.
  */
 @Component({
   selector: 'lib-soporte',
@@ -44,7 +43,6 @@ const COPIADO_MS = 1600;
       }
     }
   `,
-  host: { '(mouseenter)': 'onEnter()', '(mouseleave)': 'onLeave()' },
 })
 export class SoporteComponent {
   private readonly i18n = inject<I18nService<SoporteTranslationsHost>>(I18nService);
@@ -61,9 +59,7 @@ export class SoporteComponent {
   /** Ruta en la que se abrió el panel: la pantalla sobre la que se pide ayuda. */
   private readonly pantalla = signal('');
 
-  private closeTimer?: ReturnType<typeof setTimeout>;
   private copiadoTimer?: ReturnType<typeof setTimeout>;
-  private abiertoPorHover = 0;
 
   protected readonly empresa = computed(
     () => this.tenant.currentContenedor()?.cliente_nombre ?? this.tenant.currentSlug() ?? '',
@@ -100,27 +96,7 @@ export class SoporteComponent {
     );
   });
 
-  protected onEnter(): void {
-    this.cancelClose();
-    if (!this.open()) {
-      this.abiertoPorHover = Date.now();
-      this.abrir();
-    }
-  }
-
-  protected onLeave(): void {
-    this.cancelClose();
-    this.closeTimer = setTimeout(() => this.open.set(false), CLOSE_DELAY_MS);
-  }
-
-  /**
-   * Clic/tap sobre el botón. Con mouse el hover ya abrió el panel, y en touch el
-   * tap dispara `mouseenter` justo antes: en ambos casos ese clic no debe cerrar
-   * lo que acaba de abrirse.
-   */
   protected toggle(): void {
-    this.cancelClose();
-    if (this.open() && Date.now() - this.abiertoPorHover < HOVER_CLICK_MS) return;
     if (this.open()) this.open.set(false);
     else this.abrir();
   }
@@ -143,13 +119,6 @@ export class SoporteComponent {
   private abrir(): void {
     this.pantalla.set(this.document.location.pathname);
     this.open.set(true);
-  }
-
-  private cancelClose(): void {
-    if (this.closeTimer) {
-      clearTimeout(this.closeTimer);
-      this.closeTimer = undefined;
-    }
   }
 
   @HostListener('document:keydown.escape')

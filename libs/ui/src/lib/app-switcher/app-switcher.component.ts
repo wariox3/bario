@@ -3,9 +3,6 @@ import { CURRENT_APP, ENVIRONMENT, I18nService, TenantService } from '@reddoc/co
 import type { AppSwitcherTranslationsHost } from './i18n';
 import { SWITCHER_APPS } from './app-switcher.constants';
 
-/** Gracia al salir con el mouse antes de cerrar, para no perder el panel al cruzar el gap. */
-const CLOSE_DELAY_MS = 150;
-
 /**
  * Switcher de apps del monorepo — va en `app-header__actions`, a la izquierda
  * del user-menu. Cada app lo consume igual; lo único que cambia por app son sus
@@ -17,6 +14,9 @@ const CLOSE_DELAY_MS = 150;
  * ve el `LAST_TENANT_KEY` de las demás. Sin el slug en el href, la app destino
  * cae en su `rootRedirectGuard` y entra al último contenedor que *ella* recuerda
  * —otro, casi siempre— en vez de al que el usuario está mirando ahora.
+ *
+ * Abre solo con clic, no con hover: abrirse al cruzar el header con el mouse
+ * resultaba molesto. Cierra con otro clic, clic afuera o Escape.
  */
 @Component({
   selector: 'lib-app-switcher',
@@ -34,8 +34,6 @@ export class AppSwitcherComponent {
   protected readonly t = this.i18n.t;
   protected readonly open = signal(false);
 
-  private closeTimer?: ReturnType<typeof setTimeout>;
-
   /** Apps con URL configurada en este entorno, menos la app actual. */
   protected readonly apps = computed(() => {
     const dict = this.t().appSwitcher;
@@ -50,27 +48,8 @@ export class AppSwitcherComponent {
     });
   });
 
-  protected onEnter(): void {
-    this.cancelClose();
-    this.open.set(true);
-  }
-
-  protected onLeave(): void {
-    this.cancelClose();
-    this.closeTimer = setTimeout(() => this.open.set(false), CLOSE_DELAY_MS);
-  }
-
-  /** Click/tap sobre el trigger — abre en touch y teclado, donde no hay hover. */
   protected toggle(): void {
-    this.cancelClose();
     this.open.update((o) => !o);
-  }
-
-  private cancelClose(): void {
-    if (this.closeTimer) {
-      clearTimeout(this.closeTimer);
-      this.closeTimer = undefined;
-    }
   }
 
   @HostListener('document:keydown.escape')

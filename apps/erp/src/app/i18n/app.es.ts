@@ -359,6 +359,10 @@ export const es: AppDict = {
       fase: { validacion: 'Validación', emision: 'Emisión' },
       cols: { fase: 'Fase', mensaje: 'Mensaje', fecha: 'Fecha' },
       toasts: {
+        pendiente: {
+          title: 'Esperando respuesta de la DIAN',
+          desc: 'Algunos documentos se enviaron pero aún no tienen veredicto. Vuelve a emitirlos más tarde para consultarlo.',
+        },
         parcial: {
           title: 'Algunos documentos no se emitieron',
           desc: 'Los que fallaron quedaron en estado Error: haz clic en él para ver el motivo.',

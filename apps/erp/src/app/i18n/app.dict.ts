@@ -355,6 +355,7 @@ export interface AppDict
       toasts: {
         parcial: { title: string; desc: string };
         fallo: { title: string; desc: string };
+        pendiente: { title: string; desc: string };
       };
     };
     generar: {

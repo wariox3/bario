@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.35](https://github.com/wariox3/bario/compare/v0.1.34...v0.1.35) (2026-11-26)
+
+### Bug Fixes
+
+- **humano:** marcar y reemitir nóminas pendientes de respuesta ([e46e9e6](https://github.com/wariox3/bario/commit/e46e9e69ee8d864a6cb2e7ab83fe575b5157cc49))
+- **pos:** sugerir la caja del usuario al abrir turno y filtrar por su sede ([55731bf](https://github.com/wariox3/bario/commit/55731bf52df578f26edde573951911fb28f367b6))
+- **ui:** abrir soporte y app-switcher solo con clic ([96d3989](https://github.com/wariox3/bario/commit/96d39894802352775aab97a65eccb5da1a1ccc2f))
+
 ## [0.1.34](https://github.com/wariox3/bario/compare/v0.1.33...v0.1.34) (2026-11-26)
 
 ### Features
