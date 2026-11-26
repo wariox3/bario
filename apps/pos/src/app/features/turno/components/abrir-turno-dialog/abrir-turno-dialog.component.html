@@ -44,7 +44,8 @@
         inputId="turno-caja"
         formControlName="caja"
         [endpoint]="cajaEndpoint"
-        [suggestedMatch]="cajaSugerida()"
+        [params]="cajaParams()"
+        (optionsLoaded)="onCajasCargadas($event)"
       />
       <lib-field-error [control]="f.caja" [messages]="{ required: a.validation.required }" />
     </div>

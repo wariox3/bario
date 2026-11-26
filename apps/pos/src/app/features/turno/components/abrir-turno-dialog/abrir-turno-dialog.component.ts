@@ -7,6 +7,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -24,13 +25,13 @@ import {
   ConfiguracionUsuarioStore,
   CUENTA_BANCO_TIPO_CAJA,
   FormErrorService,
-  coincideConOpcion,
   I18nService,
   ToastService,
   type ErpSelectOption,
 } from '@reddoc/core';
 import { ErpApiSelectComponent, FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
+import { ConfiguracionCajaStore } from '../../../configuracion/configuracion-caja.store';
 import { CuentasCobroService, type CuentaCobro } from '../../../vender/cobro/cuentas-cobro';
 import { CAJA_SELECT_ENDPOINT } from '../../turno.constants';
 import type { Turno } from '../../turno.model';
@@ -80,14 +81,18 @@ export class AbrirTurnoDialogComponent {
   readonly abierto = output<Turno>();
 
   private readonly configuracionUsuario = inject(ConfiguracionUsuarioStore);
+  private readonly configuracionCaja = inject(ConfiguracionCajaStore);
   protected readonly cajaEndpoint = CAJA_SELECT_ENDPOINT;
   /**
-   * Arranca en la caja del usuario (Configuración). El catálogo solo trae las
-   * activas: si la suya se desactivó, no se sugiere nada y se elige a mano.
+   * Solo las cajas de la sede del usuario (Configuración), igual que allá: la
+   * caja tiene que ser de su sede. Sin sede configurada se ofrecen todas.
    */
-  protected readonly cajaSugerida = computed(() =>
-    coincideConOpcion(this.configuracionUsuario.caja()),
-  );
+  protected readonly cajaParams = computed((): Record<string, string> => {
+    const sede = this.configuracionCaja.configuracion().sede;
+    return sede ? { sede_id: String(sede.id) } : {};
+  });
+  /** Catálogo de cajas que trajo el select; `null` mientras no llega. */
+  private readonly cajas = signal<readonly ErpSelectOption[] | null>(null);
   protected readonly guardando = signal(false);
   protected readonly estadoCuentas = signal<EstadoCuentas>('cargando');
   private readonly cuentas = signal<readonly CuentaCobro[]>([]);
@@ -119,7 +124,36 @@ export class AbrirTurnoDialogComponent {
       if (!this.visible()) return;
       this.form.reset({ caja: null, base: 0, cuenta: null });
       this.cargarCuentas();
+      untracked(() => this.sugerirCaja());
     });
+
+    // El catálogo o la configuración del usuario pueden llegar con el modal ya abierto.
+    effect(() => this.sugerirCaja());
+  }
+
+  protected onCajasCargadas(cajas: readonly ErpSelectOption[]): void {
+    this.cajas.set(cajas);
+  }
+
+  /**
+   * Con el modal abierto y la caja vacía, propone la del usuario; si no está en
+   * el catálogo (inactiva o de otra sede) y solo hay una, esa. No pisa lo que la
+   * persona eligió.
+   *
+   * La sugerencia vive aquí y no en el `suggestedMatch` del select: el select se
+   * crea con la página (el contenido del `p-dialog` se proyecta) y sugiere una
+   * sola vez, al llegar el catálogo. El `reset` de cada apertura la borraba, y
+   * si la configuración del usuario llegaba después del catálogo no había
+   * sugerencia.
+   */
+  private sugerirCaja(): void {
+    if (!this.visible()) return;
+    const cajas = this.cajas();
+    const porDefecto = this.configuracionUsuario.caja();
+    if (!cajas?.length || untracked(() => this.form.controls.caja.value)) return;
+    const opcion =
+      cajas.find((c) => c.id === porDefecto?.id) ?? (cajas.length === 1 ? cajas[0] : undefined);
+    if (opcion) untracked(() => this.form.controls.caja.setValue(opcion));
   }
 
   protected cargarCuentas(): void {
