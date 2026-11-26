@@ -194,9 +194,7 @@ El componente es **agnóstico de app**. Lo único que cambia por app son sus pro
   hover/abierto `rgba(19 38 60 / 0.06)` — la familia del waffle. Bajo `lg` queda solo el ícono
   (`hidden lg:inline`). Para el cliente los audífonos significan soporte; el otro uso del ícono
   (pill «Acceso de soporte») solo lo ve nuestro equipo.
-- **Interacción:** hover con gracia de 150ms + clic + `Escape` + clic-fuera, como el app-switcher.
-  Diferencia: un clic a menos de 400ms de la apertura por hover **no cierra** (con mouse el hover
-  ya abrió; en touch el tap dispara `mouseenter` justo antes del `click`).
+- **Interacción:** solo clic (no hover: abrirse al cruzar el header molesta) + `Escape` + clic-fuera, como el app-switcher.
 - **Panel:** el chrome del app-switcher (`absolute top-[calc(100%+8px)] right-0 z-[60]`, `280px`,
   blanco, borde `0.08`, radius `10px`, whisper-shadow, entrada `0.12s`). Encabezado `group-label`
   y debajo una línea de invitación en `text-brand-text`.
