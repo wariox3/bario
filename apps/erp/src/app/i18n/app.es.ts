@@ -3096,8 +3096,14 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
-      filters: { aprobado: 'Aprobado', anulado: 'Anulado', contabilizado: 'Contabilizado' },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
     },
     notaDebito: {
       name: 'Nota débito',
@@ -3113,8 +3119,37 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
-      filters: { aprobado: 'Aprobado', anulado: 'Anulado', contabilizado: 'Contabilizado' },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
+    },
+    notaAjustePos: {
+      name: 'Nota de ajuste POS',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+        electronico: 'Ele',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
     },
     notaVenta: {
       form: {
@@ -3831,10 +3866,12 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',
         anulado: 'Anulado',
+        electronico: 'Electrónico',
         contabilizado: 'Contabilizado',
       },
       form: {

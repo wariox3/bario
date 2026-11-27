@@ -102,6 +102,13 @@ export const VENTA_ROUTES: Route[] = [
           import('./documentos/nota-debito/nota-debito.routes').then((m) => m.NOTA_DEBITO_ROUTES),
       },
       {
+        path: 'nota-ajuste-pos',
+        loadChildren: () =>
+          import('./documentos/nota-ajuste-pos/nota-ajuste-pos.routes').then(
+            (m) => m.NOTA_AJUSTE_POS_ROUTES,
+          ),
+      },
+      {
         path: 'contrato-servicio',
         loadChildren: () =>
           import('./documentos/contrato-servicio/contrato-servicio.routes').then(

@@ -2298,8 +2298,9 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
-      filters: { aprobado: string; anulado: string; contabilizado: string };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
     };
     /** Nota débito de venta (tipo 3). Listado; form/ficha en `notaVenta`. */
     notaDebito: {
@@ -2316,8 +2317,28 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
-      filters: { aprobado: string; anulado: string; contabilizado: string };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
+    };
+    /** Nota de ajuste POS (tipo 36). Listado; form/ficha en `notaVenta`. */
+    notaAjustePos: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+        electronico: string;
+      };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
     };
     /**
      * Textos del **form y la ficha compartidos por las notas de venta** (nota
@@ -2871,10 +2892,12 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;
         anulado: string;
+        electronico: string;
         contabilizado: string;
       };
       form: {

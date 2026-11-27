@@ -106,6 +106,8 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
   readonly contactoId = input<number | null>(null);
   /** Clase del documento referenciable (`documento_clase_id`, p. ej. `100` = factura de venta). */
   readonly documentoClaseId = input.required<number>();
+  /** Acota a un tipo dentro de la clase (la nota de ajuste POS: la POS electrónica, 24). */
+  readonly documentoTipoId = input<number | null>(null);
   readonly inputId = input<string>('');
   readonly placeholder = input<string>('');
   readonly emptyMessage = input<string>('');
@@ -131,10 +133,12 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
         switchMap((search) => {
           const contactoId = this.contactoId();
           if (contactoId == null) return of<ReferenciaOption[]>([]);
-          return this.service.buscar(contactoId, this.documentoClaseId(), search).pipe(
-            map((docs) => docs.map(toReferenciaOption)),
-            catchError(() => of<ReferenciaOption[]>([])),
-          );
+          return this.service
+            .buscar(contactoId, this.documentoClaseId(), search, this.documentoTipoId())
+            .pipe(
+              map((docs) => docs.map(toReferenciaOption)),
+              catchError(() => of<ReferenciaOption[]>([])),
+            );
         }),
         takeUntilDestroyed(this.destroyRef),
       )

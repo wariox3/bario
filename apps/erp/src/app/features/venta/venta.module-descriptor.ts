@@ -8,7 +8,7 @@ import { MODELO } from '@reddoc/core';
  * activo. Los `path` son **relativos al módulo** — el `WorkspaceLayout`
  * les prepende `/t/<slug>/venta/`.
  *
- * Acordeones: "Documentos" (contrato/pedido/factura de servicio), "Proceso" e
+ * Acordeones: "Documentos" (los de venta, sin los de servicio), "Proceso" e
  * "Informes" (Pendiente por facturar). Sumar entradas a `items` (o nuevos
  * grupos/acordeones) cuando se implementen más documentos, procesos o informes.
  *
@@ -56,14 +56,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-venta',
             },
             {
-              labelKey: 'entities.facturaPosElectronica.name',
-              path: 'factura-pos-electronica/list',
-              activeMatch: 'factura-pos-electronica',
-            },
-            {
-              labelKey: 'entities.facturaPos.name',
-              path: 'factura-pos/list',
-              activeMatch: 'factura-pos',
+              labelKey: 'entities.cuentaCobro.name',
+              path: 'cuenta-cobro/list',
+              activeMatch: 'cuenta-cobro',
             },
             {
               labelKey: 'entities.notaCredito.name',
@@ -76,21 +71,22 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'nota-debito',
             },
             {
-              labelKey: 'entities.cuentaCobro.name',
-              path: 'cuenta-cobro/list',
-              activeMatch: 'cuenta-cobro',
-            },
-            // Los de servicio quedan al final: no venían en el orden pedido.
-            {
-              labelKey: 'entities.contratoServicio.name',
-              path: 'contrato-servicio/list',
-              activeMatch: 'contrato-servicio',
+              labelKey: 'entities.facturaPosElectronica.name',
+              path: 'factura-pos-electronica/list',
+              activeMatch: 'factura-pos-electronica',
             },
             {
-              labelKey: 'entities.pedidoServicio.name',
-              path: 'pedido-servicio/list',
-              activeMatch: 'pedido-servicio',
+              labelKey: 'entities.facturaPos.name',
+              path: 'factura-pos/list',
+              activeMatch: 'factura-pos',
             },
+            {
+              labelKey: 'entities.notaAjustePos.name',
+              path: 'nota-ajuste-pos/list',
+              activeMatch: 'nota-ajuste-pos',
+            },
+            // Contrato y pedido de servicio quedan fuera del menú por ahora: sus rutas
+            // siguen vivas (`venta.routes.ts`) para enlaces guardados.
           ],
         },
       ],
