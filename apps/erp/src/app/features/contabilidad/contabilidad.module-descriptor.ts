@@ -25,7 +25,11 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.conciliacion.name', path: 'conciliacion' },
+            {
+              labelKey: 'entities.conciliacion.name',
+              path: 'conciliacion',
+              modelo: MODELO.contabilidad.conciliacion,
+            },
             { labelKey: 'entities.exogena.name', path: 'exogena' },
           ],
         },

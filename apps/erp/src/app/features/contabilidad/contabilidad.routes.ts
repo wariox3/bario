@@ -50,11 +50,11 @@ export const CONTABILIDAD_ROUTES: Route[] = [
         loadChildren: () =>
           import('./documentos/cierre/cierre.routes').then((m) => m.CIERRE_ROUTES),
       },
-      {
+      ...withPermission(MODELO.contabilidad.conciliacion, {
         path: 'conciliacion',
         loadChildren: () =>
           import('./masters/conciliacion/conciliacion.routes').then((m) => m.CONCILIACION_ROUTES),
-      },
+      }),
       {
         // Vivía en Utilidades; el redirect conserva los enlaces guardados.
         path: 'utilidades/conciliacion',

@@ -1,13 +1,13 @@
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.conciliacion.name">
   <lib-data-toolbar
     toolbar
-    [primaryAction]="primaryAction"
-    [trailingActions]="trailingActions"
+    [primaryAction]="acciones.primaryAction()"
+    [trailingActions]="acciones.trailingActions()"
     [searchEnabled]="false"
     [filtersEnabled]="true"
     [activeFilters]="activeFilters()"
     [filterFields]="filterFields"
-    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
@@ -27,7 +27,7 @@
     [sort]="sort()"
     selectionMode="multiple"
     [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
+    [rowActions]="acciones.rowActions()"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (selectionChange)="onSelectionChange($event)"
