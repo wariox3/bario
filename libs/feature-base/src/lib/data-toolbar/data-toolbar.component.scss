@@ -205,6 +205,26 @@
         background: #fecaca;
       }
     }
+
+    // Deshabilitado por estado (tabla vacía, operación en curso): se ve, no
+    // responde. Va al final para ganarle al hover de cada variante.
+    &:disabled,
+    &:disabled:hover {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    &--ghost:disabled:hover {
+      background: rgba(19 38 60 / 0.04);
+      border-color: transparent;
+    }
+
+    &--primary:disabled:hover {
+      background: var(--p-primary-color);
+      border-color: var(--p-primary-color);
+    }
   }
 
   &__dropdown-caret {

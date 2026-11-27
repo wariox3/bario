@@ -109,13 +109,14 @@ export class ConciliacionSoportesTabComponent {
           id: 'cargar',
           labelKey: 'entities.conciliacion.soporteTab.cargar',
           iconClass: 'pi pi-upload',
+          disabled: this.isBusy(),
         }
       : null,
   );
 
   /**
-   * Excel y limpiar, en el dropdown "Acciones" (estándar de la toolbar). Lo que
-   * todavía no aplica se deshabilita en vez de ocultarse.
+   * Botonera de tabla: en «Acciones» el Excel primero y, separado y en rojo,
+   * Limpiar soporte. Lo que no aplica por estado se deshabilita.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
     const sinItems = !this.hasItems();
@@ -132,6 +133,8 @@ export class ConciliacionSoportesTabComponent {
         id: 'limpiar',
         labelKey: 'entities.conciliacion.soporteTab.limpiar',
         iconClass: 'pi pi-trash',
+        severity: 'danger',
+        separatorBefore: true,
         disabled: sinItems || this.isBusy(),
       });
     }

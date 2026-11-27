@@ -47,6 +47,11 @@ interface ResolvedTrailingAction extends ToolbarAction {
  *  - `refreshEnabled` → ícono-solo con tooltip.
  *  - `primaryAction` → un botón destacado a la derecha (Nuevo).
  *
+ * Estado de cada acción (ver `ToolbarAction`): `disabled` y `loading` en
+ * botones sueltos y primaria; `disabled`, `severity: 'danger'` y
+ * `separatorBefore` en los hijos de un dropdown. El estándar completo de una
+ * botonera de tabla está en `.interface-design/system.md` («Botonera de tabla»).
+ *
  * Para casos especiales que no cubre este toolbar, el feature page puede:
  *  - Pasar la acción como una más en `trailingActions` y manejarla por id.
  *  - Componer un botón propio al lado de `<lib-data-toolbar>` dentro de la card.
@@ -152,12 +157,18 @@ export class DataToolbarComponent {
     return this.trailingActions().map((action) => ({
       ...action,
       menuItems: action.children?.length
-        ? action.children.map((child) => ({
-            label: this.resolveKey(dict, child.labelKey),
-            icon: child.iconClass,
-            disabled: child.disabled ?? false,
-            command: () => this.actionInvoked.emit(child.id),
-          }))
+        ? action.children.flatMap((child): MenuItem[] => {
+            const item: MenuItem = {
+              label: this.resolveKey(dict, child.labelKey),
+              icon: child.iconClass,
+              disabled: child.disabled ?? false,
+              // La clase es global (`_overlays.scss`): el menú es popup en `body`.
+              styleClass:
+                child.severity === 'danger' ? 'lib-data-table__menu-item--danger' : undefined,
+              command: () => this.actionInvoked.emit(child.id),
+            };
+            return child.separatorBefore ? [{ separator: true }, item] : [item];
+          })
         : null,
     }));
   });

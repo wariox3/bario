@@ -36,6 +36,9 @@ import {
   CONCILIACION_ESTADO_FILTER_FIELDS,
 } from '../../conciliacion.constants';
 
+/** Las operaciones de la pestaña; la que corre pone su spinner. */
+type OperacionDetalle = 'cargar' | 'conciliar' | 'desconciliar' | 'limpiar';
+
 /**
  * Pestaña **Detalle**: los movimientos contables de la cuenta bancaria dentro
  * del periodo, más los pendientes de conciliaciones anteriores.
@@ -89,7 +92,9 @@ export class ConciliacionDetallesTabComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   /** Alguna operación en vuelo: bloquea toda la botonera para no encadenarlas. */
-  protected readonly isBusy = signal(false);
+  /** Operación en vuelo: bloquea la botonera y pone el spinner en su botón. */
+  protected readonly enCurso = signal<OperacionDetalle | null>(null);
+  protected readonly isBusy = computed(() => this.enCurso() !== null);
   /** Diálogo que pide los días de tolerancia antes de conciliar. */
   protected readonly conciliarVisible = signal(false);
 
@@ -99,23 +104,25 @@ export class ConciliacionDetallesTabComponent {
   protected readonly hasItems = computed(() => this.totalCount() > 0);
 
   /**
-   * Acción destacada: conciliar, que es a lo que se viene. Solo con movimientos
-   * cargados que cruzar.
+   * Acción destacada: conciliar. Siempre a la vista; sin movimientos cargados
+   * o con otra operación en curso se ve deshabilitada (estándar de la botonera
+   * de tabla: por estado se deshabilita, por permiso se oculta).
    */
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.canOperate() && this.hasItems()
+    this.canOperate()
       ? {
           id: 'conciliar',
           labelKey: 'entities.conciliacion.detalleTab.conciliar',
           iconClass: 'pi pi-check-circle',
+          disabled: !this.hasItems() || this.isBusy(),
         }
       : null,
   );
 
   /**
-   * Estándar de la toolbar: las operaciones van como botón a la vista y el
-   * resto (Excel, limpiar) en el dropdown "Acciones". Lo que todavía no aplica
-   * se deshabilita en vez de ocultarse.
+   * Botonera de tabla: «Cargar movimientos» a la vista (con su spinner) y en
+   * «Acciones» el Excel primero, luego Desconciliar y, separado y en rojo,
+   * Limpiar detalle.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
     const sinItems = !this.hasItems();
@@ -128,33 +135,39 @@ export class ConciliacionDetallesTabComponent {
       },
     ];
     if (this.canOperate()) {
-      children.push({
-        id: 'desconciliar',
-        labelKey: 'entities.conciliacion.detalleTab.desconciliar',
-        iconClass: 'pi pi-replay',
-        disabled: sinItems || this.isBusy(),
-      });
-      children.push({
-        id: 'limpiar',
-        labelKey: 'entities.conciliacion.detalleTab.limpiar',
-        iconClass: 'pi pi-trash',
-        disabled: sinItems || this.isBusy(),
-      });
+      children.push(
+        {
+          id: 'desconciliar',
+          labelKey: 'entities.conciliacion.detalleTab.desconciliar',
+          iconClass: 'pi pi-replay',
+          disabled: sinItems || this.isBusy(),
+        },
+        {
+          id: 'limpiar',
+          labelKey: 'entities.conciliacion.detalleTab.limpiar',
+          iconClass: 'pi pi-trash',
+          severity: 'danger',
+          separatorBefore: true,
+          disabled: sinItems || this.isBusy(),
+        },
+      );
     }
-    const dropdown: ToolbarAction = {
+    const acciones: ToolbarAction = {
       id: 'actions',
       labelKey: 'common.actions.actions',
       iconClass: '',
       children,
     };
-    if (!this.canOperate()) return [dropdown];
+    if (!this.canOperate()) return [acciones];
     return [
       {
         id: 'cargar',
         labelKey: 'entities.conciliacion.detalleTab.cargar',
         iconClass: 'pi pi-download',
+        disabled: this.isBusy(),
+        loading: this.enCurso() === 'cargar',
       },
-      dropdown,
+      acciones,
     ];
   });
 
@@ -318,15 +331,15 @@ export class ConciliacionDetallesTabComponent {
    */
   private run(
     operation: Observable<Readonly<Record<string, number>>>,
-    key: 'cargar' | 'conciliar' | 'desconciliar' | 'limpiar',
+    key: OperacionDetalle,
     onSuccess?: () => void,
   ): void {
-    this.isBusy.set(true);
+    this.enCurso.set(key);
     const toasts = this.t().entities.conciliacion.detalleTab.toasts[key];
     operation
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isBusy.set(false)),
+        finalize(() => this.enCurso.set(null)),
       )
       .subscribe({
         next: (conteos) => {

@@ -108,9 +108,13 @@
           <button
             type="button"
             class="lib-data-toolbar__btn lib-data-toolbar__btn--ghost"
+            [disabled]="action.disabled || action.loading"
+            [attr.aria-busy]="action.loading || null"
             (click)="actionInvoked.emit(action.id)"
           >
-            @if (action.iconClass) {
+            @if (action.loading) {
+              <i class="pi pi-spin pi-spinner"></i>
+            } @else if (action.iconClass) {
               <i [class]="action.iconClass"></i>
             }
             <span>{{ translate(action.labelKey) }}</span>
@@ -138,9 +142,15 @@
     <button
       type="button"
       class="lib-data-toolbar__btn lib-data-toolbar__btn--primary"
+      [disabled]="primary.disabled || primary.loading"
+      [attr.aria-busy]="primary.loading || null"
       (click)="actionInvoked.emit(primary.id)"
     >
-      <i [class]="primary.iconClass"></i>
+      @if (primary.loading) {
+        <i class="pi pi-spin pi-spinner"></i>
+      } @else {
+        <i [class]="primary.iconClass"></i>
+      }
       <span>{{ translate(primary.labelKey) }}</span>
     </button>
   }

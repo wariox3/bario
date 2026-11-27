@@ -1013,6 +1013,56 @@ max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de l
 - **Ficha = form en solo lectura:** mismas pestañas y mismo resumen; cada tabla editable tiene su
   gemela tonta (`comercial-documento-lineas-table`, `documento-pagos-table`).
 
+## Patrón: botonera de tabla (`<lib-data-toolbar>` en pestañas y listados)
+
+(2026-11-27) La botonera que vive **sobre una tabla**: un listado o la pestaña de una ficha
+(detalle y soporte de la conciliación, renglones de programación, entidades de aporte…). Ejemplo
+vivo: `contabilidad/masters/conciliacion/components/conciliacion-detalles-tab`.
+
+**Dos niveles, dos formas, no se mezclan:**
+
+- **Acciones de la página o el documento** (Aprobar, Imprimir, Editar, Opciones): `p-buttongroup`
+  en la cabecera (`document-detail-actions`, fichas de masters). Se lee como una sola pieza: «esto
+  es el documento».
+- **Acciones de una tabla** (cargar, conciliar, exportar, limpiar): siempre `<lib-data-toolbar>`,
+  con la misma forma que un listado. No se agrupan como la cabecera.
+
+**Orden, de izquierda a derecha:**
+
+```
+[Filtros]  ←→  [Eliminar (N)] │ [operación secundaria] [Acciones ▾] [principal]
+                                                         ├ Exportar Excel
+                                                         ├ (acciones reversibles)
+                                                         ├ ─────────────
+                                                         └ Limpiar …        ← rojo
+```
+
+1. **La principal va a la derecha de Acciones** (`primaryAction`), como «Nuevo» en un listado.
+   Una sola.
+2. **Las operaciones secundarias van a la vista** como botón suelto (`trailingActions` sin
+   `children`): cargar movimientos, cargar contratos. No se esconden en el dropdown.
+3. **«Acciones ▾» junta el resto**: el **Excel primero**, después lo reversible (desconciliar) y
+   al final, con `separatorBefore` y `severity: 'danger'`, lo **destructivo** (limpiar, eliminar
+   todo). Lo destructivo nunca va como botón a la vista y siempre confirma con el botón en rojo
+   (`acceptButtonStyleClass: 'p-button-danger'`).
+4. **«Eliminar (N)» es la única acción roja a la vista**: aparece solo con filas seleccionadas
+   (`deleteSelectedEnabled`), que ya es una confirmación de intención.
+
+**Deshabilitar por estado, ocultar por permiso:**
+
+- Lo que el **estado** no permite todavía (tabla vacía, documento aprobado, otra operación en
+  curso) se ve **deshabilitado** (`disabled: true`): la persona sabe que la acción existe y qué le
+  falta. Vale para botones sueltos, la principal y los hijos del dropdown.
+- Lo que el usuario no tiene **permiso** de hacer **se quita** del array (`masterActions`, un
+  `canOperate` en falso): un botón que nunca se va a habilitar es ruido.
+- La **operación en curso** pone `loading: true` en su botón (spinner en lugar del ícono) y deja
+  deshabilitadas las demás: una sola a la vez. Se modela con un `enCurso = signal<Operacion |
+null>` y `isBusy = computed(() => enCurso() !== null)`.
+
+**Pendiente de migrar** (siguen la forma vieja): programación, liquidación y aporte ocultan por
+estado en vez de deshabilitar; las líneas de los documentos (`*-documento-detalles`) usan
+`p-button` propios en la banda; formatos de exógena, un botón suelto en la cabecera de su card.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

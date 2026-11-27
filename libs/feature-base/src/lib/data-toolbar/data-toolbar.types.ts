@@ -22,8 +22,22 @@ export interface ToolbarAction {
    */
   readonly children?: readonly ToolbarAction[];
   /**
-   * Solo para los hijos de un dropdown: el ítem se ve pero no se puede elegir.
-   * Para lo que la etapa todavía no permite, en vez de ocultarlo.
+   * Se ve pero no se puede usar. Vale para botones sueltos, la primaria y los
+   * hijos de un dropdown. Es para lo que el **estado** todavía no permite (tabla
+   * vacía, documento aprobado, otra operación en curso); lo que el usuario no
+   * tiene **permiso** de hacer se quita del array, no se deshabilita.
    */
   readonly disabled?: boolean;
+  /**
+   * Botón suelto o primaria: la operación está corriendo. Cambia el ícono por un
+   * spinner y deshabilita el botón.
+   */
+  readonly loading?: boolean;
+  /**
+   * Solo para los hijos de un dropdown: `'danger'` pinta el ítem en rojo. Para lo
+   * destructivo (limpiar, eliminar todo), que además va al final del menú.
+   */
+  readonly severity?: 'default' | 'danger';
+  /** Solo para los hijos de un dropdown: dibuja un separador antes del ítem. */
+  readonly separatorBefore?: boolean;
 }
