@@ -6774,6 +6774,7 @@ export const en: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Number',
+        documentoTipo: 'Type',
         resolucion: 'Resolution',
         fecha: 'Date',
         cliente: 'Customer',
@@ -6819,6 +6820,7 @@ export const en: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Number',
+        documentoTipo: 'Type',
         fecha: 'Date',
         empleado: 'Employee',
         total: 'Total',

@@ -8,8 +8,7 @@ import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
  *    documentos electrónicos de compra aprobados y pendientes de emitir. Se
  *    inyectan como `baseFilters` de `buildListBody`, antes de los del usuario;
  *    nunca se muestran en la UI.
- *  - Las **columnas** de la tabla (incluye `documento_tipo_nombre`, propio de
- *    compra por agrupar varios tipos electrónicos).
+ *  - Las **columnas** de la tabla.
  *  - Los **campos filtrables** por el usuario (port del mapeo legacy).
  *  - La **storage key** de los filtros.
  */
@@ -39,18 +38,18 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   {
-    field: 'documento_tipo_nombre',
-    headerKey: `${I18N}.columns.documentoTipo`,
-    type: 'text',
-    width: '160px',
-  },
-  {
     field: 'resolucion_numero',
     headerKey: `${I18N}.columns.resolucion`,
     type: 'text',
     width: '160px',
   },
   { field: 'numero', headerKey: `${I18N}.columns.numero`, type: 'text', width: '110px' },
+  {
+    field: 'documento_tipo_nombre',
+    headerKey: `${I18N}.columns.documentoTipo`,
+    type: 'text',
+    width: '160px',
+  },
   { field: 'fecha', headerKey: `${I18N}.columns.fecha`, type: 'date', width: '110px' },
   { field: 'contacto_nombre_corto', headerKey: `${I18N}.columns.proveedor`, type: 'text' },
   {

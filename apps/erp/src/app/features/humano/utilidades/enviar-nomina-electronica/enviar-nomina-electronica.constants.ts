@@ -33,6 +33,12 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   { field: 'numero', headerKey: `${I18N}.columns.numero`, type: 'text', width: '110px' },
+  {
+    field: 'documento_tipo_nombre',
+    headerKey: `${I18N}.columns.documentoTipo`,
+    type: 'text',
+    width: '160px',
+  },
   { field: 'fecha', headerKey: `${I18N}.columns.fecha`, type: 'date', width: '110px' },
   { field: 'contacto_nombre_corto', headerKey: `${I18N}.columns.empleado`, type: 'text' },
   {
