@@ -4449,6 +4449,8 @@ export interface AppDict
       detalleColumns: {
         id: string;
         fecha: string;
+        tipo: string;
+        numero: string;
         contacto: string;
         debito: string;
         credito: string;

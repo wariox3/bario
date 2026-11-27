@@ -106,6 +106,19 @@ export const CONCILIACION_DETALLE_COLUMNS: readonly ColumnDef[] = [
     width: '120px',
   },
   {
+    field: 'documento_documento_tipo_nombre',
+    headerKey: 'entities.conciliacion.detalleColumns.tipo',
+    type: 'text',
+    width: '180px',
+  },
+  {
+    // `text` y no `number`: como número se pintaría con separador de miles.
+    field: 'documento_numero',
+    headerKey: 'entities.conciliacion.detalleColumns.numero',
+    type: 'text',
+    width: '100px',
+  },
+  {
     field: 'contacto_nombre_corto',
     headerKey: 'entities.conciliacion.detalleColumns.contacto',
     type: 'text',

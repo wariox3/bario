@@ -5873,6 +5873,8 @@ export const es: AppDict = {
       detalleColumns: {
         id: 'ID',
         fecha: 'Fecha',
+        tipo: 'Tipo',
+        numero: 'Número',
         contacto: 'Contacto',
         debito: 'Débito',
         credito: 'Crédito',

@@ -707,9 +707,9 @@ Estado (2026-11-27): **verificado contra el backend** y probado de punta a punta
 
 ### 10.2 Pendiente del backend
 
-- **Documento del detalle**: el serializer solo trae el id de `documento`. Se pidieron
-  `documento_tipo_nombre` y `documento_numero` para mostrar «Recibo de caja 1» en una columna
-  «Documento». Cuando lleguen, se suman al modelo y a `CONCILIACION_DETALLE_COLUMNS`.
+Nada. El tipo y número de documento del detalle llegaron el 2026-11-27 (`e624980`): el tipo viene
+como `documento_documento_tipo_nombre` (no `documento_tipo_nombre`) y el número como
+`documento_numero`; son las columnas Tipo y Número de la pestaña Detalle.
 
 ### 10.3 Decisiones tomadas
 

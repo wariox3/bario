@@ -45,6 +45,8 @@ export interface ConciliacionDetalle {
   readonly contacto: number | null;
   readonly contacto_nombre_corto: string | null;
   readonly documento: number | null;
+  readonly documento_documento_tipo_nombre: string | null;
+  readonly documento_numero: number | null;
   readonly movimiento: number | null;
 }
 
