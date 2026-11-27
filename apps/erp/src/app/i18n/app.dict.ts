@@ -4448,10 +4448,8 @@ export interface AppDict
       columns: { id: string; fechaDesde: string; fechaHasta: string; cuentaBanco: string };
       detalleColumns: {
         id: string;
-        tipo: string;
-        numero: string;
         fecha: string;
-        cuenta: string;
+        contacto: string;
         debito: string;
         credito: string;
         detalle: string;
@@ -4469,7 +4467,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        tabs: { detalles: string; soporte: string };
         fields: {
           cuentaBanco: string;
           cuentaBancoPlaceholder: string;
@@ -4491,7 +4488,6 @@ export interface AppDict
         labels: {
           id: string;
           cuentaBanco: string;
-          cuentaContable: string;
           fechaDesde: string;
           fechaHasta: string;
         };
@@ -4500,14 +4496,30 @@ export interface AppDict
       detalleTab: {
         cargar: string;
         conciliar: string;
+        desconciliar: string;
         limpiar: string;
         confirmLimpiar: { header: string; message: string };
+        confirmDesconciliar: { header: string; message: string; accept: string };
+        /** Tolerancia en días del cruce automático (0 a 31). */
+        conciliarDialog: {
+          title: string;
+          subtitle: string;
+          dias: string;
+          diasHint: string;
+          submit: string;
+          validation: { required: string; rango: string };
+        };
         toasts: {
           cargar: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };
           };
           conciliar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          /** `desc` lleva `{detalles}` y `{soportes}`. */
+          desconciliar: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };
           };
@@ -4520,7 +4532,7 @@ export interface AppDict
       soporteTab: {
         cargar: string;
         limpiar: string;
-        plantillaNoDisponible: string;
+        plantilla: string;
         import: { title: string; subtitle: string };
         confirmLimpiar: { header: string; message: string };
         toasts: {

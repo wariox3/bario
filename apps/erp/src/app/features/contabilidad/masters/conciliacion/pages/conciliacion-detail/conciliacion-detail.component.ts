@@ -23,17 +23,19 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 interface CabeceraView {
   readonly id: number;
   readonly cuentaBanco: string | null;
-  readonly cuentaContable: string | null;
   readonly fechaDesde: Date | null;
   readonly fechaHasta: Date | null;
 }
 
 /**
- * Ficha de una **conciliación bancaria** — solo lectura.
+ * Ficha de una **conciliación bancaria**: la cabecera y debajo el proceso.
  *
- * Monta las dos mismas pestañas que el banco de trabajo pero con `canOperate` en
- * falso: se puede consultar y exportar, no cargar, importar, conciliar ni
- * limpiar. Sirve para revisar una conciliación cerrada sin riesgo de tocarla.
+ * - **Detalle**: los movimientos de la cuenta (`cargar`), el cruce y su limpieza.
+ * - **Soporte**: el extracto del banco (`importar`, con su plantilla) y su
+ *   limpieza.
+ *
+ * Conciliar (desde el detalle) marca también el soporte, que se recarga vía su
+ * `reloadToken`.
  */
 @Component({
   selector: 'app-conciliacion-detail',
@@ -66,6 +68,9 @@ export class ConciliacionDetailComponent implements OnInit {
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
   protected readonly activeTab = signal<'detalles' | 'soporte'>('detalles');
+
+  /** Se incrementa tras conciliar para que la pestaña del soporte se recargue. */
+  protected readonly soporteReloadToken = signal(0);
 
   protected readonly conciliacionId = computed(() => {
     const id = this.id();
@@ -108,13 +113,18 @@ export class ConciliacionDetailComponent implements OnInit {
     this.navigateTo('editar', Number(id));
   }
 
+  /** El cruce marcó también el soporte: su pestaña quedó desactualizada. */
+  protected onConciliado(): void {
+    this.soporteReloadToken.update((n) => n + 1);
+  }
+
   protected onNew(): void {
     this.navigateTo('nuevo');
   }
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   private load(id: number): void {
@@ -123,16 +133,9 @@ export class ConciliacionDetailComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (read: Conciliacion) => {
-          const cuentaContable = [
-            read.cuenta_banco__cuenta__codigo,
-            read.cuenta_banco__cuenta__nombre,
-          ]
-            .filter(Boolean)
-            .join(' - ');
           this.cabecera.set({
             id: read.id,
-            cuentaBanco: read.cuenta_banco__nombre ?? null,
-            cuentaContable: cuentaContable || null,
+            cuentaBanco: read.cuenta_banco_nombre ?? null,
             fechaDesde: fromIsoDate(read.fecha_desde),
             fechaHasta: fromIsoDate(read.fecha_hasta),
           });

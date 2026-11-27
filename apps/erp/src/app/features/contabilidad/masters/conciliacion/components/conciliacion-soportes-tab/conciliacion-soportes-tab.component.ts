@@ -1,18 +1,16 @@
-import {
-  Component,
-  DestroyRef,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
+import {
+  FileDownloadService,
+  I18nService,
+  ToastService,
+  buildFiltros,
+  extractErrorMessage,
+  type FilterCondition,
+} from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -20,38 +18,43 @@ import {
   type PageChangeEvent,
   type ToolbarAction,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
-import { ConciliacionService, CONCILIACION_EXCEL_SERIALIZADOR } from '../../conciliacion.service';
-import type { ConciliacionDetalle } from '../../conciliacion.model';
 import {
-  CONCILIACION_DETALLE_COLUMNS,
+  CONCILIACION_SOPORTE_EJEMPLO_ENDPOINT,
+  ConciliacionService,
+  filtrosDeConciliacion,
+} from '../../conciliacion.service';
+import type { ConciliacionSoporte } from '../../conciliacion.model';
+import {
   CONCILIACION_ESTADO_FILTER_FIELDS,
+  CONCILIACION_SOPORTE_COLUMNS,
 } from '../../conciliacion.constants';
 
 /**
- * Pestaña del **libro**: los movimientos contables de la cuenta bancaria dentro
- * del periodo de la conciliación.
+ * Pestaña **Soporte**: el extracto que entrega el banco.
  *
- * Las líneas las genera el backend ("Cargar"), no se teclean. "Conciliar" es el
- * cruce contra el extracto y marca `estado_conciliado` en los dos lados, así que
- * al terminar avisa al padre para que refresque también la otra pestaña.
- *
- * `canOperate` decide si se renderizan las acciones: el formulario de edición lo
- * prende, la ficha de solo lectura no.
+ * No se teclea ni se edita: entra por importación ("Cargar soporte", con la
+ * plantilla de Fecha, Valor y Detalle) y sale todo junto ("Limpiar"). El cruce
+ * lo dispara la pestaña Detalle y marca `estado_conciliado` también acá, por eso
+ * el padre puede forzar una recarga con `reloadToken`.
  */
 @Component({
-  selector: 'app-conciliacion-detalles-tab',
+  selector: 'app-conciliacion-soportes-tab',
   standalone: true,
   imports: [
     ConfirmDialogModule,
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
-  templateUrl: './conciliacion-detalles-tab.component.html',
+  templateUrl: './conciliacion-soportes-tab.component.html',
 })
-export class ConciliacionDetallesTabComponent {
+export class ConciliacionSoportesTabComponent {
   private readonly service = inject(ConciliacionService);
   private readonly fileDownload = inject(FileDownloadService);
   private readonly toast = inject(ToastService);
@@ -61,23 +64,15 @@ export class ConciliacionDetallesTabComponent {
 
   protected readonly t = this.i18n.t;
 
-  /** Conciliación a la que pertenecen los movimientos. */
   readonly conciliacionId = input.required<number>();
 
-  /** Muestra las acciones (cargar, conciliar, limpiar). La ficha las apaga. */
+  /** Muestra las acciones (importar, limpiar). */
   readonly canOperate = input<boolean>(false);
 
-  /**
-   * Señal externa para forzar una recarga. La usa el padre cuando otra pestaña
-   * hizo algo que afecta a esta —hoy, el "Conciliar" del extracto no existe,
-   * pero sí al revés—; cambiar el número dispara el `effect`.
-   */
+  /** Cambiar el número fuerza una recarga (lo usa el padre tras conciliar). */
   readonly reloadToken = input<number>(0);
 
-  /** Avisa al padre que el cruce corrió y la otra pestaña quedó desactualizada. */
-  readonly conciliadoChange = output<void>();
-
-  protected readonly items = signal<readonly ConciliacionDetalle[]>([]);
+  protected readonly items = signal<readonly ConciliacionSoporte[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
@@ -85,63 +80,65 @@ export class ConciliacionDetallesTabComponent {
   protected readonly filtersVisible = signal(false);
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
-  /** Alguna operación en vuelo: bloquea toda la botonera para no encadenarlas. */
   protected readonly isBusy = signal(false);
 
-  protected readonly columns = CONCILIACION_DETALLE_COLUMNS;
+  // ── Importación ───────────────────────────────────────────────────────────
+  /** Estado del diálogo del extracto: sube contra la conciliación abierta. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importarSoporte(this.conciliacionId(), file),
+    onImported: () => this.loadPage(0),
+  });
+
+  /** La plantilla trae de ejemplo fechas de la propia conciliación. */
+  protected readonly exampleConfig = computed<ExampleConfig>(() => ({
+    mode: 'enabled',
+    endpoint: CONCILIACION_SOPORTE_EJEMPLO_ENDPOINT,
+    params: { conciliacion: this.conciliacionId() },
+    filename: this.t().entities.conciliacion.soporteTab.plantilla,
+  }));
+
+  protected readonly columns = CONCILIACION_SOPORTE_COLUMNS;
   protected readonly filterFields = CONCILIACION_ESTADO_FILTER_FIELDS;
 
   protected readonly hasItems = computed(() => this.totalCount() > 0);
 
-  /**
-   * Acción destacada del toolbar: conciliar, que es a lo que se viene. Solo con
-   * el banco de trabajo abierto y con movimientos cargados que cruzar.
-   */
+  /** Acción destacada: cargar el extracto, que es por donde empieza la pestaña. */
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.canOperate() && this.hasItems() && !this.isBusy()
+    this.canOperate()
       ? {
-          id: 'conciliar',
-          labelKey: 'entities.conciliacion.detalleTab.conciliar',
-          iconClass: 'pi pi-check-circle',
+          id: 'cargar',
+          labelKey: 'entities.conciliacion.soporteTab.cargar',
+          iconClass: 'pi pi-upload',
         }
       : null,
   );
 
   /**
-   * Resto de acciones, en el dropdown "Acciones" del toolbar. Se arman según el
-   * estado —limpiar no aparece sin nada que limpiar— porque `ToolbarAction` no
-   * modela el deshabilitado: la alternativa sería ofrecer botones muertos.
+   * Excel y limpiar, en el dropdown "Acciones" (estándar de la toolbar). Lo que
+   * todavía no aplica se deshabilita en vez de ocultarse.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
-    const children: ToolbarAction[] = [];
-    if (this.canOperate() && !this.isBusy()) {
-      children.push({
-        id: 'cargar',
-        labelKey: 'entities.conciliacion.detalleTab.cargar',
-        iconClass: 'pi pi-download',
-      });
-    }
-    if (this.hasItems()) {
-      children.push({
+    const sinItems = !this.hasItems();
+    const children: ToolbarAction[] = [
+      {
         id: 'export-excel',
         labelKey: 'common.actions.exportExcel',
         iconClass: 'pi pi-file-excel',
-      });
-    }
-    if (this.canOperate() && this.hasItems() && !this.isBusy()) {
+        disabled: sinItems,
+      },
+    ];
+    if (this.canOperate()) {
       children.push({
         id: 'limpiar',
-        labelKey: 'entities.conciliacion.detalleTab.limpiar',
+        labelKey: 'entities.conciliacion.soporteTab.limpiar',
         iconClass: 'pi pi-trash',
+        disabled: sinItems || this.isBusy(),
       });
     }
-    return children.length
-      ? [{ id: 'actions', labelKey: 'common.actions.actions', iconClass: '', children }]
-      : [];
+    return [{ id: 'actions', labelKey: 'common.actions.actions', iconClass: '', children }];
   });
 
   constructor() {
-    // Carga inicial y recargas pedidas por el padre.
     effect(() => {
       this.conciliacionId();
       this.reloadToken();
@@ -168,10 +165,7 @@ export class ConciliacionDetallesTabComponent {
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'cargar':
-        this.onCargar();
-        break;
-      case 'conciliar':
-        this.onConciliar();
+        this.importar.open();
         break;
       case 'limpiar':
         this.onLimpiar();
@@ -192,24 +186,10 @@ export class ConciliacionDetallesTabComponent {
     this.loadPage(0);
   }
 
-  /** Trae del libro los movimientos del periodo. */
-  private onCargar(): void {
-    if (this.isBusy()) return;
-    this.run(this.service.cargarDetalles(this.conciliacionId()), 'cargar');
-  }
-
-  /** Cruza libro contra extracto; al terminar refresca ambas pestañas. */
-  private onConciliar(): void {
-    if (this.isBusy()) return;
-    this.run(this.service.conciliar(this.conciliacionId()), 'conciliar', () =>
-      this.conciliadoChange.emit(),
-    );
-  }
-
-  /** Borra los movimientos cargados, previa confirmación destructiva. */
+  /** Borra todo el extracto cargado, previa confirmación destructiva. */
   private onLimpiar(): void {
     if (this.isBusy()) return;
-    const labels = this.t().entities.conciliacion.detalleTab;
+    const labels = this.t().entities.conciliacion.soporteTab;
     this.confirmation.confirm({
       header: labels.confirmLimpiar.header,
       message: labels.confirmLimpiar.message,
@@ -217,19 +197,18 @@ export class ConciliacionDetallesTabComponent {
       acceptLabel: this.t().common.actions.delete,
       rejectLabel: this.t().common.actions.cancel,
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.run(this.service.limpiarDetalles(this.conciliacionId()), 'limpiar'),
+      accept: () => this.limpiar(),
     });
   }
 
   private onExportExcel(): void {
     this.fileDownload
-      .download(this.service.exportDetalleUrl, {
+      .download(this.service.exportSoporteUrl, {
         method: 'POST',
         body: {
-          conciliacion_id: this.conciliacionId(),
-          serializador: CONCILIACION_EXCEL_SERIALIZADOR,
+          filtros: buildFiltros(filtrosDeConciliacion(this.conciliacionId(), this.activeFilters())),
         },
-        fallbackFilename: 'conciliacion-detalles.xlsx',
+        fallbackFilename: 'conciliacion-soporte.xlsx',
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -243,41 +222,37 @@ export class ConciliacionDetallesTabComponent {
 
   // ── Internos ──────────────────────────────────────────────────────────────
 
-  /**
-   * Ejecuta una de las tres operaciones y recarga la tabla. Todas comparten el
-   * mismo esqueleto (bloquear, avisar, recargar); lo único que cambia son los
-   * textos del toast y un efecto opcional al terminar bien.
-   */
-  private run(
-    operation: ReturnType<ConciliacionService['cargarDetalles']>,
-    key: 'cargar' | 'conciliar' | 'limpiar',
-    onSuccess?: () => void,
-  ): void {
+  private limpiar(): void {
     this.isBusy.set(true);
-    const toasts = this.t().entities.conciliacion.detalleTab.toasts[key];
-    operation
+    const toasts = this.t().entities.conciliacion.soporteTab.toasts.limpiar;
+    this.service
+      .limpiarSoportes(this.conciliacionId())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isBusy.set(false)),
       )
       .subscribe({
-        next: () => {
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          onSuccess?.();
+        next: ({ eliminados }) => {
+          this.toast.success(
+            toasts.success.title,
+            toasts.success.desc.replace('{n}', String(eliminados)),
+          );
           this.loadPage(0);
         },
-        error: () => this.toast.error(toasts.error.title, toasts.error.desc),
+        // Sin toast del interceptor: acá se avisa todo status, con el mensaje
+        // del backend (p. ej. el 400 cuando hay líneas conciliadas).
+        error: (err: unknown) =>
+          this.toast.error(toasts.error.title, extractErrorMessage(err, toasts.error.desc)),
       });
   }
 
-  /** Recarga la tabla. Fuerza recargar desde la página pedida (0-based). */
   loadPage(page: number): void {
     const id = this.conciliacionId();
     if (!id) return;
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarDetalles(id, page + 1, this.activeFilters())
+      .listarSoportes(id, page, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

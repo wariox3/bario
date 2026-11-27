@@ -674,8 +674,8 @@ con doble guion bajo, portados del mapeo del legacy; ver §5.1.
 ## 10. Conciliación bancaria
 
 Portada desde `contabilidad/paginas/independientes/conciliacion/` del ERP anterior, donde vivía en
-`/contabilidad/especial/conciliacion`. Vive en `features/contabilidad/utilidades/conciliacion/`,
-junto a Contabilizar.
+`/contabilidad/especial/conciliacion`. Vive en `features/contabilidad/masters/conciliacion/`,
+junto a Exógena (antes estaba en Utilidades, junto a Contabilizar).
 
 Es la primera pieza del módulo que **no** es documento ni consulta: un master con endpoint propio
 (camino B) más un proceso encima. Una conciliación es una cuenta bancaria y un periodo, y de ella

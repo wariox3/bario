@@ -51,11 +51,15 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           import('./documentos/cierre/cierre.routes').then((m) => m.CIERRE_ROUTES),
       },
       {
-        path: 'utilidades/conciliacion',
+        path: 'conciliacion',
         loadChildren: () =>
-          import('./utilidades/conciliacion/conciliacion.routes').then(
-            (m) => m.CONCILIACION_ROUTES,
-          ),
+          import('./masters/conciliacion/conciliacion.routes').then((m) => m.CONCILIACION_ROUTES),
+      },
+      {
+        // Vivía en Utilidades; el redirect conserva los enlaces guardados.
+        path: 'utilidades/conciliacion',
+        pathMatch: 'full',
+        redirectTo: 'conciliacion',
       },
       {
         path: 'utilidades/inconsistencias',

@@ -273,7 +273,7 @@ export class ConciliacionesListComponent {
       });
   }
 
-  /** Navega dentro del tenant: `/t/<slug>/contabilidad/utilidades/conciliacion/<...>`. */
+  /** Navega dentro del tenant: `/t/<slug>/contabilidad/conciliacion/<...>`. */
   private navigateTo(segment?: string, id?: number): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;

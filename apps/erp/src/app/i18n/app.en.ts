@@ -5784,10 +5784,8 @@ export const en: AppDict = {
       },
       detalleColumns: {
         id: 'ID',
-        tipo: 'Type',
-        numero: 'Number',
         fecha: 'Date',
-        cuenta: 'Account',
+        contacto: 'Contact',
         debito: 'Debit',
         credito: 'Credit',
         detalle: 'Description',
@@ -5805,7 +5803,6 @@ export const en: AppDict = {
         createTitle: 'New reconciliation',
         editTitle: 'Edit reconciliation',
         sectionHint: 'Pick the bank account and the period to reconcile',
-        tabs: { detalles: 'Ledger', soporte: 'Statement' },
         fields: {
           cuentaBanco: 'Bank account',
           cuentaBancoPlaceholder: 'Select…',
@@ -5819,7 +5816,7 @@ export const en: AppDict = {
         toasts: {
           createSuccess: {
             title: 'Reconciliation created',
-            desc: 'You can now load the ledger and the statement',
+            desc: 'You can now load the detail and the statement',
           },
           createError: { title: 'Create failed', desc: 'The reconciliation could not be created' },
           editSuccess: {
@@ -5832,11 +5829,10 @@ export const en: AppDict = {
       },
       detail: {
         sections: { general: 'General information' },
-        tabs: { detalles: 'Ledger', soporte: 'Statement' },
+        tabs: { detalles: 'Detail', soporte: 'Statement' },
         labels: {
           id: 'ID',
           cuentaBanco: 'Bank account',
-          cuentaContable: 'Ledger account',
           fechaDesde: 'Date from',
           fechaHasta: 'Date to',
         },
@@ -5846,27 +5842,50 @@ export const en: AppDict = {
         },
       },
       detalleTab: {
-        cargar: 'Load ledger',
+        cargar: 'Load entries',
         conciliar: 'Reconcile',
-        limpiar: 'Clear ledger',
+        desconciliar: 'Unreconcile',
+        limpiar: 'Clear detail',
         confirmLimpiar: {
-          header: 'Clear the ledger',
+          header: 'Clear the detail',
           message: 'Delete every loaded entry? This cannot be undone.',
+        },
+        confirmDesconciliar: {
+          header: 'Unreconcile',
+          message:
+            'Everything reconciled, in the detail and in the statement, goes back to pending. Continue?',
+          accept: 'Unreconcile',
+        },
+        conciliarDialog: {
+          title: 'Reconcile',
+          subtitle: 'Matches the detail against the statement by side and amount',
+          dias: 'Tolerance in days',
+          diasHint:
+            'With 0 only identical dates match. Raise it if the bank posts entries a few days before or after.',
+          submit: 'Reconcile',
+          validation: { required: 'This field is required', rango: 'Must be between 0 and 31' },
         },
         toasts: {
           cargar: {
-            success: { title: 'Ledger loaded', desc: 'The entries for the period were loaded' },
+            success: { title: 'Entries loaded', desc: '{n} entries were loaded' },
             error: { title: 'Load failed', desc: 'The entries could not be loaded' },
           },
           conciliar: {
             success: {
               title: 'Reconciliation run',
-              desc: 'The ledger was matched against the statement',
+              desc: '{n} entries were matched',
             },
             error: { title: 'Reconcile failed', desc: 'The matching could not be run' },
           },
+          desconciliar: {
+            success: {
+              title: 'Reconciliation undone',
+              desc: '{detalles} entries and {soportes} statement lines are pending again',
+            },
+            error: { title: 'Unreconcile failed', desc: 'The matching could not be undone' },
+          },
           limpiar: {
-            success: { title: 'Ledger cleared', desc: 'The loaded entries were deleted' },
+            success: { title: 'Detail cleared', desc: '{n} entries were deleted' },
             error: { title: 'Clear failed', desc: 'The entries could not be deleted' },
           },
         },
@@ -5874,10 +5893,11 @@ export const en: AppDict = {
       soporteTab: {
         cargar: 'Load statement',
         limpiar: 'Clear statement',
-        plantillaNoDisponible: 'The backend does not expose the sample template yet',
+        plantilla: 'statement-template.xlsx',
         import: {
           title: 'Load statement',
-          subtitle: 'Upload the Excel file provided by the bank',
+          subtitle:
+            'Upload the bank statement: date, amount (positive in, negative out) and description',
         },
         confirmLimpiar: {
           header: 'Clear the statement',
@@ -5885,7 +5905,7 @@ export const en: AppDict = {
         },
         toasts: {
           limpiar: {
-            success: { title: 'Statement cleared', desc: 'The statement lines were deleted' },
+            success: { title: 'Statement cleared', desc: '{n} lines were deleted' },
             error: { title: 'Clear failed', desc: 'The lines could not be deleted' },
           },
         },

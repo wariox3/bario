@@ -2,7 +2,13 @@
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
   <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
   <lib-page-actions>
     <p-button
@@ -20,7 +26,7 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
   </lib-page-actions>
 
@@ -109,37 +115,3 @@
     </div>
   </section>
 </form>
-
-<!-- ── Banco de trabajo: solo con el registro ya creado ───────────────────── -->
-@if (isEditMode()) {
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <p-tabs
-      class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
-      [value]="activeTab()"
-      (valueChange)="activeTab.set($any($event))"
-    >
-      <p-tablist>
-        <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
-        <p-tab value="soporte">{{ f.tabs.soporte }}</p-tab>
-      </p-tablist>
-
-      <p-tabpanels>
-        <p-tabpanel value="detalles">
-          <app-conciliacion-detalles-tab
-            [conciliacionId]="conciliacionId()"
-            [canOperate]="true"
-            (conciliadoChange)="onConciliado()"
-          />
-        </p-tabpanel>
-
-        <p-tabpanel value="soporte">
-          <app-conciliacion-soportes-tab
-            [conciliacionId]="conciliacionId()"
-            [canOperate]="true"
-            [reloadToken]="soporteReloadToken()"
-          />
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
-  </section>
-}

@@ -1,10 +1,10 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
-export const CONCILIACIONES_FILTERS_STORAGE_KEY = 'conciliaciones:filters:v1';
+export const CONCILIACIONES_FILTERS_STORAGE_KEY = 'conciliaciones:filters:v2';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
-export const CONCILIACION_LIST_PATH = ['contabilidad', 'utilidades', 'conciliacion'] as const;
+export const CONCILIACION_LIST_PATH = ['contabilidad', 'conciliacion'] as const;
 
 /**
  * Catálogo de cuentas bancarias de la cabecera.
@@ -39,12 +39,18 @@ export const CONCILIACIONES_COLUMNS: readonly ColumnDef[] = [
     width: '140px',
   },
   {
-    field: 'cuenta_banco__nombre',
+    field: 'cuenta_banco_nombre',
     headerKey: 'entities.conciliacion.columns.cuentaBanco',
     type: 'text',
+    // No hay orden por nombre: `lista/` solo ordena por campos del modelo.
+    sortable: false,
   },
 ];
 
+/**
+ * Solo lo que `campos_filtrables` declara (id, fechas y `cuenta_banco_id`): el
+ * nombre de la cuenta no es filtrable y respondería 400.
+ */
 export const CONCILIACIONES_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.conciliacion.columns.id', type: 'number' },
   {
@@ -56,11 +62,6 @@ export const CONCILIACIONES_FILTER_FIELDS: readonly FilterField[] = [
     name: 'fecha_hasta',
     displayNameKey: 'entities.conciliacion.columns.fechaHasta',
     type: 'date',
-  },
-  {
-    name: 'cuenta_banco__nombre',
-    displayNameKey: 'entities.conciliacion.columns.cuentaBanco',
-    type: 'string',
   },
 ];
 
@@ -99,28 +100,16 @@ export const CONCILIACION_DETALLE_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'documento__documento_tipo__nombre',
-    headerKey: 'entities.conciliacion.detalleColumns.tipo',
-    type: 'text',
-    width: '150px',
-  },
-  {
-    field: 'documento__numero',
-    headerKey: 'entities.conciliacion.detalleColumns.numero',
-    type: 'text',
-    width: '110px',
-  },
-  {
     field: 'fecha',
     headerKey: 'entities.conciliacion.detalleColumns.fecha',
     type: 'date',
     width: '120px',
   },
   {
-    field: 'cuenta__codigo',
-    headerKey: 'entities.conciliacion.detalleColumns.cuenta',
+    field: 'contacto_nombre_corto',
+    headerKey: 'entities.conciliacion.detalleColumns.contacto',
     type: 'text',
-    width: '110px',
+    width: '200px',
   },
   {
     field: 'debito',
