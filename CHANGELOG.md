@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.37](https://github.com/wariox3/bario/compare/v0.1.36...v0.1.37) (2026-11-27)
+
+### Features
+
+- **erp:** tipo de documento tras el número al emitir documento electrónico ([77b5b9a](https://github.com/wariox3/bario/commit/77b5b9a1940b992bbd0411c60d8013932ff138d8))
+- **venta:** nota de ajuste POS y columna Ele en las notas electrónicas ([262bcbf](https://github.com/wariox3/bario/commit/262bcbf9e92f4efb9da1bca9d94959261a8a6a8c))
+
 ## [0.1.36](https://github.com/wariox3/bario/compare/v0.1.35...v0.1.36) (2026-11-27)
 
 ### Features
