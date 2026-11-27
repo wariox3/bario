@@ -4,8 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  MascaraFechaDirective,
+  PageActionsComponent,
+} from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -17,8 +21,6 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
-import { ConciliacionDetallesTabComponent } from '../../components/conciliacion-detalles-tab/conciliacion-detalles-tab.component';
-import { ConciliacionSoportesTabComponent } from '../../components/conciliacion-soportes-tab/conciliacion-soportes-tab.component';
 import { CONCILIACION_LIST_PATH, CUENTA_BANCO_ENDPOINT } from '../../conciliacion.constants';
 import { conciliacionToFormValue, formValueToPayload } from '../../conciliacion.mapper';
 import type { Conciliacion } from '../../conciliacion.model';
@@ -26,19 +28,9 @@ import { ConciliacionService } from '../../conciliacion.service';
 import { rangoFechasValido } from '../../conciliacion.validators';
 
 /**
- * Alta/edición de una **conciliación bancaria** y, en edición, su banco de
- * trabajo.
- *
- * La cabecera es corta —periodo y cuenta bancaria— y debajo, **solo cuando el
- * registro existe**, aparecen las dos pestañas donde ocurre el proceso: cargar
- * los movimientos del libro, importar el extracto del banco y cruzarlos.
- *
- * Mismo criterio que la depreciación y el cierre: lo que necesita el id del
- * registro vive en la edición, y al crear se entra derecho a editarlo.
- *
- * "Conciliar" toca las dos colecciones, así que cuando la pestaña del libro
- * avisa que corrió, se incrementa el token que fuerza a la del extracto a
- * recargarse.
+ * Alta/edición de la cabecera de una **conciliación bancaria**: cuenta bancaria
+ * y periodo. El proceso (cargar, importar el extracto, conciliar) vive en la
+ * ficha, que es adonde se cae al guardar.
  */
 @Component({
   selector: 'app-conciliacion-form',
@@ -49,12 +41,10 @@ import { rangoFechasValido } from '../../conciliacion.validators';
     ButtonModule,
     DatePickerModule,
     MascaraFechaDirective,
-    TabsModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpApiSelectComponent,
-    ConciliacionDetallesTabComponent,
-    ConciliacionSoportesTabComponent,
   ],
   templateUrl: './conciliacion-form.component.html',
   styleUrl: './conciliacion-form.component.scss',
@@ -76,16 +66,8 @@ export class ConciliacionFormComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly isEditMode = computed(() => !!this.id());
-  protected readonly conciliacionId = computed(() => {
-    const id = this.id();
-    return id ? Number(id) : 0;
-  });
 
   protected readonly isSaving = signal(false);
-  protected readonly activeTab = signal<'detalles' | 'soporte'>('detalles');
-
-  /** Se incrementa tras conciliar para que la pestaña del extracto se refresque. */
-  protected readonly soporteReloadToken = signal(0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
@@ -131,14 +113,11 @@ export class ConciliacionFormComponent implements OnInit {
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
         this.isSaving.set(false);
-        if (id) {
-          this.toast.success(toasts.editSuccess.title, toasts.editSuccess.desc);
-          this.navigateToList();
-          return;
-        }
-        // Recién creada: el proceso necesita el id, así que se entra a editarla.
-        this.toast.success(toasts.createSuccess.title, toasts.createSuccess.desc);
-        if (saved?.id != null) this.navigateTo('editar', saved.id);
+        const done = id ? toasts.editSuccess : toasts.createSuccess;
+        this.toast.success(done.title, done.desc);
+        // Se cae en la ficha: ahí se carga el detalle y el soporte.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId != null) this.navigateTo('detalle', savedId);
         else this.navigateToList();
       },
       error: (err: unknown) => {
@@ -151,11 +130,6 @@ export class ConciliacionFormComponent implements OnInit {
 
   protected onCancel(): void {
     this.navigateToList();
-  }
-
-  /** El cruce corrió: la pestaña del extracto quedó desactualizada. */
-  protected onConciliado(): void {
-    this.soporteReloadToken.update((n) => n + 1);
   }
 
   private loadConciliacion(id: number): void {

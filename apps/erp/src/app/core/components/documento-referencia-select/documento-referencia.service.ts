@@ -31,12 +31,17 @@ export class DocumentoReferenciaService extends BaseHttpService {
     contactoId: number,
     documentoClaseId: number,
     search: string,
+    documentoTipoId: number | null = null,
   ): Observable<readonly DocumentoReferenciaApi[]> {
     const params: Record<string, string | number> = {
       contacto_id: contactoId,
       documento_clase_id: documentoClaseId,
     };
     if (search) params['search'] = search;
+    // Acota a un tipo dentro de la clase (la POS electrónica, 24, dentro de la 105).
+    // TODO(backend): `seleccionar-referencia/` todavía no lee `documento_tipo_id`
+    // y lo ignora; mientras tanto llegan todos los tipos de la clase.
+    if (documentoTipoId != null) params['documento_tipo_id'] = documentoTipoId;
 
     return this.get<DocumentoReferenciaApiResponse>(SELECCIONAR_REFERENCIA_ENDPOINT, params).pipe(
       map((res) => res.results),

@@ -7,9 +7,8 @@
  * el libro (`conciliacion_detalle`) y el extracto del banco
  * (`conciliacion_soporte`).
  *
- * ⚠️ Contratos **supuestos** a partir del ERP legacy (nombres y tipos), sin
- * verificar contra el backend. Los campos de relación llegan aplanados con doble
- * guion bajo, como los sirve el serializador.
+ * Contratos verificados contra el schema del backend (2026-11-27). Las FK traen
+ * su texto como `<fk>_nombre`.
  */
 
 /** Read-model de una conciliación (listado y ficha). */
@@ -18,10 +17,7 @@ export interface Conciliacion {
   readonly fecha_desde: string | null;
   readonly fecha_hasta: string | null;
   readonly cuenta_banco: number | null;
-  readonly cuenta_banco__nombre?: string | null;
-  /** Cuenta contable asociada a la cuenta bancaria (solo display en la ficha). */
-  readonly cuenta_banco__cuenta__codigo?: string | null;
-  readonly cuenta_banco__cuenta__nombre?: string | null;
+  readonly cuenta_banco_nombre: string | null;
 }
 
 /** Body (POST/PUT) de una conciliación. */
@@ -38,14 +34,20 @@ export interface ConciliacionPayload {
 export interface ConciliacionDetalle {
   readonly id: number;
   readonly fecha: string | null;
-  readonly documento__documento_tipo__nombre?: string | null;
-  readonly documento__numero?: string | number | null;
-  readonly cuenta__codigo?: string | null;
   readonly debito: string | number | null;
   readonly credito: string | number | null;
   readonly detalle: string | null;
   /** `true` cuando el cruce encontró su contraparte en el extracto. */
   readonly estado_conciliado: boolean;
+  readonly conciliacion: number;
+  readonly cuenta: number | null;
+  readonly cuenta_nombre: string | null;
+  readonly contacto: number | null;
+  readonly contacto_nombre_corto: string | null;
+  readonly documento: number | null;
+  readonly documento_documento_tipo_nombre: string | null;
+  readonly documento_numero: number | null;
+  readonly movimiento: number | null;
 }
 
 /**

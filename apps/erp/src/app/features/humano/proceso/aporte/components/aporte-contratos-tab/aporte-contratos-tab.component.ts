@@ -99,6 +99,8 @@ export class AporteContratosTabComponent {
   protected readonly currentPage = signal(0);
   protected readonly selectedRows = signal<readonly AporteContratoFila[]>([]);
   protected readonly isBusy = signal(false);
+  /** La carga de contratos está corriendo: spinner en su botón. */
+  protected readonly isCargando = signal(false);
 
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
@@ -132,15 +134,14 @@ export class AporteContratosTabComponent {
    * "Cargar contratos" es la acción destacada. Se ofrece solo en borrador; el
    * toolbar la oculta cuando no hay ninguna.
    */
-  protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.capacidades().puedeCargarContratos && !this.isBusy()
-      ? {
-          id: 'cargar-contratos',
-          labelKey: 'entities.aporte.contratos.cargarContratos',
-          iconClass: 'pi pi-download',
-        }
-      : null,
-  );
+  protected readonly primaryAction = computed<ToolbarAction>(() => ({
+    id: 'cargar-contratos',
+    labelKey: 'entities.aporte.contratos.cargarContratos',
+    iconClass: 'pi pi-download',
+    // Por estado se deshabilita, no se oculta (estándar de la botonera de tabla).
+    disabled: !this.capacidades().puedeCargarContratos || this.isBusy(),
+    loading: this.isCargando(),
+  }));
 
   /** "Excel ▾" de la tabla, junto a "Cargar contratos": exporta los contratos. */
   protected readonly trailingActions = excelAction('contratos');
@@ -265,12 +266,16 @@ export class AporteContratosTabComponent {
 
   private ejecutarCarga(): void {
     this.isBusy.set(true);
+    this.isCargando.set(true);
     const toasts = this.t().entities.aporte.contratos.toasts;
     this.service
       .cargarContratos(this.aporteId())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isBusy.set(false)),
+        finalize(() => {
+          this.isBusy.set(false);
+          this.isCargando.set(false);
+        }),
       )
       .subscribe({
         next: (res) => {

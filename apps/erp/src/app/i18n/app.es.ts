@@ -3096,8 +3096,14 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
-      filters: { aprobado: 'Aprobado', anulado: 'Anulado', contabilizado: 'Contabilizado' },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
     },
     notaDebito: {
       name: 'Nota débito',
@@ -3113,8 +3119,37 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
-      filters: { aprobado: 'Aprobado', anulado: 'Anulado', contabilizado: 'Contabilizado' },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
+    },
+    notaAjustePos: {
+      name: 'Nota de ajuste POS',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+        electronico: 'Ele',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
     },
     notaVenta: {
       form: {
@@ -3831,10 +3866,12 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',
         anulado: 'Anulado',
+        electronico: 'Electrónico',
         contabilizado: 'Contabilizado',
       },
       form: {
@@ -5872,10 +5909,10 @@ export const es: AppDict = {
       },
       detalleColumns: {
         id: 'ID',
+        fecha: 'Fecha',
         tipo: 'Tipo',
         numero: 'Número',
-        fecha: 'Fecha',
-        cuenta: 'Cuenta',
+        contacto: 'Contacto',
         debito: 'Débito',
         credito: 'Crédito',
         detalle: 'Detalle',
@@ -5893,7 +5930,6 @@ export const es: AppDict = {
         createTitle: 'Nueva conciliación',
         editTitle: 'Editar conciliación',
         sectionHint: 'Elige la cuenta bancaria y el periodo a conciliar',
-        tabs: { detalles: 'Libro', soporte: 'Extracto' },
         fields: {
           cuentaBanco: 'Cuenta banco',
           cuentaBancoPlaceholder: 'Seleccionar…',
@@ -5907,7 +5943,7 @@ export const es: AppDict = {
         toasts: {
           createSuccess: {
             title: 'Conciliación creada',
-            desc: 'Ya puedes cargar el libro y el extracto',
+            desc: 'Ya puedes cargar el detalle y el soporte',
           },
           createError: { title: 'Error al crear', desc: 'No se pudo crear la conciliación' },
           editSuccess: {
@@ -5923,11 +5959,10 @@ export const es: AppDict = {
       },
       detail: {
         sections: { general: 'Información general' },
-        tabs: { detalles: 'Libro', soporte: 'Extracto' },
+        tabs: { detalles: 'Detalle', soporte: 'Soporte' },
         labels: {
           id: 'ID',
           cuentaBanco: 'Cuenta banco',
-          cuentaContable: 'Cuenta contable',
           fechaDesde: 'Fecha desde',
           fechaHasta: 'Fecha hasta',
         },
@@ -5937,43 +5972,67 @@ export const es: AppDict = {
         },
       },
       detalleTab: {
-        cargar: 'Cargar libro',
+        cargar: 'Cargar movimientos',
         conciliar: 'Conciliar',
-        limpiar: 'Limpiar libro',
+        desconciliar: 'Desconciliar',
+        limpiar: 'Limpiar detalle',
         confirmLimpiar: {
-          header: 'Limpiar el libro',
+          header: 'Limpiar el detalle',
           message: '¿Eliminar todos los movimientos cargados? Esta acción no se puede deshacer.',
+        },
+        confirmDesconciliar: {
+          header: 'Desconciliar',
+          message:
+            'Todo lo conciliado, en el detalle y en el soporte, vuelve a quedar pendiente. ¿Continuar?',
+          accept: 'Desconciliar',
+        },
+        conciliarDialog: {
+          title: 'Conciliar',
+          subtitle: 'Cruza el detalle con el soporte por lado y valor',
+          dias: 'Días de tolerancia',
+          diasHint:
+            'Con 0 solo cruza fechas iguales. Súbelo si el banco registra los movimientos unos días antes o después.',
+          submit: 'Conciliar',
+          validation: { required: 'Este campo es obligatorio', rango: 'Debe estar entre 0 y 31' },
         },
         toasts: {
           cargar: {
-            success: { title: 'Libro cargado', desc: 'Se trajeron los movimientos del periodo' },
+            success: { title: 'Movimientos cargados', desc: 'Se cargaron {n} movimientos' },
             error: { title: 'Error al cargar', desc: 'No se pudieron traer los movimientos' },
           },
           conciliar: {
-            success: { title: 'Conciliación ejecutada', desc: 'Se cruzó el libro con el extracto' },
+            success: { title: 'Conciliación ejecutada', desc: 'Se cruzaron {n} movimientos' },
             error: { title: 'Error al conciliar', desc: 'No se pudo ejecutar el cruce' },
           },
+          desconciliar: {
+            success: {
+              title: 'Conciliación deshecha',
+              desc: 'Quedaron pendientes {detalles} movimientos y {soportes} líneas del soporte',
+            },
+            error: { title: 'Error al desconciliar', desc: 'No se pudo deshacer el cruce' },
+          },
           limpiar: {
-            success: { title: 'Libro limpiado', desc: 'Se eliminaron los movimientos cargados' },
+            success: { title: 'Detalle limpiado', desc: 'Se eliminaron {n} movimientos' },
             error: { title: 'Error al limpiar', desc: 'No se pudieron eliminar los movimientos' },
           },
         },
       },
       soporteTab: {
-        cargar: 'Cargar extracto',
-        limpiar: 'Limpiar extracto',
-        plantillaNoDisponible: 'El backend todavía no expone la plantilla de ejemplo',
+        cargar: 'Cargar soporte',
+        limpiar: 'Limpiar soporte',
+        plantilla: 'plantilla-extracto.xlsx',
         import: {
-          title: 'Cargar extracto',
-          subtitle: 'Sube el Excel que entrega el banco',
+          title: 'Cargar soporte',
+          subtitle:
+            'Sube el extracto del banco: fecha, valor (positivo entra, negativo sale) y detalle',
         },
         confirmLimpiar: {
-          header: 'Limpiar el extracto',
+          header: 'Limpiar el soporte',
           message: '¿Eliminar todas las líneas del extracto? Esta acción no se puede deshacer.',
         },
         toasts: {
           limpiar: {
-            success: { title: 'Extracto limpiado', desc: 'Se eliminaron las líneas del extracto' },
+            success: { title: 'Soporte limpiado', desc: 'Se eliminaron {n} líneas' },
             error: { title: 'Error al limpiar', desc: 'No se pudieron eliminar las líneas' },
           },
         },
@@ -6806,6 +6865,7 @@ export const es: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Número',
+        documentoTipo: 'Tipo',
         resolucion: 'Resolución',
         fecha: 'Fecha',
         cliente: 'Cliente',
@@ -6851,6 +6911,7 @@ export const es: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Número',
+        documentoTipo: 'Tipo',
         fecha: 'Fecha',
         empleado: 'Empleado',
         total: 'Total',

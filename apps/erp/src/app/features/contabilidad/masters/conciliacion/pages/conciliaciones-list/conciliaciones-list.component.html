@@ -1,27 +1,39 @@
-<div>
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.conciliacion.name">
   <lib-data-toolbar
-    [primaryAction]="primaryAction()"
-    [trailingActions]="trailingActions()"
+    toolbar
+    [primaryAction]="acciones.primaryAction()"
+    [trailingActions]="acciones.trailingActions()"
     [searchEnabled]="false"
     [filtersEnabled]="true"
     [activeFilters]="activeFilters()"
     [filterFields]="filterFields"
+    [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
+    [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filterEdit)="openFilters($event)"
     (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
+    (deleteSelected)="removeSelected()"
   />
 
   <lib-data-table
+    table
     [columns]="columns"
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
     [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [rowActions]="acciones.rowActions()"
     (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
   />
-</div>
+</lib-list-shell>
 
 <lib-data-filter-modal
   [fields]="filterFields"

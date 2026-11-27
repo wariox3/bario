@@ -214,7 +214,19 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly conceptoCorreccionParams = computed(() => ({
     documento_clase_id: String(this.conceptoCorreccionClaseId()),
   }));
-  protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_VENTA;
+  /**
+   * Qué referencia la nota (`DocumentEntityConfig.referencia`). Sin declarar ⇒ una
+   * factura de venta, opcional, como la nota crédito y la débito.
+   */
+  protected readonly referenciaDocumentoClaseId = computed(
+    () => this.document().referencia?.documentoClaseId ?? DOCUMENTO_CLASE_ID.FACTURA_VENTA,
+  );
+  protected readonly referenciaRequerida = computed(
+    () => this.document().referencia?.requerida === true,
+  );
+  protected readonly referenciaDocumentoTipoId = computed(
+    () => this.document().referencia?.documentoTipoId ?? null,
+  );
 
   /** El documento ofrece cargar las líneas de su factura referencia (la nota crédito). */
   protected readonly cargaLineasReferencia = computed(
@@ -391,6 +403,12 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
       const concepto = this.form.controls.documento_concepto_correccion;
       concepto.addValidators(Validators.required);
       concepto.updateValueAndValidity({ emitEvent: false });
+    }
+    // Igual con la referencia: la nota de ajuste POS no existe sin la factura que ajusta.
+    if (this.referenciaRequerida()) {
+      const referencia = this.form.controls.documento_referencia;
+      referencia.addValidators(Validators.required);
+      referencia.updateValueAndValidity({ emitEvent: false });
     }
 
     const id = this.id();

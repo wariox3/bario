@@ -73,7 +73,7 @@
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="conciliacion-detail__label">{{ det.labels.cuentaBanco }}</dt>
-        <dd class="conciliacion-detail__value">{{ c.cuentaBanco || '—' }}</dd>
+        <dd class="conciliacion-detail__value">{{ c.cuentaBanco }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="conciliacion-detail__label">{{ det.labels.fechaDesde }}</dt>
@@ -83,14 +83,10 @@
         <dt class="conciliacion-detail__label">{{ det.labels.fechaHasta }}</dt>
         <dd class="conciliacion-detail__value">{{ formatFecha(c.fechaHasta) }}</dd>
       </div>
-      <div class="flex flex-col gap-0.5 sm:col-span-2">
-        <dt class="conciliacion-detail__label">{{ det.labels.cuentaContable }}</dt>
-        <dd class="conciliacion-detail__value">{{ c.cuentaContable || '—' }}</dd>
-      </div>
     </dl>
   </section>
 
-  <!-- ── Libro y extracto, sin acciones ──────────────────────────────────────── -->
+  <!-- ── Detalle (libro) y soporte (extracto del banco) ──────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <p-tabs
       class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
@@ -104,11 +100,19 @@
 
       <p-tabpanels>
         <p-tabpanel value="detalles">
-          <app-conciliacion-detalles-tab [conciliacionId]="conciliacionId()" />
+          <app-conciliacion-detalles-tab
+            [conciliacionId]="conciliacionId()"
+            [canOperate]="true"
+            (conciliadoChange)="onConciliado()"
+          />
         </p-tabpanel>
 
         <p-tabpanel value="soporte">
-          <app-conciliacion-soportes-tab [conciliacionId]="conciliacionId()" />
+          <app-conciliacion-soportes-tab
+            [conciliacionId]="conciliacionId()"
+            [canOperate]="true"
+            [reloadToken]="soporteReloadToken()"
+          />
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>

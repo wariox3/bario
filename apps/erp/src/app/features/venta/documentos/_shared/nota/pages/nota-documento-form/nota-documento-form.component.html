@@ -99,13 +99,21 @@
         <div class="flex flex-col gap-1.5">
           <label for="documento_referencia" class="nota-documento-form__label">
             {{ f.fields.documentoReferencia }}
+            @if (referenciaRequerida()) {
+              <span class="ml-px text-red-500">*</span>
+            }
           </label>
           <div class="flex items-stretch gap-2">
             <app-documento-referencia-select
               class="min-w-0 flex-1"
               inputId="documento_referencia"
               formControlName="documento_referencia"
-              [documentoClaseId]="referenciaDocumentoClaseId"
+              [documentoClaseId]="referenciaDocumentoClaseId()"
+              [documentoTipoId]="referenciaDocumentoTipoId()"
+              [invalid]="
+                form.controls.documento_referencia.invalid &&
+                form.controls.documento_referencia.touched
+              "
               [contactoId]="contactoId()"
               [emptyMessage]="f.fields.documentoReferenciaEmpty"
               [placeholder]="
@@ -122,6 +130,10 @@
               />
             }
           </div>
+          <lib-field-error
+            [control]="form.controls.documento_referencia"
+            [messages]="{ required: f.validation.required }"
+          />
         </div>
 
         <!-- Método de pago -->

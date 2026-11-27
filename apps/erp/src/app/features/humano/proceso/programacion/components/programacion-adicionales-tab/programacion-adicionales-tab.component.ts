@@ -82,21 +82,27 @@ export class ProgramacionAdicionalesTabComponent {
       : [],
   );
 
-  /** "Acciones" de la tabla, como en los masters: por ahora solo importar. */
-  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() =>
-    this.capacidades().puedeGestionarAdicionales && !this.isBusy()
-      ? [
-          {
-            id: 'actions',
-            labelKey: 'common.actions.actions',
-            iconClass: '',
-            children: [
-              { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
-            ],
-          },
-        ]
-      : [],
+  /** Fuera de borrador o con algo en curso: se ve, no se usa (estándar de la botonera). */
+  private readonly sinGestion = computed(
+    () => !this.capacidades().puedeGestionarAdicionales || this.isBusy(),
   );
+
+  /** "Acciones" de la tabla, como en los masters: por ahora solo importar. */
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => [
+    {
+      id: 'actions',
+      labelKey: 'common.actions.actions',
+      iconClass: '',
+      children: [
+        {
+          id: 'import',
+          labelKey: 'common.actions.import',
+          iconClass: 'pi pi-upload',
+          disabled: this.sinGestion(),
+        },
+      ],
+    },
+  ]);
 
   /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
   protected readonly exampleConfig = {
@@ -118,11 +124,12 @@ export class ProgramacionAdicionalesTabComponent {
     masters: IMPORT_MASTERS_ALL,
   });
 
-  protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.capacidades().puedeGestionarAdicionales && !this.isBusy()
-      ? { id: 'new', labelKey: 'common.actions.new', iconClass: 'pi pi-plus' }
-      : null,
-  );
+  protected readonly primaryAction = computed<ToolbarAction>(() => ({
+    id: 'new',
+    labelKey: 'common.actions.new',
+    iconClass: 'pi pi-plus',
+    disabled: this.sinGestion(),
+  }));
 
   constructor() {
     effect(() => {

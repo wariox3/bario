@@ -167,6 +167,22 @@ export interface DocumentEntityConfig {
    */
   readonly conceptoCorreccionClaseId?: number;
   /**
+   * Qué documento referencia la nota, para la familia de notas de venta. Se omite
+   * ⇒ factura de venta (clase 100), opcional y de cualquier estado electrónico,
+   * como la nota crédito y la débito.
+   *
+   * - `documentoClaseId`: clase con que se filtra `seleccionar-referencia/`.
+   * - `requerida`: la nota no se guarda sin referencia (la de ajuste POS: el
+   *   backend responde 400 sin ella).
+   * - `documentoTipoId`: acota además a un tipo de la clase. Separa la POS
+   *   electrónica (24) de la POS sin envío (27), que comparten la clase 105.
+   */
+  readonly referencia?: {
+    readonly documentoClaseId: number;
+    readonly requerida?: boolean;
+    readonly documentoTipoId?: number;
+  };
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */

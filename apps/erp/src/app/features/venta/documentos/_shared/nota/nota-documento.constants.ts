@@ -1,8 +1,8 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 
 /**
- * Constantes compartidas por las **notas de venta**: nota crédito (2) y nota
- * débito (3).
+ * Constantes compartidas por las **notas de venta**: nota crédito (2), nota
+ * débito (3) y nota de ajuste POS (36). Las tres se emiten a la DIAN.
  */
 
 /** Endpoint `seleccionar` de sedes. */
@@ -67,6 +67,14 @@ export function buildNotaColumns(i18nNamespace: string): readonly ColumnDef[] {
       width: '70px',
       align: 'center',
     },
+    // Las tres notas de venta se emiten a la DIAN: «Ele» al final, como la factura.
+    {
+      field: 'estado_electronico',
+      headerKey: `${ns}.electronico`,
+      type: 'boolean',
+      width: '70px',
+      align: 'center',
+    },
   ];
 }
 
@@ -89,6 +97,7 @@ export function buildNotaFilters(i18nNamespace: string): readonly FilterField[] 
     { name: 'contacto__nombre_corto', displayNameKey: `${cols}.contacto`, type: 'string' },
     { name: 'estado_aprobado', displayNameKey: `${filters}.aprobado`, type: 'boolean' },
     { name: 'estado_anulado', displayNameKey: `${filters}.anulado`, type: 'boolean' },
+    { name: 'estado_electronico', displayNameKey: `${filters}.electronico`, type: 'boolean' },
     { name: 'estado_contabilizado', displayNameKey: `${filters}.contabilizado`, type: 'boolean' },
   ];
 }

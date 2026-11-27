@@ -9,7 +9,7 @@ import type { Route } from '@angular/router';
  * `editar/:id` comparten componente pero no se ven igual: en alta solo está la
  * cabecera, porque el proceso necesita el id.
  *
- * URL base: `/t/:tenantSlug/contabilidad/utilidades/conciliacion`
+ * URL base: `/t/:tenantSlug/contabilidad/conciliacion`
  */
 export const CONCILIACION_ROUTES: Route[] = [
   {

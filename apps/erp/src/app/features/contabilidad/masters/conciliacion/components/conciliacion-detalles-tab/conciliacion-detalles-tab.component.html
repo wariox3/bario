@@ -1,39 +1,27 @@
-<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.conciliacion.name">
+<div>
   <lib-data-toolbar
-    toolbar
-    [primaryAction]="primaryAction"
-    [trailingActions]="trailingActions"
+    [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
     [searchEnabled]="false"
     [filtersEnabled]="true"
     [activeFilters]="activeFilters()"
     [filterFields]="filterFields"
-    [deleteSelectedEnabled]="hasSelection()"
-    [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filterEdit)="openFilters($event)"
     (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
-    (deleteSelected)="removeSelected()"
   />
 
   <lib-data-table
-    table
     [columns]="columns"
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
     [currentPage]="currentPage()"
-    [sort]="sort()"
-    selectionMode="multiple"
-    [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
     (pageChange)="onPageChange($event)"
-    (sortChange)="onSortChange($event)"
-    (selectionChange)="onSelectionChange($event)"
-    (rowActionInvoked)="onRowAction($event)"
   />
-</lib-list-shell>
+</div>
 
 <lib-data-filter-modal
   [fields]="filterFields"
@@ -42,6 +30,13 @@
   [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
+/>
+
+<app-conciliar-dialog
+  [visible]="conciliarVisible()"
+  (visibleChange)="conciliarVisible.set($event)"
+  [processing]="isBusy()"
+  (confirmar)="conciliar($event)"
 />
 
 <p-confirmDialog />

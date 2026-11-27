@@ -6,7 +6,7 @@
  * `DocumentEntityConfig` use magic numbers — cada documento del framework
  * referencia su tipo por nombre semántico desde este mapa.
  *
- * Catálogo completo de tipos del backend (1..35). Tener un id aquí no implica
+ * Catálogo completo de tipos del backend (1..36). Tener un id aquí no implica
  * que el documento esté implementado en el front: solo los que tienen su
  * `DocumentEntityConfig` aparecen en la UI. El nombre semántico evita magic
  * numbers al referenciarlos.
@@ -51,6 +51,8 @@ export const DOCUMENT_TYPE_ID = {
   CONTRATO_SERVICIO: 34,
   /** Pedido de servicio (movimiento de venta; misma familia que contrato servicio). */
   PEDIDO_SERVICIO: 35,
+  /** Nota de ajuste POS: ajusta una factura POS electrónica ante la DIAN. */
+  NOTA_AJUSTE_POS: 36,
 } as const satisfies Readonly<Record<string, number>>;
 
 /** Nombre semántico (clave) de un tipo de documento registrado. */
@@ -71,6 +73,9 @@ export const DOCUMENTO_CLASE_ID = {
   FACTURA_VENTA: 100,
   NOTA_CREDITO_VENTA: 101,
   NOTA_DEBITO_VENTA: 102,
+  /** Factura POS, electrónica (24) y no electrónica (27). */
+  FACTURA_POS: 105,
+  NOTA_AJUSTE_POS: 111,
   FACTURA_COMPRA: 300,
   DOCUMENTO_SOPORTE: 303,
   NOTA_AJUSTE: 304,

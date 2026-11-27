@@ -3,7 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
+import {
+  FileDownloadService,
+  I18nService,
+  ToastService,
+  buildFiltros,
+  extractErrorMessage,
+  type FilterCondition,
+} from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -15,7 +22,11 @@ import { ImportDialogComponent } from '@erp/core/components/import-dialog/import
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
-import { ConciliacionService, CONCILIACION_EXCEL_SERIALIZADOR } from '../../conciliacion.service';
+import {
+  CONCILIACION_SOPORTE_EJEMPLO_ENDPOINT,
+  ConciliacionService,
+  filtrosDeConciliacion,
+} from '../../conciliacion.service';
 import type { ConciliacionSoporte } from '../../conciliacion.model';
 import {
   CONCILIACION_ESTADO_FILTER_FIELDS,
@@ -23,15 +34,12 @@ import {
 } from '../../conciliacion.constants';
 
 /**
- * Pestaña del **extracto bancario**: las líneas que el banco entrega en Excel.
+ * Pestaña **Soporte**: el extracto que entrega el banco.
  *
- * No se teclean ni se editan: entran por importación ("Cargar soporte") y salen
- * todas juntas ("Limpiar"). El cruce contra el libro lo dispara la otra pestaña
- * y marca `estado_conciliado` también acá, por eso el padre puede forzar una
- * recarga con `reloadToken`.
- *
- * `canOperate` decide si se renderizan las acciones: el formulario de edición lo
- * prende, la ficha de solo lectura no.
+ * No se teclea ni se edita: entra por importación ("Cargar soporte", con la
+ * plantilla de Fecha, Valor y Detalle) y sale todo junto ("Limpiar"). El cruce
+ * lo dispara la pestaña Detalle y marca `estado_conciliado` también acá, por eso
+ * el padre puede forzar una recarga con `reloadToken`.
  */
 @Component({
   selector: 'app-conciliacion-soportes-tab',
@@ -58,7 +66,7 @@ export class ConciliacionSoportesTabComponent {
 
   readonly conciliacionId = input.required<number>();
 
-  /** Muestra las acciones (importar, limpiar). La ficha las apaga. */
+  /** Muestra las acciones (importar, limpiar). */
   readonly canOperate = input<boolean>(false);
 
   /** Cambiar el número fuerza una recarga (lo usa el padre tras conciliar). */
@@ -81,14 +89,12 @@ export class ConciliacionSoportesTabComponent {
     onImported: () => this.loadPage(0),
   });
 
-  /**
-   * El ERP anterior servía la plantilla del extracto desde un XLSX alojado
-   * fuera del backend, así que no hay endpoint que ofrecer. El botón se muestra
-   * deshabilitado, con el motivo a la vista, hasta que el backend exponga uno.
-   */
+  /** La plantilla trae de ejemplo fechas de la propia conciliación. */
   protected readonly exampleConfig = computed<ExampleConfig>(() => ({
-    mode: 'disabled',
-    reason: this.t().entities.conciliacion.soporteTab.plantillaNoDisponible,
+    mode: 'enabled',
+    endpoint: CONCILIACION_SOPORTE_EJEMPLO_ENDPOINT,
+    params: { conciliacion: this.conciliacionId() },
+    filename: this.t().entities.conciliacion.soporteTab.plantilla,
   }));
 
   protected readonly columns = CONCILIACION_SOPORTE_COLUMNS;
@@ -98,39 +104,41 @@ export class ConciliacionSoportesTabComponent {
 
   /** Acción destacada: cargar el extracto, que es por donde empieza la pestaña. */
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.canOperate() && !this.isBusy()
+    this.canOperate()
       ? {
           id: 'cargar',
           labelKey: 'entities.conciliacion.soporteTab.cargar',
           iconClass: 'pi pi-upload',
+          disabled: this.isBusy(),
         }
       : null,
   );
 
   /**
-   * Resto de acciones, en el dropdown "Acciones". Se arman según el estado
-   * —limpiar no aparece sin nada que limpiar— porque `ToolbarAction` no modela
-   * el deshabilitado.
+   * Botonera de tabla: en «Acciones» el Excel primero y, separado y en rojo,
+   * Limpiar soporte. Lo que no aplica por estado se deshabilita.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
-    const children: ToolbarAction[] = [];
-    if (this.hasItems()) {
-      children.push({
+    const sinItems = !this.hasItems();
+    const children: ToolbarAction[] = [
+      {
         id: 'export-excel',
         labelKey: 'common.actions.exportExcel',
         iconClass: 'pi pi-file-excel',
-      });
-    }
-    if (this.canOperate() && this.hasItems() && !this.isBusy()) {
+        disabled: sinItems,
+      },
+    ];
+    if (this.canOperate()) {
       children.push({
         id: 'limpiar',
         labelKey: 'entities.conciliacion.soporteTab.limpiar',
         iconClass: 'pi pi-trash',
+        severity: 'danger',
+        separatorBefore: true,
+        disabled: sinItems || this.isBusy(),
       });
     }
-    return children.length
-      ? [{ id: 'actions', labelKey: 'common.actions.actions', iconClass: '', children }]
-      : [];
+    return [{ id: 'actions', labelKey: 'common.actions.actions', iconClass: '', children }];
   });
 
   constructor() {
@@ -201,8 +209,7 @@ export class ConciliacionSoportesTabComponent {
       .download(this.service.exportSoporteUrl, {
         method: 'POST',
         body: {
-          conciliacion_id: this.conciliacionId(),
-          serializador: CONCILIACION_EXCEL_SERIALIZADOR,
+          filtros: buildFiltros(filtrosDeConciliacion(this.conciliacionId(), this.activeFilters())),
         },
         fallbackFilename: 'conciliacion-soporte.xlsx',
       })
@@ -228,11 +235,17 @@ export class ConciliacionSoportesTabComponent {
         finalize(() => this.isBusy.set(false)),
       )
       .subscribe({
-        next: () => {
-          this.toast.success(toasts.success.title, toasts.success.desc);
+        next: ({ eliminados }) => {
+          this.toast.success(
+            toasts.success.title,
+            toasts.success.desc.replace('{n}', String(eliminados)),
+          );
           this.loadPage(0);
         },
-        error: () => this.toast.error(toasts.error.title, toasts.error.desc),
+        // Sin toast del interceptor: acá se avisa todo status, con el mensaje
+        // del backend (p. ej. el 400 cuando hay líneas conciliadas).
+        error: (err: unknown) =>
+          this.toast.error(toasts.error.title, extractErrorMessage(err, toasts.error.desc)),
       });
   }
 
@@ -242,7 +255,7 @@ export class ConciliacionSoportesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarSoportes(id, page + 1, this.activeFilters())
+      .listarSoportes(id, page, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

@@ -2298,8 +2298,9 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
-      filters: { aprobado: string; anulado: string; contabilizado: string };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
     };
     /** Nota débito de venta (tipo 3). Listado; form/ficha en `notaVenta`. */
     notaDebito: {
@@ -2316,8 +2317,28 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
-      filters: { aprobado: string; anulado: string; contabilizado: string };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
+    };
+    /** Nota de ajuste POS (tipo 36). Listado; form/ficha en `notaVenta`. */
+    notaAjustePos: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+        electronico: string;
+      };
+      filters: { aprobado: string; anulado: string; electronico: string; contabilizado: string };
     };
     /**
      * Textos del **form y la ficha compartidos por las notas de venta** (nota
@@ -2871,10 +2892,12 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;
         anulado: string;
+        electronico: string;
         contabilizado: string;
       };
       form: {
@@ -4448,10 +4471,10 @@ export interface AppDict
       columns: { id: string; fechaDesde: string; fechaHasta: string; cuentaBanco: string };
       detalleColumns: {
         id: string;
+        fecha: string;
         tipo: string;
         numero: string;
-        fecha: string;
-        cuenta: string;
+        contacto: string;
         debito: string;
         credito: string;
         detalle: string;
@@ -4469,7 +4492,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        tabs: { detalles: string; soporte: string };
         fields: {
           cuentaBanco: string;
           cuentaBancoPlaceholder: string;
@@ -4491,7 +4513,6 @@ export interface AppDict
         labels: {
           id: string;
           cuentaBanco: string;
-          cuentaContable: string;
           fechaDesde: string;
           fechaHasta: string;
         };
@@ -4500,14 +4521,30 @@ export interface AppDict
       detalleTab: {
         cargar: string;
         conciliar: string;
+        desconciliar: string;
         limpiar: string;
         confirmLimpiar: { header: string; message: string };
+        confirmDesconciliar: { header: string; message: string; accept: string };
+        /** Tolerancia en días del cruce automático (0 a 31). */
+        conciliarDialog: {
+          title: string;
+          subtitle: string;
+          dias: string;
+          diasHint: string;
+          submit: string;
+          validation: { required: string; rango: string };
+        };
         toasts: {
           cargar: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };
           };
           conciliar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          /** `desc` lleva `{detalles}` y `{soportes}`. */
+          desconciliar: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };
           };
@@ -4520,7 +4557,7 @@ export interface AppDict
       soporteTab: {
         cargar: string;
         limpiar: string;
-        plantillaNoDisponible: string;
+        plantilla: string;
         import: { title: string; subtitle: string };
         confirmLimpiar: { header: string; message: string };
         toasts: {
@@ -5186,6 +5223,7 @@ export interface AppDict
       columns: {
         id: string;
         numero: string;
+        documentoTipo: string;
         resolucion: string;
         fecha: string;
         cliente: string;
@@ -5218,6 +5256,7 @@ export interface AppDict
       columns: {
         id: string;
         numero: string;
+        documentoTipo: string;
         fecha: string;
         empleado: string;
         total: string;

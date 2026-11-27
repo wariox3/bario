@@ -95,31 +95,30 @@ export class LiquidacionAdicionalesTabComponent {
       : [],
   );
 
+  /** Fuera de borrador o con algo en curso: se ven, no se usan (estándar de la botonera). */
+  private readonly sinGestion = computed(
+    () => !this.capacidades().puedeGestionarAdicionales || this.isBusy(),
+  );
+
   /**
    * Las dos altas. Van como acción primaria y acción trailing porque el toolbar
    * compartido admite una sola primaria; la adición es la más frecuente.
    */
-  protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.capacidades().puedeGestionarAdicionales && !this.isBusy()
-      ? {
-          id: 'nueva-adicion',
-          labelKey: 'entities.liquidacion.adicionales.nuevaAdicion',
-          iconClass: 'pi pi-plus',
-        }
-      : null,
-  );
+  protected readonly primaryAction = computed<ToolbarAction>(() => ({
+    id: 'nueva-adicion',
+    labelKey: 'entities.liquidacion.adicionales.nuevaAdicion',
+    iconClass: 'pi pi-plus',
+    disabled: this.sinGestion(),
+  }));
 
-  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() =>
-    this.capacidades().puedeGestionarAdicionales && !this.isBusy()
-      ? [
-          {
-            id: 'nueva-deduccion',
-            labelKey: 'entities.liquidacion.adicionales.nuevaDeduccion',
-            iconClass: 'pi pi-minus',
-          },
-        ]
-      : [],
-  );
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => [
+    {
+      id: 'nueva-deduccion',
+      labelKey: 'entities.liquidacion.adicionales.nuevaDeduccion',
+      iconClass: 'pi pi-minus',
+      disabled: this.sinGestion(),
+    },
+  ]);
 
   constructor() {
     effect(() => {

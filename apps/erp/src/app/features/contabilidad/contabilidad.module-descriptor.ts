@@ -22,7 +22,18 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       labelKey: 'layout.nav.sections.accounting',
       iconClass: 'pi pi-book',
       defaultExpanded: true,
-      groups: [{ items: [{ labelKey: 'entities.exogena.name', path: 'exogena' }] }],
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.conciliacion.name',
+              path: 'conciliacion',
+              modelo: MODELO.contabilidad.conciliacion,
+            },
+            { labelKey: 'entities.exogena.name', path: 'exogena' },
+          ],
+        },
+      ],
     },
     {
       kind: 'accordion',
@@ -94,11 +105,6 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
         {
           items: [
             { labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' },
-            {
-              labelKey: 'entities.conciliacion.name',
-              path: 'utilidades/conciliacion',
-              activeMatch: 'utilidades/conciliacion',
-            },
             { labelKey: 'entities.inconsistencias.name', path: 'utilidades/inconsistencias' },
             { labelKey: 'entities.movimientoContable.name', path: 'utilidades/movimientos' },
           ],

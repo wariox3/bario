@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ConciliacionService } from '../../conciliacion.service';
 import type { Conciliacion } from '../../conciliacion.model';
@@ -102,9 +103,11 @@ export class ConciliacionesListComponent {
 
   protected readonly columns = CONCILIACIONES_COLUMNS;
   protected readonly filterFields = CONCILIACIONES_FILTER_FIELDS;
-  protected readonly rowActions = CONCILIACIONES_ROW_ACTIONS;
-  protected readonly primaryAction = CONCILIACIONES_PRIMARY_ACTION;
-  protected readonly trailingActions = CONCILIACIONES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.contabilidad.conciliacion, {
+    row: CONCILIACIONES_ROW_ACTIONS,
+    primary: CONCILIACIONES_PRIMARY_ACTION,
+    trailing: CONCILIACIONES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -273,7 +276,7 @@ export class ConciliacionesListComponent {
       });
   }
 
-  /** Navega dentro del tenant: `/t/<slug>/contabilidad/utilidades/conciliacion/<...>`. */
+  /** Navega dentro del tenant: `/t/<slug>/contabilidad/conciliacion/<...>`. */
   private navigateTo(segment?: string, id?: number): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;

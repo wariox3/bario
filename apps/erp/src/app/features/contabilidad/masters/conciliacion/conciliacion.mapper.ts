@@ -9,7 +9,7 @@ export function conciliacionToFormValue(read: Conciliacion): Partial<Conciliacio
     fecha_hasta: fromIsoDate(read.fecha_hasta),
     cuenta_banco:
       read.cuenta_banco != null
-        ? { id: read.cuenta_banco, nombre: read.cuenta_banco__nombre ?? '' }
+        ? { id: read.cuenta_banco, nombre: read.cuenta_banco_nombre ?? '' }
         : null,
   };
 }

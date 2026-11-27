@@ -83,6 +83,14 @@ export const NOTA_AJUSTE_COLUMNS: readonly ColumnDef[] = [
     width: '70px',
     align: 'center',
   },
+  // Se emite a la DIAN: «Ele» al final, como el documento soporte.
+  {
+    field: 'estado_electronico',
+    headerKey: 'entities.notaAjuste.columns.electronico',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
 ];
 
 /**
@@ -110,6 +118,11 @@ export const NOTA_AJUSTE_FILTERS: readonly FilterField[] = [
   {
     name: 'estado_anulado',
     displayNameKey: 'entities.notaAjuste.filters.anulado',
+    type: 'boolean',
+  },
+  {
+    name: 'estado_electronico',
+    displayNameKey: 'entities.notaAjuste.filters.electronico',
     type: 'boolean',
   },
   {

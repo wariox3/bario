@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.37](https://github.com/wariox3/bario/compare/v0.1.36...v0.1.37) (2026-11-27)
+
+### Features
+
+- **erp:** tipo de documento tras el número al emitir documento electrónico ([77b5b9a](https://github.com/wariox3/bario/commit/77b5b9a1940b992bbd0411c60d8013932ff138d8))
+- **venta:** nota de ajuste POS y columna Ele en las notas electrónicas ([262bcbf](https://github.com/wariox3/bario/commit/262bcbf9e92f4efb9da1bca9d94959261a8a6a8c))
+
+## [0.1.36](https://github.com/wariox3/bario/compare/v0.1.35...v0.1.36) (2026-11-27)
+
+### Features
+
+- **contabilidad:** conciliación bancaria contra los endpoints del backend ([8085d7a](https://github.com/wariox3/bario/commit/8085d7ad8105c6bd96d86610a4ce86bef1d5b1c8))
+- **contabilidad:** permisos de la conciliación como el resto de masters ([ad78234](https://github.com/wariox3/bario/commit/ad78234361e2e695cc8c797f9934899c7063da87))
+- **contabilidad:** tipo y número de documento en el detalle de la conciliación ([80dac7f](https://github.com/wariox3/bario/commit/80dac7f9f84b60119400046650a22982ef977fc1))
+- **ui:** estándar de botonera de tabla en lib-data-toolbar ([7011280](https://github.com/wariox3/bario/commit/7011280e6ffbc8b82544f1ddfc1cfcbf5a3b42a3))
+
+### Refactoring
+
+- **erp:** botoneras de tabla con el estándar de lib-data-toolbar ([ec0063d](https://github.com/wariox3/bario/commit/ec0063d3a441232058c77a2f667f95e0d171a8c4))
+
 ## [0.1.35](https://github.com/wariox3/bario/compare/v0.1.34...v0.1.35) (2026-11-26)
 
 ### Bug Fixes
