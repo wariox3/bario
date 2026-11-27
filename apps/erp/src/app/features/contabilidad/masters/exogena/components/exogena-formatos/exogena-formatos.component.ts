@@ -1,38 +1,64 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ButtonModule } from 'primeng/button';
-import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { finalize } from 'rxjs';
+import { I18nService, ToastService, type ColumnDef } from '@reddoc/core';
 import {
-  I18nService,
-  LIST_PAGE_SIZE,
-  ToastService,
-  formatCop,
-  formatFechaCorta,
-} from '@reddoc/core';
+  DataTableComponent,
+  DataToolbarComponent,
+  type PageChangeEvent,
+  type ToolbarAction,
+} from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import type { ExogenaFormato } from '../../exogena.model';
 import { ExogenaService } from '../../exogena.service';
 
-/** Fila de la tabla: el formato con sus valores ya formateados. */
-interface FormatoFila {
-  readonly id: number;
-  readonly nombre: string;
-  readonly cuantiaMenor: string;
-  readonly registros: number;
-  readonly total: string;
-  readonly fechaGeneracion: string;
-  readonly presentado: boolean;
-}
+/** Columnas de los formatos: los importes en pesos, la fecha corta. */
+const FORMATO_COLUMNS: readonly ColumnDef[] = [
+  { field: 'formato_nombre', headerKey: 'entities.exogena.formatos.columns.formato', type: 'text' },
+  {
+    field: 'cuantia_menor',
+    headerKey: 'entities.exogena.formatos.columns.cuantiaMenor',
+    type: 'currency',
+    align: 'right',
+  },
+  {
+    field: 'registros',
+    headerKey: 'entities.exogena.formatos.columns.registros',
+    type: 'number',
+    width: '110px',
+    align: 'right',
+  },
+  {
+    field: 'total',
+    headerKey: 'entities.exogena.formatos.columns.total',
+    type: 'currency',
+    align: 'right',
+  },
+  {
+    field: 'fecha_generacion',
+    headerKey: 'entities.exogena.formatos.columns.fechaGeneracion',
+    type: 'date',
+    width: '150px',
+  },
+  {
+    field: 'estado_presentado',
+    headerKey: 'entities.exogena.formatos.columns.presentado',
+    type: 'boolean',
+    width: '120px',
+    align: 'center',
+  },
+];
 
 /**
  * Formatos de la exógena de un año, dentro de su ficha. Se carga sola y pagina de
- * a 25. Trae también «Cargar formatos», que suma los del catálogo que falten.
+ * a 25. Sigue la botonera de tabla: «Cargar formatos» (suma los del catálogo que
+ * falten) es la principal y, con la exógena presentada, se ve deshabilitada —el
+ * backend respondería 400—.
  */
 @Component({
   selector: 'app-exogena-formatos',
   standalone: true,
-  imports: [ButtonModule, PaginatorModule],
+  imports: [DataTableComponent, DataToolbarComponent],
   templateUrl: './exogena-formatos.component.html',
 })
 export class ExogenaFormatosComponent implements OnInit {
@@ -44,37 +70,38 @@ export class ExogenaFormatosComponent implements OnInit {
   protected readonly t = this.i18n.t;
 
   readonly exogenaId = input.required<number>();
+  /** Presentada ya no se modifica: «Cargar formatos» queda deshabilitado. */
+  readonly presentada = input(false);
 
-  protected readonly pageSize = LIST_PAGE_SIZE;
+  protected readonly columns = FORMATO_COLUMNS;
   protected readonly page = signal(0);
   protected readonly totalFormatos = signal(0);
   protected readonly formatos = signal<readonly ExogenaFormato[]>([]);
   protected readonly isLoading = signal(true);
-  protected readonly hasError = signal(false);
   protected readonly isCargando = signal(false);
 
-  protected readonly filas = computed<readonly FormatoFila[]>(() =>
-    this.formatos().map((f) => ({
-      id: f.id,
-      nombre: f.formato_nombre ?? '',
-      cuantiaMenor: formatCop(f.cuantia_menor),
-      registros: f.registros,
-      total: formatCop(f.total),
-      fechaGeneracion: formatFechaCorta(f.fecha_generacion, ''),
-      presentado: f.estado_presentado,
-    })),
-  );
+  protected readonly primaryAction = computed<ToolbarAction>(() => ({
+    id: 'cargar',
+    labelKey: 'entities.exogena.formatos.cargar',
+    iconClass: 'pi pi-download',
+    disabled: this.presentada() || this.isCargando(),
+    loading: this.isCargando(),
+  }));
 
   ngOnInit(): void {
     this.load();
   }
 
-  protected onPageChange(event: PaginatorState): void {
-    this.page.set(event.page ?? 0);
+  protected onPageChange(event: PageChangeEvent): void {
+    this.page.set(event.page);
     this.load();
   }
 
-  protected cargarFormatos(): void {
+  protected onToolbarAction(actionId: string): void {
+    if (actionId === 'cargar') this.cargarFormatos();
+  }
+
+  private cargarFormatos(): void {
     if (this.isCargando()) return;
     this.isCargando.set(true);
     this.service
@@ -105,7 +132,6 @@ export class ExogenaFormatosComponent implements OnInit {
 
   private load(): void {
     this.isLoading.set(true);
-    this.hasError.set(false);
     this.service
       .listarFormatos(this.exogenaId(), this.page())
       .pipe(
@@ -117,7 +143,14 @@ export class ExogenaFormatosComponent implements OnInit {
           this.formatos.set(res.results);
           this.totalFormatos.set(res.count);
         },
-        error: () => this.hasError.set(true),
+        error: () => {
+          this.formatos.set([]);
+          this.totalFormatos.set(0);
+          this.toast.error(
+            this.t().common.toasts.loadError.title,
+            this.t().entities.exogena.formatos.loadError,
+          );
+        },
       });
   }
 }

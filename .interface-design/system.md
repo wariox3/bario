@@ -1048,6 +1048,11 @@ vivo: `contabilidad/masters/conciliacion/components/conciliacion-detalles-tab`.
 4. **«Eliminar (N)» es la única acción roja a la vista**: aparece solo con filas seleccionadas
    (`deleteSelectedEnabled`), que ya es una confirmación de intención.
 
+**Variante «Excel ▾»:** si el dropdown **solo** tiene exportaciones, se titula «Excel ▾» en vez
+de «Acciones ▾», con cada exportación como ítem (renglones, nómina y nómina detalle en
+programación; contratos, detalles y entidades en aporte). En cuanto suma algo que no es exportar,
+vuelve a ser «Acciones ▾» con el Excel primero.
+
 **Deshabilitar por estado, ocultar por permiso:**
 
 - Lo que el **estado** no permite todavía (tabla vacía, documento aprobado, otra operación en
@@ -1059,9 +1064,9 @@ vivo: `contabilidad/masters/conciliacion/components/conciliacion-detalles-tab`.
   deshabilitadas las demás: una sola a la vez. Se modela con un `enCurso = signal<Operacion |
 null>` y `isBusy = computed(() => enCurso() !== null)`.
 
-**Pendiente de migrar** (siguen la forma vieja): programación, liquidación y aporte ocultan por
-estado en vez de deshabilitar; las líneas de los documentos (`*-documento-detalles`) usan
-`p-button` propios en la banda; formatos de exógena, un botón suelto en la cabecera de su card.
+**Fuera del patrón:** las líneas de los documentos (`*-documento-detalles`, `documento-pagos`).
+Son tablas editables en línea —escáner, «Guardar todo (N)», menú de «Agregar línea»— con su propia
+banda de `p-button`; ya deshabilitan por estado y no se migran a `<lib-data-toolbar>`.
 
 ## i18n
 

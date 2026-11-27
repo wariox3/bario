@@ -104,6 +104,8 @@ export class ProgramacionRenglonesTabComponent {
   protected readonly currentPage = signal(0);
   protected readonly selectedRows = signal<readonly ProgramacionDetalle[]>([]);
   protected readonly isBusy = signal(false);
+  /** La carga de contratos está corriendo: spinner en su botón. */
+  protected readonly isCargando = signal(false);
 
   /** Columnas según el tipo de pago. */
   protected readonly columns = computed(() => columnasDeRenglones(this.pagoTipoId()));
@@ -160,18 +162,17 @@ export class ProgramacionRenglonesTabComponent {
   );
 
   /**
-   * "Cargar contratos" es la acción destacada. Se ofrece solo en borrador; el
-   * dropdown de acciones queda vacío (y por tanto oculto) cuando no hay nada más.
+   * "Cargar contratos" es la acción destacada. Siempre a la vista: fuera de
+   * borrador o con otra operación en curso se ve deshabilitada (estándar de la
+   * botonera de tabla: por estado se deshabilita, no se oculta).
    */
-  protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.capacidades().puedeCargarContratos && !this.isBusy()
-      ? {
-          id: 'cargar-contratos',
-          labelKey: 'entities.programacion.renglones.cargarContratos',
-          iconClass: 'pi pi-download',
-        }
-      : null,
-  );
+  protected readonly primaryAction = computed<ToolbarAction>(() => ({
+    id: 'cargar-contratos',
+    labelKey: 'entities.programacion.renglones.cargarContratos',
+    iconClass: 'pi pi-download',
+    disabled: !this.capacidades().puedeCargarContratos || this.isBusy(),
+    loading: this.isCargando(),
+  }));
 
   /**
    * "Excel ▾" de la tabla: las tres exportaciones, junto a lo que exportan. El
@@ -348,12 +349,16 @@ export class ProgramacionRenglonesTabComponent {
 
   private ejecutarCarga(): void {
     this.isBusy.set(true);
+    this.isCargando.set(true);
     const toasts = this.t().entities.programacion.renglones.toasts;
     this.service
       .cargarContratos(this.programacionId())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isBusy.set(false)),
+        finalize(() => {
+          this.isBusy.set(false);
+          this.isCargando.set(false);
+        }),
       )
       .subscribe({
         next: (res) => {
